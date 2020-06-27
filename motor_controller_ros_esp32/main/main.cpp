@@ -1,7 +1,7 @@
 /**
  * @file main.cpp
  * @author Mergim Halimi (m.halimi123@gmail.com)
- * @brief 
+ * @brief This file holds the main function call
  * @version 0.1
  * @date 2020-05-07
  * 
@@ -22,6 +22,7 @@ extern "C" {
 
 int app_main(void)
 {
+  ESP_ERROR_CHECK(output_gpio_init());
   ESP_ERROR_CHECK(rosserial_setup());
 
   while(true) 
