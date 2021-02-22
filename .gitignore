@@ -1,2 +1,15 @@
+.vscode/
+
+motor_controller_can_arduino/MotorController/.vscode/
+motor_controller_can_arduino/MotorController/build/
+motor_controller_can_arduino/MotorController/docs/
+motor_controller_can_arduino/MotorController/doxygen_warnings.log
+
+motor_controller_can_arduino/MotorController/Arduino/
+motor_controller_can_arduino/MotorController/lib/
+
+motor_controller_ros_esp32/.vscode/
 motor_controller_ros_esp32/build/
+motor_controller_ros_esp32/docs/
+motor_controller_ros_esp32/doxygen_warnings.log
 motor_controller_ros_esp32/sdkconfig

@@ -10,28 +10,20 @@
  */
 #ifndef ___ESP32_ROS_INTERFACE_H___
 #define ___ESP32_ROS_INTERFACE_H___
-
-#include "stdio.h"
-#include "sdkconfig.h"
 #include "esp_err.h"
-#include "esp_system.h"
-#include "esp_spi_flash.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
-#include "driver/can.h"
-#include "driver/gpio.h"
 
 #define PUBLISHER_FEEDBACK_TOPIC_CAN_MSG_ARRAY "/esp32/feedback/can_msg_array"
 #define SUBSCRIBER_COMMAND_TOPIC_CAN_MSG_ARRAY "/esp32/command/can_msg_array"
 
-#define WHEEL_MSG_COUNT 4u
-#define LIGHT_MSG_COUNT 1u
-#define CAN_MSG_LENGTH 8u
+#define CAN_MSG_COUNT 5U
+#define LIGHT_MSG_ID 0x31
 
-#define GPIO_OUTPUT_LIGHT_LEFT    18
-#define GPIO_OUTPUT_LIGHT_RIGHT   19
+// #define GPIO_CAN_TRANSMIT 21U
+#define GPIO_CAN_TRANSMIT 5U
+// #define GPIO_CAN_RECEIVE  22U
+#define GPIO_CAN_RECEIVE  4U
+#define GPIO_OUTPUT_LIGHT_LEFT  18U
+#define GPIO_OUTPUT_LIGHT_RIGHT 19U
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<GPIO_OUTPUT_LIGHT_LEFT) | (1ULL<<GPIO_OUTPUT_LIGHT_RIGHT))
 
 #ifdef __cplusplus
@@ -39,25 +31,39 @@ extern "C" {
 #endif //end __cplusplus
 
 /**
+ * @brief Installs and starts the Can Driver
+ * 
+ * @return esp_err_t Return error code with success or fail
+ */
+esp_err_t can_init(void);
+
+/**
+ * @brief Uninstalls and stops the Can Driver
+ * 
+ * @return esp_err_t Return error code with success or fail
+ */
+esp_err_t can_destroy(void);
+
+/**
  * @brief Initialise the Output GPIO configuration
  * 
  * @return esp_err_t Return error code with success or fail
  */
-esp_err_t output_gpio_init();
+esp_err_t output_gpio_init(void);
 
 /**
  * @brief Initialise the ROS Node, subscriber and publisher
  * 
  * @return esp_err_t Return error code with success or fail
  */
-esp_err_t rosserial_setup();
+esp_err_t rosserial_setup(void);
 
 /**
  * @brief Spin the ROS Node callback, and publish feedback
  * 
  * @return esp_err_t Return error code with success or fail
  */
-esp_err_t rosserial_spinonce();
+esp_err_t rosserial_spinonce(void);
 
 #ifdef __cplusplus
 }

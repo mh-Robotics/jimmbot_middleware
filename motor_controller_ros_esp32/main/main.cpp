@@ -22,15 +22,18 @@ extern "C" {
 
 int app_main(void)
 {
+  ESP_ERROR_CHECK(can_init());
   ESP_ERROR_CHECK(output_gpio_init());
-  ESP_ERROR_CHECK(rosserial_setup());
 
-  while(true) 
   {
-    ESP_ERROR_CHECK(rosserial_spinonce());
-
-    vTaskDelay(100);
+    rosserial_setup();
+    while(true) 
+    {
+      rosserial_spinonce();
+    }
   }
 
-  return 0;
+  ESP_ERROR_CHECK(can_destroy());
+
+  return EXIT_SUCCESS;
 }
