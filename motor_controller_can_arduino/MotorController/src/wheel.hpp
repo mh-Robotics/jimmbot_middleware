@@ -52,7 +52,6 @@ class Wheel
     Wheel_Enum determineWheel(void);
 
     pin_configuration_t _pin_configuration;
-    Wheel_Enum _wheel_enum;
     uint8_t _can_id;
     uint8_t _feedback_id;
     bool _is_inverse;

@@ -22,8 +22,7 @@ bool Wheel::setup(void)
   DDRC &= ~(1 << this->_pin_configuration._wheel_back_right); // Configuring PC3 as Input
   PORTC |= (1 << this->_pin_configuration._wheel_back_right); // Enable internal Pull Up
 
-  this->_wheel_enum = this->determineWheel();
-  this->setCanIdFromEnum(this->_wheel_enum);
+  this->setCanIdFromEnum(this->determineWheel());
 
   return true;
 }

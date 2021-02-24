@@ -152,7 +152,12 @@ ISR(TIMER1_COMPB_vect)
   if(interrupts_configured_.is_called && motor_started_.is_called && counter_ > 7)
   {
     counter_ = 0;
-    iWheelController.timeoutCheckCallback();
+
+    //If we don't have a can message for 250ms, set can message zero, and update the motors
+    if(iWheelController.timeoutCheckCallback())
+    {
+      iWheelController.setUpdateReadyFlag(true);
+    }
   }
 }
 

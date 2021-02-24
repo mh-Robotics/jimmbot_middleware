@@ -23,8 +23,11 @@ static const can_general_config_t g_config = CAN_GENERAL_CONFIG_DEFAULT((gpio_nu
 
 jimmbot_msgs::canFrameArray feedback_msg;
 
+constexpr int ENABLE_LIGHT_LEFT_MSG_INDEX = 3;
+constexpr int ENABLE_LIGHT_RIGHT_MSG_INDEX = 7;
+
 ros::NodeHandle nh;
-void canFrameArrayFeedback(void);
+void canFrameArrayFeedback(int index);
 ros::Publisher canFrameArrayPublisher(PUBLISHER_FEEDBACK_TOPIC_CAN_MSG_ARRAY, &feedback_msg);
 void canFrameArrayCallback(const jimmbot_msgs::canFrameArray& data_msg);
 ros::Subscriber<jimmbot_msgs::canFrameArray> canFrameArraySubscriber(SUBSCRIBER_COMMAND_TOPIC_CAN_MSG_ARRAY, &canFrameArrayCallback);
@@ -39,22 +42,23 @@ void canFrameArrayCallback(const jimmbot_msgs::canFrameArray& data_msg)
   //   data_msg.can_frames.size(); //This does not return the size, even 'thou we know it is 5
   // }
 
-  for(int i = 0; i < CAN_MSG_COUNT; i++)
+  int feedback_index = 0;
+  for(int index = 0; index < CAN_MSG_COUNT; index++)
   {
-    if(data_msg.can_frames[i].id == LIGHT_MSG_ID)
+    if(data_msg.can_frames[index].id == LIGHT_MSG_ID)
     {
-      gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_LEFT, data_msg.can_frames[i].data[3]);
-      gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_RIGHT, data_msg.can_frames[i].data[7]);
+      gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_LEFT, data_msg.can_frames[index].data[ENABLE_LIGHT_LEFT_MSG_INDEX]);
+      gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_RIGHT, data_msg.can_frames[index].data[ENABLE_LIGHT_RIGHT_MSG_INDEX]);
 
       continue;
     }
 
-    tx_msg.extd = data_msg.can_frames[i].is_extended;
-    tx_msg.rtr = data_msg.can_frames[i].is_rtr;
-    tx_msg.identifier = data_msg.can_frames[i].id;
-    tx_msg.data_length_code = data_msg.can_frames[i].dlc;
+    tx_msg.extd = data_msg.can_frames[index].is_extended;
+    tx_msg.rtr = data_msg.can_frames[index].is_rtr;
+    tx_msg.identifier = data_msg.can_frames[index].id;
+    tx_msg.data_length_code = data_msg.can_frames[index].dlc;
     tx_msg.ss = 1;
-    memcpy(tx_msg.data, data_msg.can_frames[i].data, data_msg.can_frames[i].dlc);
+    memcpy(tx_msg.data, data_msg.can_frames[index].data, data_msg.can_frames[index].dlc);
 
     esp_err_t err = can_transmit(&tx_msg, portMAX_DELAY);
     if(err != ESP_OK)
@@ -64,41 +68,36 @@ void canFrameArrayCallback(const jimmbot_msgs::canFrameArray& data_msg)
       nh.logerror(esp_err_to_name(err));
       return;
     }
-  }
 
-  // canFrameArrayFeedback();
+    canFrameArrayFeedback(feedback_index);
+    feedback_index++;
+  }
 }
 
-void canFrameArrayFeedback(void)
+void canFrameArrayFeedback(int index)
 {
   can_message_t rx_msg;
-
   feedback_msg.header.stamp = nh.now();
-  for(int i = 0; i < 2; i++)
+
+  esp_err_t err = can_receive(&rx_msg, portMAX_DELAY);
+  if(err != ESP_OK)
   {
-    esp_err_t err = can_receive(&rx_msg, portMAX_DELAY);
-    if(err != ESP_OK)
-    {
-      nh.logerror(__PRETTY_FUNCTION__);
-      nh.logerror("can_receive: ");
-      nh.logerror(esp_err_to_name(err));
-      return;
-    }
-
-    feedback_msg.can_frames[i].is_extended = rx_msg.extd;
-    feedback_msg.can_frames[i].is_rtr = rx_msg.rtr;
-    feedback_msg.can_frames[i].id = rx_msg.identifier;
-    feedback_msg.can_frames[i].dlc = rx_msg.data_length_code;
-    memcpy(feedback_msg.can_frames[i].data, rx_msg.data, rx_msg.data_length_code);
-
-    // feedback_msg.can_frames[0].is_extended = rx_msg.extd;
-    // feedback_msg.can_frames[0].is_rtr = rx_msg.rtr;
-    // feedback_msg.can_frames[0].id = rx_msg.identifier;
-    // feedback_msg.can_frames[0].dlc = rx_msg.data_length_code;
-    // memcpy(feedback_msg.can_frames[0].data, rx_msg.data, rx_msg.data_length_code);
+    nh.logerror(__PRETTY_FUNCTION__);
+    nh.logerror("can_receive: ");
+    nh.logerror(esp_err_to_name(err));
+    return;
   }
 
-  canFrameArrayPublisher.publish(&feedback_msg);
+  feedback_msg.can_frames[index].is_extended = rx_msg.extd;
+  feedback_msg.can_frames[index].is_rtr = rx_msg.rtr;
+  feedback_msg.can_frames[index].id = rx_msg.identifier;
+  feedback_msg.can_frames[index].dlc = rx_msg.data_length_code;
+  memcpy(feedback_msg.can_frames[index].data, rx_msg.data, rx_msg.data_length_code);
+
+  if(index == (CAN_MSG_COUNT - 1))
+  {
+    canFrameArrayPublisher.publish(&feedback_msg);
+  }
 }
 
 esp_err_t can_init(void)
