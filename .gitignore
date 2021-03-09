@@ -1,5 +1,7 @@
 .vscode/
 
+build/
+
 motor_controller_can_arduino/MotorController/.vscode/
 motor_controller_can_arduino/MotorController/build/
 motor_controller_can_arduino/MotorController/docs/

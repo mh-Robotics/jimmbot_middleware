@@ -18,6 +18,7 @@ class IWheelController
 
     bool updateMillis(void);
     bool updateCanMessage(void);
+    void updateTimeout(void);
     bool updateWheelSignal(void);
 
     bool updateCallback(void);

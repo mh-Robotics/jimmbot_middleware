@@ -32,7 +32,6 @@ void WheelController::wheelSignalIrqHandler(void)
     this->_signal_counter--;
   }
 
-  this->_timeout = this->getMillis();
   this->_time_taken = this->getMillis() - this->_old_time;
   this->_old_time = this->getMillis();
 
@@ -41,6 +40,11 @@ void WheelController::wheelSignalIrqHandler(void)
   this->_wheel_velocity = this->_wheel_radius * this->_wheel_rpm * 0.104;
   this->_wheel_distance = (2 * M_PI * this->_wheel_radius * this->_signal_counter);
   this->_wheel_position = 9.9;
+}
+
+void WheelController::updateTimeout(void)
+{
+  this->_timeout = this->getMillis();
 }
 
 void WheelController::setMillisIrqHandler(void)
@@ -69,9 +73,6 @@ bool WheelController::timeoutCheck(void)
   if(this->getMillis() - this->_timeout > TIME_OUT_MS) //no inetrrupt found for 250ms
   {
     this->_wheel_rpm = this->_wheel_velocity = 0;
-    
-    this->_timeout = this->getMillis();
-
     return true;
   }
 

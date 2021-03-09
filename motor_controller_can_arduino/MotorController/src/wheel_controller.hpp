@@ -20,7 +20,7 @@
 
 #include "pin_configuration.hpp"
 
-constexpr int TIME_OUT_MS = 250; // Check timer TIMER0_COMPB_vect prescaler for correct number
+constexpr int TIME_OUT_MS = 1500; // Check timer TIMER0_COMPB_vect prescaler for correct number
 
 class WheelController
 {
@@ -31,6 +31,7 @@ class WheelController
     bool setup(void);
 
     void wheelSignalIrqHandler(void);
+    void updateTimeout(void);
     void setMillisIrqHandler(void);
     unsigned long getMillis(void);
     bool timeoutCheck(void);

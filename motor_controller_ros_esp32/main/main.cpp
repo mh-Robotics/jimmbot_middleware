@@ -22,8 +22,8 @@ extern "C" {
 
 int app_main(void)
 {
-  ESP_ERROR_CHECK(can_init());
-  ESP_ERROR_CHECK(output_gpio_init());
+  can_init();
+  output_gpio_init();
 
   {
     rosserial_setup();
@@ -33,7 +33,7 @@ int app_main(void)
     }
   }
 
-  ESP_ERROR_CHECK(can_destroy());
+  can_destroy();
 
   return EXIT_SUCCESS;
 }

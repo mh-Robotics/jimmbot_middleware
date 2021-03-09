@@ -15,7 +15,7 @@
 #define PUBLISHER_FEEDBACK_TOPIC_CAN_MSG_ARRAY "/esp32/feedback/can_msg_array"
 #define SUBSCRIBER_COMMAND_TOPIC_CAN_MSG_ARRAY "/esp32/command/can_msg_array"
 
-#define CAN_MSG_COUNT 5U
+#define CAN_MSG_COUNT 4U
 #define LIGHT_MSG_ID 0x31
 
 // #define GPIO_CAN_TRANSMIT 21U

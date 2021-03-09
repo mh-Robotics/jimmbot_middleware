@@ -55,6 +55,11 @@ bool IWheelController::updateCanMessage(void)
   this->_can_wrapper.canIrqHandler();
 }
 
+void IWheelController::updateTimeout(void)
+{
+  this->_wheel_controller.updateTimeout();
+}
+
 bool IWheelController::updateWheelSignal(void)
 {
   this->_wheel_controller.wheelSignalIrqHandler();
@@ -128,6 +133,10 @@ bool IWheelController::diagnosticsCallback(void)
 
 bool IWheelController::timeoutCheckCallback(void)
 {
-  this->_can_wrapper.cleanCanMsg();
-  return this->_wheel_controller.timeoutCheck();
+  if(this->_wheel_controller.timeoutCheck())
+  {
+    return true;
+  }
+  
+  return false;
 }

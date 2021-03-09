@@ -73,22 +73,22 @@ void configureTimer0(void)
 
 void configureTimer1(void)
 {
-  cli();
+  // cli();
 
-  TCCR1A = TCCR1B = TCNT1 = TIMSK1 = 0;
+  // TCCR1A = TCCR1B = TCNT1 = TIMSK1 = 0;
 
-  OCR1A = 8332;
-  OCR1B = OCR1A / 2;
+  // OCR1A = 8332;
+  // OCR1B = OCR1A / 2;
 
-  TCCR1A |= (1 << WGM11) | (1 << WGM10);
+  // TCCR1A |= (1 << WGM11) | (1 << WGM10);
 
-  TCCR1B |= (1 << WGM13) | (1 << WGM12);
+  // TCCR1B |= (1 << WGM13) | (1 << WGM12);
   
-  TCCR1B |= (0 << CS12) | (1 << CS11) | (1 << CS10);
+  // TCCR1B |= (0 << CS12) | (1 << CS11) | (1 << CS10);
 
-  TIMSK1 |= (1 << OCIE1B) | (1 << OCIE1A) | (1<<TOIE0);
+  // TIMSK1 |= (1 << OCIE1B) | (1 << OCIE1A) | (1<<TOIE0);
 
-  sei();
+  // sei();
 }
 
 void configureExternalInt0(void)
@@ -114,6 +114,9 @@ void configureExternalInt1(void)
 
 void setup() { /* I hate using this */}
 
+void(* resetFunc) (void) = 0; //declare reset function @ address 0
+bool startChecker = false;
+
 void loop()
 {
   std::call_once(interrupts_configured_, [](){ configureTimer0();
@@ -131,8 +134,13 @@ void loop()
   if(iWheelController.updateReady())
   {
     iWheelController.updateCallback();
-
     iWheelController.feedbackCallback();
+    iWheelController.updateTimeout();
+    startChecker = true;
+  }
+  else if(iWheelController.timeoutCheckCallback() && startChecker)
+  {
+    resetFunc();
   }
 }
 
@@ -142,28 +150,9 @@ ISR(TIMER1_COMPA_vect)
   if(interrupts_configured_.is_called && motor_started_.is_called && ++counter_)
   {
     #ifdef __DEBUG__
-      // iWheelController.diagnosticsCallback();
+      iWheelController.diagnosticsCallback();
     #endif  
   }
-}
-
-ISR(TIMER1_COMPB_vect)
-{
-  if(interrupts_configured_.is_called && motor_started_.is_called && counter_ > 7)
-  {
-    counter_ = 0;
-
-    //If we don't have a can message for 250ms, set can message zero, and update the motors
-    if(iWheelController.timeoutCheckCallback())
-    {
-      iWheelController.setUpdateReadyFlag(true);
-    }
-  }
-}
-
-ISR(TIMER1_OVF_vect)
-{
-  iWheelController.updateMillis();
 }
 
 ISR(INT0_vect)
@@ -172,7 +161,6 @@ ISR(INT0_vect)
   {
     iWheelController.updateCanMessage();
     iWheelController.setUpdateReadyFlag(true);
-    iWheelController.diagnosticsCallback();
   }
 }
 
