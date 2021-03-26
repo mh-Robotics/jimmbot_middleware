@@ -80,7 +80,7 @@ bool Wheel::setCanIdFromEnum(Wheel::Wheel_Enum wheelEnum)
     case Wheel::Wheel_Enum::BackRight : 
     {
       this->_can_id = static_cast<uint8_t>(Wheel::CanId::COMMAND_WHEEL_BACK_RIGHT);
-      this->_feedback_id = static_cast<uint8_t>(Wheel::CanId::FEEDBACK_WHEEL_FRONT_RIGHT);
+      this->_feedback_id = static_cast<uint8_t>(Wheel::CanId::FEEDBACK_WHEEL_BACK_RIGHT);
       this->_is_inverse = true;
       break;
     }

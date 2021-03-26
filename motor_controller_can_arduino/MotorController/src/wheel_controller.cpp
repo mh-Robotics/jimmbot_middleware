@@ -35,11 +35,11 @@ void WheelController::wheelSignalIrqHandler(void)
   this->_time_taken = this->getMillis() - this->_old_time;
   this->_old_time = this->getMillis();
 
-  this->_wheel_rpm = (1000 / this->_time_taken++) * 60;
+  this->_wheel_rpm = (1000 / this->_time_taken++) * 60; //Max 440 Rpm > 255
 
   this->_wheel_velocity = this->_wheel_radius * this->_wheel_rpm * 0.104;
-  this->_wheel_distance = (2 * M_PI * this->_wheel_radius * this->_signal_counter);
-  this->_wheel_position = 9.9;
+  this->_wheel_position = (2 * M_PI * this->_wheel_radius * this->_signal_counter);
+  this->_wheel_effort = 25;
 }
 
 void WheelController::updateTimeout(void)
@@ -122,13 +122,13 @@ void WheelController::setSpeed(const int speed)
   }
   else if(speed > 0)
   {
-    this->getIsInverse() ? this->setDirection(false) : this->setDirection(true);
+    this->getIsInverse() ? this->setDirection(true) : this->setDirection(false);
     OCR0A = static_cast<uint8_t>(abs(speed));
     this->brk(false);
   }
   else if(speed < 0)
   {
-    this->getIsInverse() ? this->setDirection(true) : this->setDirection(false);
+    this->getIsInverse() ? this->setDirection(false) : this->setDirection(true);
     OCR0A = static_cast<uint8_t>(abs(speed));
     this->brk(false);
   }
@@ -144,14 +144,14 @@ int WheelController::getWheelRpm(void)
   return this->_wheel_rpm;
 }
 
-double WheelController::getWheelDistance(void)
-{
-  return this->_wheel_distance;
-}
-
 double WheelController::getWheelPosition(void)
 {
   return this->_wheel_position;
+}
+
+double WheelController::getWheelEffort(void)
+{
+  return this->_wheel_effort;
 }
 
 void WheelController::brk(const bool brk)

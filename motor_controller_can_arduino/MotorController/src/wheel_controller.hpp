@@ -20,7 +20,7 @@
 
 #include "pin_configuration.hpp"
 
-constexpr int TIME_OUT_MS = 1500; // Check timer TIMER0_COMPB_vect prescaler for correct number
+constexpr int TIME_OUT_MS = 1000;
 
 class WheelController
 {
@@ -44,7 +44,7 @@ class WheelController
     void setSpeed(const int speed);
     double getWheelVelocity(void);
     int getWheelRpm(void);
-    double getWheelDistance(void);
+    double getWheelEffort(void);
     double getWheelPosition(void);
 
     void brk(const bool brk);
@@ -56,7 +56,7 @@ class WheelController
     int _signal_counter{0};
     unsigned long _millis;
     unsigned long _old_time{0}, _time_taken{0}, _timeout{0};
-    long double _wheel_radius{0.00825}, _wheel_velocity{0}, _wheel_distance{0}, _wheel_position{0};  //Measure the radius of your wheel and enter it here in cm
+    long double _wheel_radius{0.00825}, _wheel_velocity{0}, _wheel_position{0}, _wheel_effort{0};  //Measure the radius of your wheel and enter it here in cm
     unsigned long _wheel_rpm{0};
     unsigned long _timer1_millis{0};
     unsigned long _timer1_overflow_count{0};

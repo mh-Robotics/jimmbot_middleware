@@ -8,9 +8,8 @@
 
   <maintainer email="m.halimi@gmail.com">Mergim Halimi</maintainer>
 
-  <url type="website">todo</url>
-  <url type="bugtracker">todo</url>
-  <url type="repository">todo</url>
+  <url type="website">www.mergimhalimi.com</url>
+  <url type="repository">https://github.com/mh-Robotics/jimmbot_esp32_firmware</url>
 
   <license>MIT</license>
 
