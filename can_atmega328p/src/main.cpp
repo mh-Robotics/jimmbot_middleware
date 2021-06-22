@@ -1,14 +1,12 @@
 #include "iwheel_controller.hpp"
 
-// #define __DEBUG__
-
 constexpr short motorEnable    = PD4;
 constexpr short motorSignal    = PD3;
 constexpr short motorDirection = PD5;
 constexpr short motorSpeed     = PD6;
 
 constexpr short canMcpIrq      = PD2;
-constexpr short canMcpRcv      = 10; //PB2
+constexpr short canMcpRcv      = PB2;
 constexpr short canMcpMosi     = PB3;
 constexpr short canMcpMiso     = PB4;
 constexpr short canMcpSck      = PB5;
@@ -17,6 +15,13 @@ constexpr short wheelFrontLeft   = PC0;
 constexpr short wheelFrontRight  = PC1;
 constexpr short wheelBackLeft    = PC2;
 constexpr short wheelBackRight   = PC3;
+
+/**
+ * @brief Software reset microcontroller
+ * Just call: softwareReset(); to reset.
+ * 
+ */
+void(* softwareReset) (void) = 0;
 
 namespace std
 {
@@ -53,42 +58,35 @@ pin_configuration_t pinConfiguration{motorEnable,
 IWheelController iWheelController;
 std::once_flag motor_started_, interrupts_configured_;
 
+void initDrivers(void)
+{
+  millis_init();
+  spi_init();
+  usart_init();
+}
+
 void configureTimer0(void)
 {
   cli();
 
-  TCCR0A = TCCR0B = TCNT0 = 0;
-
-  OCR0A = 0;
-  OCR0B = 0;
-
   TCCR0A |= (1 << COM0A1);
-
   TCCR0A |= (1 << WGM01) | (1 << WGM00);
-
-  TCCR0B |= (1 << CS01);
+  TCCR0B |= (1 << CS01) | (1 << CS00);
+  //for ::millis_get(), configured in millis_init()
 
   sei();
 }
 
 void configureTimer1(void)
 {
-  // cli();
+  cli();
 
-  // TCCR1A = TCCR1B = TCNT1 = TIMSK1 = 0;
+  TCCR1A = TCCR1B = TCNT1 = TIMSK1 = 0;
+  OCR1A = 31250;
+  TCCR1B |= (1 << WGM12) | (1 << CS12);
+  TIMSK1 |= (1 << OCIE1A);
 
-  // OCR1A = 8332;
-  // OCR1B = OCR1A / 2;
-
-  // TCCR1A |= (1 << WGM11) | (1 << WGM10);
-
-  // TCCR1B |= (1 << WGM13) | (1 << WGM12);
-  
-  // TCCR1B |= (0 << CS12) | (1 << CS11) | (1 << CS10);
-
-  // TIMSK1 |= (1 << OCIE1B) | (1 << OCIE1A) | (1<<TOIE0);
-
-  // sei();
+  sei();
 }
 
 void configureExternalInt0(void)
@@ -112,49 +110,65 @@ void configureExternalInt1(void)
   sei();
 }
 
-void setup() { /* I hate using this */}
-
-void(* resetFunc) (void) = 0; //declare reset function @ address 0
-bool startChecker = false;
-
-void loop()
+int main()
 {
-  std::call_once(interrupts_configured_, [](){ configureTimer0();
-                                               configureTimer1();
-                                               configureExternalInt0();
-                                               configureExternalInt1();
-                                             });
-
-  std::call_once(motor_started_, [](){ if(iWheelController.init(::pinConfiguration))
-                                       {
-                                         iWheelController.start();
-                                       }
-                                     });
-
-  if(iWheelController.updateReady())
+  while(true)
   {
-    iWheelController.updateCallback();
-    iWheelController.feedbackCallback();
-    iWheelController.updateTimeout();
-    startChecker = true;
+    std::call_once(interrupts_configured_, [](){
+                                                initDrivers();
+                                                configureTimer0();
+                                                configureTimer1();
+                                                configureExternalInt0();
+                                                configureExternalInt1();
+                                               });
+
+    std::call_once(motor_started_, [](){ if(iWheelController.init(::pinConfiguration))
+                                         {
+                                            iWheelController.start();
+                                         }
+                                       });
+
+    if(iWheelController.updateReady())
+    {
+      iWheelController.updateCallback();
+      iWheelController.updateTimeout();
+    }
+    else if(iWheelController.timeoutCheckCallback())
+    {
+      iWheelController.updateEmptyCanMessage();
+      iWheelController.setUpdateReadyFlag(true);
+    }
+
+    if(iWheelController.feedbackReady())
+    {
+      iWheelController.feedbackCallback();
+    }
   }
-  else if(iWheelController.timeoutCheckCallback() && startChecker)
-  {
-    resetFunc();
-  }
+
+  return EXIT_SUCCESS;
 }
 
-static int counter_ = 0;
+/**
+ * @brief Interrupt service routine to trigger diagnostics data to serial.
+ * 
+ */
 ISR(TIMER1_COMPA_vect)
 {
-  if(interrupts_configured_.is_called && motor_started_.is_called && ++counter_)
+  if(interrupts_configured_.is_called && motor_started_.is_called)
   {
     #ifdef __DEBUG__
       iWheelController.diagnosticsCallback();
-    #endif  
+    #endif
+
+    //todo: setFeedbackReadyFlag(true);
+    //todo: mutex the can feedback send and receive
   }
 }
 
+/**
+ * @brief Interrupt service routine when a can message is received.
+ * 
+ */
 ISR(INT0_vect)
 {
   if(interrupts_configured_.is_called && motor_started_.is_called)
@@ -164,12 +178,14 @@ ISR(INT0_vect)
   }
 }
 
-static int counter1_ = 0;
+/**
+ * @brief Interrupt service routine when a tick is received from encoder.
+ * 
+ */
 ISR(INT1_vect)
 {
-  if(interrupts_configured_.is_called && motor_started_.is_called && ++counter1_ == 2)
+  if(interrupts_configured_.is_called && motor_started_.is_called)
   {
-    counter1_ = 0;
     iWheelController.updateWheelSignal();
   }
 }

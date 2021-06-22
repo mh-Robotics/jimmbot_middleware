@@ -59,4 +59,15 @@ typedef struct PinConfiguration
                                            _wheel_back_left{wheelBackLeft},
                                            _wheel_back_right{wheelBackRight} { }
 }pin_configuration_t;
+
+#define SPEED_CONTROL_PWM(speed) ((OCR0A) = (speed))
+#define DIRECTION_BIT_INDEX 6
+#define SPEED_BIT_INDEX 7
+
+constexpr int TIME_OUT_MS = 250;
+
+#include "drivers/include/millis.h"
+#include "drivers/include/usart.h"
+#include "drivers/include/spi.h"
+
 #endif //___PIN_CONFIGURATION_H___

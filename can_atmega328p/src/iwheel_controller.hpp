@@ -14,16 +14,17 @@ class IWheelController
     bool start(void);
     bool updateReady(void);
     bool setUpdateReadyFlag(const bool flag);
+    bool feedbackReady(void);
     bool setFeedbackReadyFlag(const bool flag);
 
-    bool updateMillis(void);
     bool updateCanMessage(void);
+    bool updateEmptyCanMessage(void);
     void updateTimeout(void);
     bool updateWheelSignal(void);
 
     bool updateCallback(void);
     bool feedbackCallback(void);
-    bool diagnosticsCallback(void);
+    void diagnosticsCallback(void);
     bool timeoutCheckCallback(void);
 
     ~IWheelController(void) = default;

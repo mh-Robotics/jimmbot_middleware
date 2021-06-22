@@ -88,7 +88,7 @@ static void can_receive_task(void *arg)
 {
   while (true) 
   {
-    canFrameArrayFeedback();
+    // canFrameArrayFeedback();
     vTaskDelay(pdMS_TO_TICKS(100));
   }
 }

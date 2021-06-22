@@ -1,10 +1,6 @@
 #ifndef ___WHEEL_H___
 #define ___WHEEL_H___
 
-#ifndef __AVR_ATmega328P__
-// #define __AVR_ATmega328P__
-#endif
-
 #include <avr/pgmspace.h>
 #include <avr/io.h>
 

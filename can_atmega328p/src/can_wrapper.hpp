@@ -1,8 +1,7 @@
 #ifndef ___CAN_WRAPPER_H___
 #define ___CAN_WRAPPER_H___
 
-#include "can/mcp2515.h"
-
+#include "mcp2515.h"
 #include "pin_configuration.hpp"
 
 class CanWrapper
@@ -29,7 +28,7 @@ class CanWrapper
     bool setCanIdFilterMask(int canId);
     struct can_frame getCanMsg(void);
     int getSpeed(void);
-    int getDirection(void);
+    int getWheelDirection(void);
     void cleanCanMsg(void);
 
     ~CanWrapper() = default;
@@ -39,8 +38,8 @@ class CanWrapper
     int getDirectionFromCanMsg(void);
 
     pin_configuration_t _pin_configuration;
-    MCP2515 _mcp_can;
-    struct can_frame _can_msg{0, 8, 0};
-    struct can_frame _feedback_msg{0, 8, 0};
+    MCP2515 _mcp_can = MCP2515(this->_pin_configuration._can_mcp_rcv);
+    struct can_frame _can_msg{ 0, 8, { 0 } };
+    struct can_frame _feedback_msg{ 0, 8, { 0 } };
 };
 #endif //___CAN_WRAPPER_H___

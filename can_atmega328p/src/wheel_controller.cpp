@@ -19,11 +19,9 @@ bool WheelController::setup()
   return true;
 }
 
-#include <Arduino.h> // TODO remove after a proper ::millis() implementation
-
 void WheelController::wheelSignalIrqHandler(void)
 {
-  if(this->getDirection())
+  if(this->getWheelDirection())
   {
     this->_signal_counter++;
   }
@@ -32,14 +30,25 @@ void WheelController::wheelSignalIrqHandler(void)
     this->_signal_counter--;
   }
 
+  //@todo Change logic here, call differently
+  this->calculateWheelOdometry();
+}
+
+//https://www.digikey.com/en/blog/using-bldc-hall-sensors-as-position-encoders-part-1
+void WheelController::calculateWheelOdometry()
+{
+  if(!this->_first_tick)
+  {
+    this->_old_time = this->getMillis();
+    this->_first_tick = true;
+  }
+
   this->_time_taken = this->getMillis() - this->_old_time;
-  this->_old_time = this->getMillis();
-
-  this->_wheel_rpm = (1000 / this->_time_taken++) * 60; //Max 440 Rpm > 255
-
-  this->_wheel_velocity = this->_wheel_radius * this->_wheel_rpm * 0.104;
-  this->_wheel_position = (2 * M_PI * this->_wheel_radius * this->_signal_counter);
+  this->_wheel_rpm = (((1000.0 * 60.0) / this->_wheel_pulses_per_revolution) / this->_time_taken);
+  this->_wheel_velocity = (((2 * M_PI * this->_wheel_radius) / this->_wheel_pulses_per_revolution) / this->_time_taken);
+  this->_wheel_position = (((2 * M_PI * this->_wheel_radius) / this->_wheel_pulses_per_revolution) * this->_signal_counter); //Pose in CM
   this->_wheel_effort = 25;
+  this->_old_time = this->getMillis();
 }
 
 void WheelController::updateTimeout(void)
@@ -47,32 +56,15 @@ void WheelController::updateTimeout(void)
   this->_timeout = this->getMillis();
 }
 
-void WheelController::setMillisIrqHandler(void)
-{
-  this->_timer1_millis += MILLIS_INC;
-  this->_timer1_fract += FRACT_INC;
-
-  if (this->_timer1_fract >= FRACT_MAX) 
-  {
-    this->_timer1_fract -= FRACT_MAX;
-    this->_timer1_millis += 1;
-  }
-
-  this->_timer1_overflow_count++;
-}
-
 unsigned long WheelController::getMillis(void)
 {
-  //1000/30
-  // return this->_timer1_millis * 33.3;
-  return ::millis();
+  return ::millis_get();
 }
 
 bool WheelController::timeoutCheck(void)
 {
   if(this->getMillis() - this->_timeout > TIME_OUT_MS) //no inetrrupt found for 250ms
   {
-    this->_wheel_rpm = this->_wheel_velocity = 0;
     return true;
   }
 
@@ -107,34 +99,34 @@ bool WheelController::setDirection(bool direction)
   return true;
 }
 
-bool WheelController::getDirection(void)
-{
-  return this->_direction;
-}
-
 void WheelController::setSpeed(const int speed)
 {
   if(speed == 0)
   {
     this->brk(true);
-    this->setDirection(false);
-    OCR0A = static_cast<uint8_t>(abs(speed));
+    SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
+    //@todo If we add a drive with brake, we need to add the pin here.
   }
   else if(speed > 0)
   {
     this->getIsInverse() ? this->setDirection(true) : this->setDirection(false);
-    OCR0A = static_cast<uint8_t>(abs(speed));
+    SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
     this->brk(false);
   }
   else if(speed < 0)
   {
     this->getIsInverse() ? this->setDirection(false) : this->setDirection(true);
-    OCR0A = static_cast<uint8_t>(abs(speed));
+    SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
     this->brk(false);
   }
 }
 
-double WheelController::getWheelVelocity(void)
+bool WheelController::getWheelDirection(void)
+{
+  return this->_direction;
+}
+
+long double WheelController::getWheelVelocity(void)
 {
   return this->_wheel_velocity;
 }
@@ -144,14 +136,19 @@ int WheelController::getWheelRpm(void)
   return this->_wheel_rpm;
 }
 
-double WheelController::getWheelPosition(void)
+long double WheelController::getWheelPosition(void)
 {
   return this->_wheel_position;
 }
 
-double WheelController::getWheelEffort(void)
+int WheelController::getWheelEffort(void)
 {
   return this->_wheel_effort;
+}
+
+int WheelController::getWheelSignalCounter(void)
+{
+  return this->_signal_counter;
 }
 
 void WheelController::brk(const bool brk)

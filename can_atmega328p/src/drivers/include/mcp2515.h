@@ -1,8 +1,12 @@
 #ifndef _MCP2515_H_
 #define _MCP2515_H_
 
-#include <SPI.h>
+#include <string.h>
+#include <util/delay.h>
+
+#include "spi.h"
 #include "can.h"
+#include "millis.h"
 
 /*
  *  Speed 8M
@@ -456,7 +460,6 @@ class MCP2515
         void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
     
     public:
-        MCP2515(void);
         MCP2515(const uint8_t _CS);
         ERROR reset(void);
         ERROR setConfigMode();

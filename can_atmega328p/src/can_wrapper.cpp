@@ -50,24 +50,14 @@ struct can_frame CanWrapper::getCanMsg(void)
   return this->_can_msg;
 }
 
-int CanWrapper::getDirection(void)
+int CanWrapper::getWheelDirection(void)
 {
   return this->getDirectionFromCanMsg();
 }
 
 int CanWrapper::getDirectionFromCanMsg(void)
 {
-  int dir = 0;
-
-  for(int i = 0; i < this->_can_msg.can_dlc; i++)
-  {
-    if(i == 6) //For the moment 6th bit is the dir
-    {
-      dir = this->_can_msg.data[i];
-    }
-  }
-
-  return dir;
+  return this->_can_msg.data[DIRECTION_BIT_INDEX];
 }
 
 int CanWrapper::getSpeed(void)
@@ -75,30 +65,13 @@ int CanWrapper::getSpeed(void)
   return this->getSpeedFromCanMsg();
 }
 
-static int counter_ = 0;
 void CanWrapper::cleanCanMsg(void)
 {
-  int everyOneSecond = 4;
-  int everyTwoSeconds = 8;
-
-  if(++counter_ == everyOneSecond)
-  {
-    counter_ = 0;
-    this->_can_msg = {0, 8, 0};
-  }
+  this->_can_msg = { 0, 8, { 0 } };
+  this->_feedback_msg = { 0, 8, { 0 } };
 }
 
 int CanWrapper::getSpeedFromCanMsg(void)
 {
-  int speed = 0;
-
-  for(int i = 0; i < this->_can_msg.can_dlc; i++)
-  {
-    if(i == 7) //For the moment 7th bit is the speed
-    {
-      speed = this->_can_msg.data[i];
-    }
-  }
-
-  return speed;
+  return this->_can_msg.data[SPEED_BIT_INDEX];
 }

@@ -2,16 +2,13 @@
 
 build/
 
-motor_controller_can_arduino/MotorController/.vscode/
-motor_controller_can_arduino/MotorController/build/
-motor_controller_can_arduino/MotorController/docs/
-motor_controller_can_arduino/MotorController/doxygen_warnings.log
+can_atmega328p/.vscode/
+can_atmega328p/build/
+can_atmega328p/docs/
+can_atmega328p/doxygen_warnings.log
 
-motor_controller_can_arduino/MotorController/Arduino/
-motor_controller_can_arduino/MotorController/lib/
-
-motor_controller_ros_esp32/.vscode/
-motor_controller_ros_esp32/build/
-motor_controller_ros_esp32/docs/
-motor_controller_ros_esp32/doxygen_warnings.log
-motor_controller_ros_esp32/sdkconfig
+can_esp32/.vscode/
+can_esp32/build/
+can_esp32/docs/
+can_esp32/doxygen_warnings.log
+can_esp32/sdkconfig
