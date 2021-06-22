@@ -13,5 +13,5 @@ Greetings! Thank you for choosing Motor Controller firmware
 Mergim Halimi MotorController Firmware used in mhRobotics jimmBOT Robot.
 
   
-  - https://github.com/mh-Robotics/jimmbot_esp32_firmware
+  - https://github.com/mh-Robotics/jimmbot_boards_firmware
 */

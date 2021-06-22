@@ -11,10 +11,10 @@ Follow the steps below in order to generate and include ROS libraries
 ```
 $ cd path/to/catkin_ws/src/
 $ git clone 
-$ rosrun jimmbot_esp32_firmware make_libraries.py $IDF_PATH/components/ jimmbot_msgs
+$ rosrun jimmbot_boards_firmware make_libraries.py $IDF_PATH/components/ jimmbot_msgs
 ```
 
-After execution of above commands, all the necessary ROS files and custom messages would have been generated in `$IDF_PATH/components/jimmbot_esp32_firmware/`
+After execution of above commands, all the necessary ROS files and custom messages would have been generated in `$IDF_PATH/components/jimmbot_boards_firmware/`
 
 ### Firmware
 * [esp32_firmware](motor_controller_ros_esp32/README.md)
