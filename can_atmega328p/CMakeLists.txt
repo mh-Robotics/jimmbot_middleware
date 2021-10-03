@@ -14,11 +14,11 @@ set(AVRDUDE_BIN "${CMAKE_CURRENT_SOURCE_DIR}/conf/avrdude")
 set(AVRDUDE_CONF "${CMAKE_CURRENT_SOURCE_DIR}/conf/avrdude.conf")
 
 set(CMAKE_C_COMPILER "avr-gcc") 
-set(CMAKE_C_FLAGS "-D__DEBUG__ -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -std=c17 -Os -Wl,--relax,--gc-sections -DF_CPU=${CPU_FREQ} -mmcu=${CPU}")
+set(CMAKE_C_FLAGS "-fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -std=c17 -Os -Wl,--relax,--gc-sections -DF_CPU=${CPU_FREQ} -mmcu=${CPU}")
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 set(CMAKE_CXX_COMPILER "avr-g++") 
-set(CMAKE_CXX_FLAGS "-D__DEBUG__ -fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -std=c++17 -Os -Wl,--relax,--gc-sections -DF_CPU=${CPU_FREQ} -mmcu=${CPU}")
+set(CMAKE_CXX_FLAGS "-fpermissive -fno-exceptions -ffunction-sections -fdata-sections -fno-threadsafe-statics -Wno-error=narrowing -std=c++17 -Os -Wl,--relax,--gc-sections -DF_CPU=${CPU_FREQ} -mmcu=${CPU}")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 include_directories(

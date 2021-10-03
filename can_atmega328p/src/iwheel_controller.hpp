@@ -18,6 +18,8 @@ class IWheelController
     bool setFeedbackReadyFlag(const bool flag);
 
     bool updateCanMessage(void);
+    void resetCan(void);
+    void resetCanInterrupts(void);
     bool updateEmptyCanMessage(void);
     void updateTimeout(void);
     bool updateWheelSignal(void);

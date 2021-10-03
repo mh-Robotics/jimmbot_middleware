@@ -1,5 +1,6 @@
 #include "iwheel_controller.hpp"
 
+constexpr short motorBrake     = PD7;
 constexpr short motorEnable    = PD4;
 constexpr short motorSignal    = PD3;
 constexpr short motorDirection = PD5;
@@ -41,7 +42,8 @@ namespace std
   }
 }
 
-pin_configuration_t pinConfiguration{motorEnable,
+pin_configuration_t pinConfiguration{motorBrake,
+                                     motorEnable,
                                      motorSignal,
                                      motorDirection,
                                      motorSpeed,
@@ -132,17 +134,20 @@ int main()
     {
       iWheelController.updateCallback();
       iWheelController.updateTimeout();
+      iWheelController.resetCanInterrupts();
     }
     else if(iWheelController.timeoutCheckCallback())
     {
       iWheelController.updateEmptyCanMessage();
       iWheelController.setUpdateReadyFlag(true);
+      // iWheelController.resetCan();
     }
 
-    if(iWheelController.feedbackReady())
-    {
-      iWheelController.feedbackCallback();
-    }
+    // if(iWheelController.feedbackReady())
+    // {
+    //   iWheelController.feedbackCallback();
+    //   iWheelController.resetCanInterrupts();
+    // }
   }
 
   return EXIT_SUCCESS;

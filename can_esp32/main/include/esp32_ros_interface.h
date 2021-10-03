@@ -18,12 +18,12 @@
 #define CAN_MSG_COUNT 4U
 #define LIGHT_MSG_ID 0x31
 
-// #define GPIO_CAN_TRANSMIT 21U
-#define GPIO_CAN_TRANSMIT 5U
-// #define GPIO_CAN_RECEIVE  22U
-#define GPIO_CAN_RECEIVE  4U
-#define GPIO_OUTPUT_LIGHT_LEFT  18U
-#define GPIO_OUTPUT_LIGHT_RIGHT 19U
+#define GPIO_CAN0_TRANSMIT 5U
+#define GPIO_CAN0_RECEIVE  4U
+#define GPIO_CAN1_TRANSMIT 21U
+#define GPIO_CAN1_RECEIVE  22U
+#define GPIO_OUTPUT_LIGHT_LEFT  32U
+#define GPIO_OUTPUT_LIGHT_RIGHT 33U
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<GPIO_OUTPUT_LIGHT_LEFT) | (1ULL<<GPIO_OUTPUT_LIGHT_RIGHT))
 
 #ifdef __cplusplus
@@ -50,6 +50,13 @@ esp_err_t can_destroy(void);
  * @return esp_err_t Return error code with success or fail
  */
 esp_err_t output_gpio_init(void);
+
+/**
+ * @brief Uninstalls and stops output gpios
+ * 
+ * @return esp_err_t 
+ */
+esp_err_t output_gpio_destroy(void);
 
 /**
  * @brief Initialise the ROS Node, subscriber and publisher

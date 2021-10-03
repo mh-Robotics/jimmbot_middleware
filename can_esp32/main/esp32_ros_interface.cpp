@@ -22,7 +22,7 @@
 constexpr int STACK_SIZE = 4096;
 constexpr int RX_TASK_PRIO = 8;
 constexpr int TX_TASK_PRIO = 9;
-constexpr int CAN_RX_TX_DELAY_MS = 25;
+constexpr int CAN_RX_TX_DELAY_MS = 100;
 
 static const can_timing_config_t t_config = CAN_TIMING_CONFIG_500KBITS();
 
@@ -36,8 +36,8 @@ static const can_filter_config_t f_config =
 static const can_general_config_t g_config = 
 {
  .mode = CAN_MODE_NORMAL,
- .tx_io = (gpio_num_t)GPIO_CAN_TRANSMIT,
- .rx_io = (gpio_num_t)GPIO_CAN_RECEIVE,
+ .tx_io = (gpio_num_t)GPIO_CAN1_TRANSMIT,
+ .rx_io = (gpio_num_t)GPIO_CAN1_RECEIVE,
  .clkout_io = (gpio_num_t)CAN_IO_UNUSED,
  .bus_off_io = (gpio_num_t)CAN_IO_UNUSED,
  .tx_queue_len = 10,
@@ -164,6 +164,15 @@ esp_err_t output_gpio_init(void)
   io_conf.pull_up_en = (gpio_pullup_t)0;
   
   err = gpio_config(&io_conf);
+
+  return err;
+}
+
+esp_err_t output_gpio_destroy(void)
+{
+  esp_err_t err;
+  err = gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_LEFT, false);
+  err = gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_RIGHT, false);
 
   return err;
 }

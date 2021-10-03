@@ -3,6 +3,7 @@
 
 typedef struct PinConfiguration
 {
+  short _motor_brake;
   short _motor_enable;
   short _motor_signal;
   short _motor_direction;
@@ -19,21 +20,23 @@ typedef struct PinConfiguration
   short _wheel_back_left;
   short _wheel_back_right;
 
-  PinConfiguration() : _motor_enable{5},
+  PinConfiguration() : _motor_brake{7},
+                       _motor_enable{4},
                        _motor_signal{3},
-                       _motor_direction{4},
-                       _motor_speed{1},
+                       _motor_direction{5},
+                       _motor_speed{6},
                        _can_mcp_irq{2},
                        _can_mcp_rcv{10},
                        _can_mcp_mosi{11},
                        _can_mcp_miso{12},
                        _can_mcp_sck{13},
-                       _wheel_front_left{6},
-                       _wheel_front_right{7},
-                       _wheel_back_left{8},
-                       _wheel_back_right{9} { }
+                       _wheel_front_left{14},
+                       _wheel_front_right{15},
+                       _wheel_back_left{16},
+                       _wheel_back_right{17} { }
 
-  PinConfiguration(short motorEnable,
+  PinConfiguration(short motorBrake,
+                   short motorEnable,
                    short motorSignal,
                    short motorDirection,
                    short motorSpeed,
@@ -45,7 +48,8 @@ typedef struct PinConfiguration
                    short wheelFrontLeft,
                    short wheelFrontRight,
                    short wheelBackLeft,
-                   short wheelBackRight) : _motor_enable{motorEnable},
+                   short wheelBackRight) : _motor_brake{motorBrake},
+                                           _motor_enable{motorEnable},
                                            _motor_signal{motorSignal},
                                            _motor_direction{motorDirection},
                                            _motor_speed{motorSpeed},

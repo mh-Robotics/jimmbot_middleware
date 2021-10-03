@@ -48,6 +48,17 @@ bool IWheelController::setFeedbackReadyFlag(const bool flag)
 bool IWheelController::updateCanMessage(void)
 {
   this->_can_wrapper.canIrqHandler();
+  this->_can_wrapper.resetCanInterrupts();
+}
+
+void IWheelController::resetCan(void)
+{
+  this->_can_wrapper.resetCan();
+}
+
+void IWheelController::resetCanInterrupts(void)
+{
+  this->_can_wrapper.resetCanInterrupts();
 }
 
 bool IWheelController::updateEmptyCanMessage(void)
@@ -94,7 +105,9 @@ bool IWheelController::feedbackCallback(void)
   return true;
 }
 
-#include <stdio.h>
+#ifdef __DEBUG__
+  #include <stdio.h>
+#endif
 
 void IWheelController::diagnosticsCallback(void)
 {

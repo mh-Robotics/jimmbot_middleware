@@ -1,4 +1,5 @@
 #include "wheel_controller.hpp"
+#include <util/delay.h>
 #include <limits.h>
 
 bool WheelController::init(const pin_configuration_t &pinConfiguration)
@@ -11,10 +12,13 @@ bool WheelController::init(const pin_configuration_t &pinConfiguration)
 bool WheelController::setup()
 {
   DDRD |= (1 << this->_pin_configuration._motor_direction);
+  DDRD |= (1 << this->_pin_configuration._motor_brake);
   DDRD |= (1 << this->_pin_configuration._motor_enable);
   DDRD &= ~(1 << this->_pin_configuration._motor_signal);
   PORTD |= (1 << this->_pin_configuration._motor_signal);
   DDRD |= (1 << this->_pin_configuration._motor_speed);
+
+  this->drive(false);
 
   return true;
 }
@@ -85,6 +89,7 @@ bool WheelController::getIsInverse(void)
 
 bool WheelController::setDirection(bool direction)
 {
+  //todo, reverse logic here.
   if(direction)
   {
     PORTD |= (1 << this->_pin_configuration._motor_direction);
@@ -103,21 +108,20 @@ void WheelController::setSpeed(const int speed)
 {
   if(speed == 0)
   {
-    this->brk(true);
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
-    //@todo If we add a drive with brake, we need to add the pin here.
+    this->drive(false);
   }
   else if(speed > 0)
   {
+    this->drive(true);
     this->getIsInverse() ? this->setDirection(true) : this->setDirection(false);
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
-    this->brk(false);
   }
   else if(speed < 0)
   {
+    this->drive(true);
     this->getIsInverse() ? this->setDirection(false) : this->setDirection(true);
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
-    this->brk(false);
   }
 }
 
@@ -151,14 +155,42 @@ int WheelController::getWheelSignalCounter(void)
   return this->_signal_counter;
 }
 
+void WheelController::enableDrive(const bool state)
+{
+  if(state)
+  {
+    PORTD |= (1 << this->_pin_configuration._motor_enable);
+  }
+  else
+  {
+    PORTD &= ~(1 << this->_pin_configuration._motor_enable);
+  }
+}
+
 void WheelController::brk(const bool brk)
 {
   if(brk)
   {
-    PORTD &= ~(1 << this->_pin_configuration._motor_enable);
+    PORTD |= (1 << this->_pin_configuration._motor_brake);
   }
   else
   {
-    PORTD |= (1 << this->_pin_configuration._motor_enable);
+    PORTD &= ~(1 << this->_pin_configuration._motor_brake);
+  }
+}
+
+void WheelController::drive(const bool drive)
+{
+  if(drive)
+  {
+    this->brk(false);
+    _delay_ms(10);
+    this->enableDrive(true);
+  }
+  else
+  {
+    this->enableDrive(false);
+    _delay_ms(10);
+    this->brk(true);
   }
 }

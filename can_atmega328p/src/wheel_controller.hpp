@@ -35,7 +35,9 @@ class WheelController
     int getWheelSignalCounter(void);
     long double getWheelPosition(void);
 
+    void enableDrive(const bool state);
     void brk(const bool brk);
+    void drive(const bool drive);
 
     ~WheelController() = default;
 

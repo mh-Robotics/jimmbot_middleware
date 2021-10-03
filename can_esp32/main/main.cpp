@@ -27,12 +27,13 @@ int app_main(void)
 
   {
     rosserial_setup();
-    while(true) 
+    while(ros::ok())
     {
       rosserial_spinonce();
     }
   }
 
+  output_gpio_destroy();
   can_destroy();
 
   return EXIT_SUCCESS;

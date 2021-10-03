@@ -30,6 +30,8 @@ class CanWrapper
     int getSpeed(void);
     int getWheelDirection(void);
     void cleanCanMsg(void);
+    void resetCan(void);
+    void resetCanInterrupts(void);
 
     ~CanWrapper() = default;
 

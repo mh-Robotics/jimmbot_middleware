@@ -71,6 +71,16 @@ void CanWrapper::cleanCanMsg(void)
   this->_feedback_msg = { 0, 8, { 0 } };
 }
 
+void CanWrapper::resetCan(void)
+{
+  this->_mcp_can.reset();
+}
+
+void CanWrapper::resetCanInterrupts(void)
+{
+  this->_mcp_can.clearInterrupts();
+}
+
 int CanWrapper::getSpeedFromCanMsg(void)
 {
   return this->_can_msg.data[SPEED_BIT_INDEX];
