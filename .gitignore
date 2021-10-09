@@ -12,3 +12,4 @@ can_esp32/build/
 can_esp32/docs/
 can_esp32/doxygen_warnings.log
 can_esp32/sdkconfig
+can_esp32/sdkconfig.old

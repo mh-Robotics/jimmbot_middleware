@@ -1,57 +1,103 @@
-#ifndef ___WHEEL_CONTROLLER_H___
-#define ___WHEEL_CONTROLLER_H___
+/**
+ * @file wheel_controller.hpp
+ * @author Mergim Halimi (m.halimi123@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2021-10-09
+ *
+ * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
+ *
+ */
+#ifndef CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
+#define CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 
-#include <stdlib.h>
-#include <math.h>
-#include <avr/pgmspace.h>
-#include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+#include <math.h>
+#include <stdlib.h>
 
-#include "pin_configuration.hpp"
+#include "wheel.hpp"
 
-class WheelController
-{
+// todo Check inherit wheel into wheel controller, so when we instantiate
+// wheelcontroller,
+// we have a ready wheel instantiated
+
+namespace std {
+struct once_flag {
+  bool is_called = false;
+};
+
+template <class Callable, class... Args>
+void inline call_once(once_flag &flag, Callable &&f, Args &&... args) {
+  if (!flag.is_called) {
+    f();
+    flag.is_called = true;
+  }
+}
+} // namespace std
+
+class WheelController : private Wheel {
+public:
+  typedef struct MotorStatus {
   public:
-    WheelController(void) = default;
-
-    bool init(const pin_configuration_t &pinConfiguration);
-    bool setup(void);
-
-    void wheelSignalIrqHandler(void);
-    void calculateWheelOdometry(void);
-    void updateTimeout(void);
-    unsigned long getMillis(void);
-    bool timeoutCheck(void);
-
-    bool setIsInverse(bool isInverse);
-    bool getIsInverse(void);
-    bool setDirection(bool direction);
-    bool getWheelDirection(void);
-
-    void setSpeed(const int speed);
-    long double getWheelVelocity(void);
-    int getWheelRpm(void);
-    int getWheelEffort(void);
-    int getWheelSignalCounter(void);
-    long double getWheelPosition(void);
-
-    void enableDrive(const bool state);
-    void brk(const bool brk);
-    void drive(const bool drive);
-
-    ~WheelController() = default;
+    int CommandId(void) { return command_id; }
+    void CommandId(int command_id) { this->command_id = command_id; }
+    int FeedbackId(void) { return feedback_id; }
+    void FeedbackId(int feedback_id) { this->feedback_id = feedback_id; }
+    double Effort(void) { return effort; }
+    void Effort(double effort) { this->effort = effort; }
+    double Position(void) { return position; }
+    void Position(double position) { this->position = position; }
+    int Rpm(void) { return rpm; }
+    void Rpm(int rpm) { this->rpm = rpm; }
+    double Velocity(void) { return velocity; }
+    void Velocity(double velocity) { this->velocity = velocity; }
+    bool Inverse(void) { return inverse; }
+    void Inverse(bool inverse) { this->inverse = inverse; }
+    bool Reverse(void) { return reverse; }
+    void Reverse(bool reverse) { this->reverse = reverse; }
 
   private:
-    pin_configuration_t _pin_configuration;
-    unsigned long _signal_counter{0};
-    unsigned long _millis;
-    unsigned long _old_time{0}, _time_taken{0}, _timeout{0};
-    unsigned long _wheel_rpm{0};
-    long double _wheel_radius{8.25}, _wheel_velocity{0}, _wheel_position{0}; //Values here in CM, Velocity in m/s
-    int _wheel_effort{0}, _wheel_pulses_per_revolution{90};
-    bool _first_tick{false};
-    bool _is_inverse{false};
-    bool _roll_over{false};
-    bool _direction{false};
+    int command_id;
+    int feedback_id;
+    double effort;
+    double position;
+    int rpm;
+    double velocity;
+    bool inverse;
+    bool reverse;
+  } motor_status_t;
+
+  WheelController(void) = default;
+
+  bool Init(const pin_configuration_t &pinConfiguration);
+  bool Setup(void);
+
+  bool WheelSignalIrqHandler(void);
+  bool CalculateWheelOdometry(void);
+  void UpdateTimeout(void);
+  unsigned long Millis(void);
+  bool TimeoutCheck(void);
+
+  bool SetDirection(bool direction);
+  void SetSpeed(const int speed);
+  motor_status_t MotorStatus(void);
+
+  void Drive(const bool drive);
+
+  ~WheelController() = default;
+
+private:
+  void EnableDrive(const bool state);
+  void Break(const bool kBreak);
+
+  pin_configuration_t pin_configuration_;
+  motor_status_t motor_status_;
+  Wheel wheel_;
+
+  volatile unsigned long timeout_{0}, old_time_{0}, time_taken_{0},
+      signal_counter_{0};
+  std::once_flag first_odometry_tick_;
 };
-#endif //___MOTOR_CONTROLLER_H___
+#endif // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_

@@ -1,47 +1,43 @@
-#ifndef ___CAN_WRAPPER_H___
-#define ___CAN_WRAPPER_H___
+/**
+ * @file can_wrapper.hpp
+ * @author Mergim Halimi (m.halimi123@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2021-10-09
+ * 
+ * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
+ * 
+ */
+#ifndef CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
+#define CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 
 #include "mcp2515.h"
 #include "pin_configuration.hpp"
 
-class CanWrapper
-{
-  public: 
-    enum class Command : uint8_t 
-    { 
-      BEGIN = 0,
-      MOTOR_OFF = BEGIN,
-      MOTOR_ON,
-      MOTOR_STATUS,
-      MOTOR_SPEED,
-      UNSPECIFIED,
-      END
-    };
+class CanWrapper {
+public:
+  CanWrapper(void) = default;
 
-  public:
-    CanWrapper(void) = default;
+  bool init(const pin_configuration_t &pinConfiguration);
+  bool canIrqHandler(void);
+  void canFeedbackHandler(const can_frame_t &canMsg);
+  bool setCanIdFilterMask(int canId);
+  can_frame_t getCanMsg(void);
+  uint8_t getSpeed(void);
+  bool getWheelDirection(void);
+  bool cleanCanMsg(void);
+  void resetCanInterrupts(void);
 
-    bool init(const pin_configuration_t &pinConfiguration);
-    bool setup(void);
-    void canIrqHandler(void);
-    void canFeedbackHandler(uint8_t id, uint8_t dlc, uint8_t data[8]);
-    bool setCanIdFilterMask(int canId);
-    struct can_frame getCanMsg(void);
-    int getSpeed(void);
-    int getWheelDirection(void);
-    void cleanCanMsg(void);
-    void resetCan(void);
-    void resetCanInterrupts(void);
+  ~CanWrapper() = default;
 
-    ~CanWrapper() = default;
+private:
+  bool setup(const pin_configuration_t &pinConfiguration);
+  uint8_t getSpeedFromCanMsg(void);
+  bool getDirectionFromCanMsg(void);
 
-  private:
-    int getSpeedFromCanMsg(void);
-    int getDirectionFromCanMsg(void);
-
-    pin_configuration_t _pin_configuration;
-    MCP2515 _mcp_can = MCP2515(this->_pin_configuration._can_mcp_rcv);
-    struct can_frame _can_msg{ 0, 8, { 0 } };
-    struct can_frame _feedback_msg{ 0, 8, { 0 } };
+  MCP2515 mcp_can_;
+  can_frame_t can_msg_{0, 8, {0}};
+  volatile uint8_t speed_pwm_;
+  volatile bool direction_;
 };
-#endif //___CAN_WRAPPER_H___
+#endif // CAN_WRAPPER_H_

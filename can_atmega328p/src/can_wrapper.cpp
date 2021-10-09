@@ -1,87 +1,81 @@
+/**
+ * @file can_wrapper.cpp
+ * @author Mergim Halimi (m.halimi123@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2021-10-09
+ * 
+ * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
+ * 
+ */
 #include "can_wrapper.hpp"
 
-bool CanWrapper::init(const pin_configuration_t &pinConfiguration)
-{
-  this->_pin_configuration = pinConfiguration;
-
-  return CanWrapper::setup();
+bool CanWrapper::init(const pin_configuration_t &pinConfiguration) {
+  return CanWrapper::setup(pinConfiguration);
 }
 
-bool CanWrapper::setup()
-{
-  this->_mcp_can = MCP2515(this->_pin_configuration._can_mcp_rcv);
+bool CanWrapper::setup(const pin_configuration_t &pinConfiguration) {
+  mcp_can_ = MCP2515(pinConfiguration.can_mcp_rcv);
 
-  this->_mcp_can.reset();
-  this->_mcp_can.setBitrate(CAN_500KBPS, MCP_8MHZ);
+  mcp_can_.reset();
+  mcp_can_.setBitrate(CAN_500KBPS, MCP_8MHZ);
 
   return true;
 }
 
-void CanWrapper::canIrqHandler(void)
-{
-  if(this->_mcp_can.readMessage(&this->_can_msg) != MCP2515::ERROR_OK) { }
+bool CanWrapper::canIrqHandler(void) {
+  if (mcp_can_.readMessage(&can_msg_) != MCP2515::ERROR_OK) {
+    speed_pwm_ = getSpeedFromCanMsg();
+    direction_ = getDirectionFromCanMsg();
+
+    return true;
+  }
+
+  return false;
 }
 
-void CanWrapper::canFeedbackHandler(uint8_t id, uint8_t dlc, uint8_t data[8])
-{
-  this->_feedback_msg.can_id = id;
-  this->_feedback_msg.can_dlc = dlc;
-  memcpy(this->_feedback_msg.data, data, dlc);
-
-  if(this->_mcp_can.sendMessage(&this->_feedback_msg) != MCP2515::ERROR_OK) { }
+void CanWrapper::canFeedbackHandler(const can_frame_t &canMsg) {
+  mcp_can_.sendMessage(&canMsg);
 }
 
-bool CanWrapper::setCanIdFilterMask(int canId)
-{
-  this->_mcp_can.setConfigMode();
-  this->_mcp_can.setFilterMask(MCP2515::MASK0, false, 0x7FF);
-  this->_mcp_can.setFilter(MCP2515::RXF0, false, canId);
-  this->_mcp_can.setFilter(MCP2515::RXF1, false, canId);
-  this->_mcp_can.setFilterMask(MCP2515::MASK1, false, 0x7FF);
-  this->_mcp_can.setFilter(MCP2515::RXF2, false, canId);
-  this->_mcp_can.setFilter(MCP2515::RXF3, false, canId);
-  this->_mcp_can.setFilter(MCP2515::RXF4, false, canId);
-  this->_mcp_can.setFilter(MCP2515::RXF5, false, canId);
-  this->_mcp_can.setNormalMode();
+bool CanWrapper::setCanIdFilterMask(int canId) {
+  MCP2515::ERROR err = MCP2515::ERROR_FAIL;
+
+  err = mcp_can_.setConfigMode();
+  err = mcp_can_.setFilterMask(MCP2515::MASK0, false, 0x7FF);
+  err = mcp_can_.setFilter(MCP2515::RXF0, false, canId);
+  err = mcp_can_.setFilter(MCP2515::RXF1, false, canId);
+  err = mcp_can_.setFilterMask(MCP2515::MASK1, false, 0x7FF);
+  err = mcp_can_.setFilter(MCP2515::RXF2, false, canId);
+  err = mcp_can_.setFilter(MCP2515::RXF3, false, canId);
+  err = mcp_can_.setFilter(MCP2515::RXF4, false, canId);
+  err = mcp_can_.setFilter(MCP2515::RXF5, false, canId);
+  err = mcp_can_.setNormalMode();
+
+  return ((err == MCP2515::ERROR_OK) ? true : false);
 }
 
-struct can_frame CanWrapper::getCanMsg(void)
-{
-  return this->_can_msg;
+can_frame_t CanWrapper::getCanMsg(void) { return can_msg_; }
+
+bool CanWrapper::getWheelDirection(void) { return direction_; }
+
+bool CanWrapper::getDirectionFromCanMsg(void) {
+  return can_msg_.data[DIRECTION_BIT_INDEX];
 }
 
-int CanWrapper::getWheelDirection(void)
-{
-  return this->getDirectionFromCanMsg();
+uint8_t CanWrapper::getSpeed(void) { return speed_pwm_; }
+
+bool CanWrapper::cleanCanMsg(void) {
+  can_msg_ = {0, 8, {0}};
+
+  return true;
 }
 
-int CanWrapper::getDirectionFromCanMsg(void)
-{
-  return this->_can_msg.data[DIRECTION_BIT_INDEX];
+void CanWrapper::resetCanInterrupts(void) {
+  mcp_can_.clearRXnOVRFlags();
+  mcp_can_.clearInterrupts();
 }
 
-int CanWrapper::getSpeed(void)
-{
-  return this->getSpeedFromCanMsg();
-}
-
-void CanWrapper::cleanCanMsg(void)
-{
-  this->_can_msg = { 0, 8, { 0 } };
-  this->_feedback_msg = { 0, 8, { 0 } };
-}
-
-void CanWrapper::resetCan(void)
-{
-  this->_mcp_can.reset();
-}
-
-void CanWrapper::resetCanInterrupts(void)
-{
-  this->_mcp_can.clearInterrupts();
-}
-
-int CanWrapper::getSpeedFromCanMsg(void)
-{
-  return this->_can_msg.data[SPEED_BIT_INDEX];
+uint8_t CanWrapper::getSpeedFromCanMsg(void) {
+  return can_msg_.data[SPEED_BIT_INDEX];
 }

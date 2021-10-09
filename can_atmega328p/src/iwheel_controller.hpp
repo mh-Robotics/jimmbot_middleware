@@ -5,26 +5,27 @@
 #include "wheel_controller.hpp"
 #include "can_wrapper.hpp"
 
+#include "can_packt.hpp"
+
 class IWheelController
 {
   public:
     IWheelController() = default;
 
-    bool init(const pin_configuration_t &pinConfiguration);
-    bool start(void);
-    bool updateReady(void);
-    bool setUpdateReadyFlag(const bool flag);
-    bool feedbackReady(void);
-    bool setFeedbackReadyFlag(const bool flag);
+    bool Init(const pin_configuration_t &pinConfiguration);
+    bool Start(void);
+    bool CommandReady(void);
+    void CommandReady(const bool flag);
+    bool FeedbackReady(void);
+    void FeedbackReady(const bool flag);
 
     bool updateCanMessage(void);
-    void resetCan(void);
     void resetCanInterrupts(void);
     bool updateEmptyCanMessage(void);
-    void updateTimeout(void);
+    
     bool updateWheelSignal(void);
 
-    bool updateCallback(void);
+    bool commandCallback(void);
     bool feedbackCallback(void);
     void diagnosticsCallback(void);
     bool timeoutCheckCallback(void);
@@ -32,10 +33,12 @@ class IWheelController
     ~IWheelController(void) = default;
 
   private:
-    Wheel _wheel;
-    WheelController _wheel_controller;
-    CanWrapper _can_wrapper;
-    bool _update_flag;
-    bool _feedback_flag;
+    void UpdateTimeout(void);
+    WheelController wheel_controller_;
+    CanWrapper can_wrapper_; //Inherit canpackt and remove canpackt instance here @todo
+    CanPackt canpressor_;
+
+    volatile bool update_flag_;
+    volatile bool feedback_flag_;
 };
 #endif //___INTERFACE_MOTOR_CONTROLLER_H___

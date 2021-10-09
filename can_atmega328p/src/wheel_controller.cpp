@@ -1,196 +1,123 @@
 #include "wheel_controller.hpp"
-#include <util/delay.h>
 #include <limits.h>
+#include <util/delay.h>
 
-bool WheelController::init(const pin_configuration_t &pinConfiguration)
-{
-  this->_pin_configuration = pinConfiguration;
+bool WheelController::Init(const pin_configuration_t &pinConfiguration) {
+  pin_configuration_ = pinConfiguration;
 
-  return WheelController::setup();
+  wheel_.Init(pinConfiguration);
+
+  motor_status_.CommandId(wheel_.Properties().CommandId());
+  motor_status_.FeedbackId(wheel_.Properties().FeedbackId());
+  motor_status_.Inverse(wheel_.Properties().Inverse());
+
+  return WheelController::Setup(); // todo send pins as argument
 }
 
-bool WheelController::setup()
-{
-  DDRD |= (1 << this->_pin_configuration._motor_direction);
-  DDRD |= (1 << this->_pin_configuration._motor_brake);
-  DDRD |= (1 << this->_pin_configuration._motor_enable);
-  DDRD &= ~(1 << this->_pin_configuration._motor_signal);
-  PORTD |= (1 << this->_pin_configuration._motor_signal);
-  DDRD |= (1 << this->_pin_configuration._motor_speed);
+bool WheelController::Setup() {
+  DDRD |= (1 << pin_configuration_.motor_direction);
+  DDRD |= (1 << pin_configuration_.motor_brake);
+  DDRD |= (1 << pin_configuration_.motor_enable);
+  DDRD &= ~(1 << pin_configuration_.motor_signal);
+  PORTD |= (1 << pin_configuration_.motor_signal);
+  DDRD |= (1 << pin_configuration_.motor_speed);
 
-  this->drive(false);
+  Drive(false);
 
   return true;
 }
 
-void WheelController::wheelSignalIrqHandler(void)
-{
-  if(this->getWheelDirection())
-  {
-    this->_signal_counter++;
-  }
-  else
-  {
-    this->_signal_counter--;
-  }
+bool WheelController::WheelSignalIrqHandler(void) {
+  motor_status_.Reverse() ? signal_counter_-- : signal_counter_++;
 
   //@todo Change logic here, call differently
-  this->calculateWheelOdometry();
+  return CalculateWheelOdometry();
 }
 
-//https://www.digikey.com/en/blog/using-bldc-hall-sensors-as-position-encoders-part-1
-void WheelController::calculateWheelOdometry()
-{
-  if(!this->_first_tick)
-  {
-    this->_old_time = this->getMillis();
-    this->_first_tick = true;
-  }
-
-  this->_time_taken = this->getMillis() - this->_old_time;
-  this->_wheel_rpm = (((1000.0 * 60.0) / this->_wheel_pulses_per_revolution) / this->_time_taken);
-  this->_wheel_velocity = (((2 * M_PI * this->_wheel_radius) / this->_wheel_pulses_per_revolution) / this->_time_taken);
-  this->_wheel_position = (((2 * M_PI * this->_wheel_radius) / this->_wheel_pulses_per_revolution) * this->_signal_counter); //Pose in CM
-  this->_wheel_effort = 25;
-  this->_old_time = this->getMillis();
-}
-
-void WheelController::updateTimeout(void)
-{
-  this->_timeout = this->getMillis();
-}
-
-unsigned long WheelController::getMillis(void)
-{
-  return ::millis_get();
-}
-
-bool WheelController::timeoutCheck(void)
-{
-  if(this->getMillis() - this->_timeout > TIME_OUT_MS) //no inetrrupt found for 250ms
-  {
-    return true;
-  }
-
-  return false;
-}
-
-bool WheelController::setIsInverse(bool isInverse)
-{
-  this->_is_inverse = isInverse;
+// https://www.digikey.com/en/blog/using-bldc-hall-sensors-as-position-encoders-part-1
+bool WheelController::CalculateWheelOdometry() {
+  std::call_once(first_odometry_tick_, [this]() { old_time_ = Millis(); });
+  // todo Fix magic numbers, make constants
+  time_taken_ = Millis() - old_time_;
+  motor_status_.Effort(25);
+  motor_status_.Position(((2 * M_PI * wheel_.Properties().Radius()) /
+                          wheel_.Properties().PulsePerRevolution()) *
+                         signal_counter_); // Pose in CM
+  motor_status_.Rpm(
+      ((1000.0 * 60.0) / wheel_.Properties().PulsePerRevolution()) /
+      time_taken_);
+  motor_status_.Velocity(((2 * M_PI * wheel_.Properties().Radius()) /
+                          wheel_.Properties().PulsePerRevolution()) /
+                         time_taken_);
+  old_time_ = Millis();
 
   return true;
 }
 
-bool WheelController::getIsInverse(void)
-{
-  return this->_is_inverse;
+void WheelController::UpdateTimeout(void) { timeout_ = Millis(); }
+
+unsigned long WheelController::Millis(void) { return ::millis_get(); }
+
+bool WheelController::TimeoutCheck(void) {
+  return (Millis() - timeout_ > kTimeoutMs);
 }
 
-bool WheelController::setDirection(bool direction)
-{
-  //todo, reverse logic here.
-  if(direction)
-  {
-    PORTD |= (1 << this->_pin_configuration._motor_direction);
+bool WheelController::SetDirection(bool direction) {
+  motor_status_.Reverse(
+      direction); // Todo, setDirection makes no sense, change name
+
+  if (!direction) {
+    PORTD |= (1 << pin_configuration_.motor_direction);
+  } else {
+    PORTD &= ~(1 << pin_configuration_.motor_direction);
   }
-  else
-  {
-    PORTD &= ~(1 << this->_pin_configuration._motor_direction);
-  }
-  
-  this->_direction = direction;
 
   return true;
 }
 
-void WheelController::setSpeed(const int speed)
-{
-  if(speed == 0)
-  {
+void WheelController::SetSpeed(const int speed) {
+  if (speed == 0) {
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
-    this->drive(false);
-  }
-  else if(speed > 0)
-  {
-    this->drive(true);
-    this->getIsInverse() ? this->setDirection(true) : this->setDirection(false);
+    Drive(false);
+  } else if (speed > 0) {
+    Drive(true);
+    motor_status_.Inverse() ? SetDirection(true) : SetDirection(false);
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
-  }
-  else if(speed < 0)
-  {
-    this->drive(true);
-    this->getIsInverse() ? this->setDirection(false) : this->setDirection(true);
+  } else if (speed < 0) {
+    Drive(true);
+    motor_status_.Inverse() ? SetDirection(false) : SetDirection(true);
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
   }
 }
 
-bool WheelController::getWheelDirection(void)
-{
-  return this->_direction;
+WheelController::motor_status_t WheelController::MotorStatus(void) {
+  return motor_status_;
 }
 
-long double WheelController::getWheelVelocity(void)
-{
-  return this->_wheel_velocity;
-}
-
-int WheelController::getWheelRpm(void)
-{
-  return this->_wheel_rpm;
-}
-
-long double WheelController::getWheelPosition(void)
-{
-  return this->_wheel_position;
-}
-
-int WheelController::getWheelEffort(void)
-{
-  return this->_wheel_effort;
-}
-
-int WheelController::getWheelSignalCounter(void)
-{
-  return this->_signal_counter;
-}
-
-void WheelController::enableDrive(const bool state)
-{
-  if(state)
-  {
-    PORTD |= (1 << this->_pin_configuration._motor_enable);
-  }
-  else
-  {
-    PORTD &= ~(1 << this->_pin_configuration._motor_enable);
+void WheelController::EnableDrive(const bool enable) {
+  if (enable) {
+    PORTD |= (1 << pin_configuration_.motor_enable);
+  } else {
+    PORTD &= ~(1 << pin_configuration_.motor_enable);
   }
 }
 
-void WheelController::brk(const bool brk)
-{
-  if(brk)
-  {
-    PORTD |= (1 << this->_pin_configuration._motor_brake);
-  }
-  else
-  {
-    PORTD &= ~(1 << this->_pin_configuration._motor_brake);
+void WheelController::Break(const bool kBreak) {
+  if (kBreak) {
+    PORTD |= (1 << pin_configuration_.motor_brake);
+  } else {
+    PORTD &= ~(1 << pin_configuration_.motor_brake);
   }
 }
 
-void WheelController::drive(const bool drive)
-{
-  if(drive)
-  {
-    this->brk(false);
-    _delay_ms(10);
-    this->enableDrive(true);
-  }
-  else
-  {
-    this->enableDrive(false);
-    _delay_ms(10);
-    this->brk(true);
+void WheelController::Drive(const bool drive) {
+  if (drive) {
+    Break(false);
+    _delay_ms(5);
+    EnableDrive(true);
+  } else {
+    EnableDrive(false);
+    _delay_ms(5);
+    Break(true);
   }
 }
