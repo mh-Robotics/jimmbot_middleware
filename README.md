@@ -17,4 +17,5 @@ $ rosrun jimmbot_boards_firmware make_libraries.py $IDF_PATH/components/ jimmbot
 After execution of above commands, all the necessary ROS files and custom messages would have been generated in `$IDF_PATH/components/jimmbot_boards_firmware/`
 
 ### Firmware
-* [esp32_firmware](motor_controller_ros_esp32/README.md)
+* [can_atmega328p_firmware](can_atmega328p/README.md)
+* [can_esp32_firmware](can_esp32/README.md)
