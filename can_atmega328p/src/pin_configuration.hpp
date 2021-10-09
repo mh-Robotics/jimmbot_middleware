@@ -36,12 +36,14 @@ typedef struct PinConfiguration {
         can_mcp_sck{PB5}, wheel_front_left{PC0}, wheel_front_right{PC1},
         wheel_back_left{PC2}, wheel_back_right{PC3} {}
 
-  PinConfiguration(uint8_t motorBrake, uint8_t motorEnable, uint8_t motorSignal,
-                   uint8_t motorDirection, uint8_t motorSpeed,
-                   uint8_t canMcpIrq, uint8_t canMcpRcv, uint8_t canMcpMosi,
-                   uint8_t canMcpMiso, uint8_t canMcpSck,
-                   uint8_t wheelFrontLeft, uint8_t wheelFrontRight,
-                   uint8_t wheelBackLeft, uint8_t wheelBackRight)
+  PinConfiguration(const uint8_t &motorBrake, const uint8_t &motorEnable,
+                   const uint8_t &motorSignal, const uint8_t &motorDirection,
+                   const uint8_t &motorSpeed, const uint8_t &canMcpIrq,
+                   const uint8_t &canMcpRcv, const uint8_t &canMcpMosi,
+                   const uint8_t &canMcpMiso, const uint8_t &canMcpSck,
+                   const uint8_t &wheelFrontLeft,
+                   const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
+                   const uint8_t &wheelBackRight)
       : motor_brake{motorBrake}, motor_enable{motorEnable},
         motor_signal{motorSignal}, motor_direction{motorDirection},
         motor_speed{motorSpeed}, can_mcp_irq{canMcpIrq}, can_mcp_rcv{canMcpRcv},

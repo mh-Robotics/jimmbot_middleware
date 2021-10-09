@@ -11,7 +11,8 @@
  */
 #include "can_packt.hpp"
 
-can_frame_t CanPackt::ParseToCan(WheelController::motor_status_t motorStatus) {
+can_frame_t
+CanPackt::ParseToCan(const WheelController::motor_status_t &motorStatus) {
   can_frame _msg;
 
   _msg.can_id = motorStatus.FeedbackId();
@@ -28,7 +29,8 @@ can_frame_t CanPackt::ParseToCan(WheelController::motor_status_t motorStatus) {
   return _msg;
 }
 
-WheelController::motor_status_t CanPackt::ParseFromCan(can_frame_t canFrame) {
+WheelController::motor_status_t
+CanPackt::ParseFromCan(const can_frame_t &canFrame) {
   WheelController::motor_status_t _ms;
 
   _ms.Effort(removePrecision(canFrame.data[1]));

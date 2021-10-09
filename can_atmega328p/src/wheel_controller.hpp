@@ -41,22 +41,22 @@ class WheelController : private Wheel {
 public:
   typedef struct MotorStatus {
   public:
-    int CommandId(void) { return command_id; }
-    void CommandId(int command_id) { this->command_id = command_id; }
-    int FeedbackId(void) { return feedback_id; }
-    void FeedbackId(int feedback_id) { this->feedback_id = feedback_id; }
-    double Effort(void) { return effort; }
-    void Effort(double effort) { this->effort = effort; }
-    double Position(void) { return position; }
-    void Position(double position) { this->position = position; }
-    int Rpm(void) { return rpm; }
-    void Rpm(int rpm) { this->rpm = rpm; }
-    double Velocity(void) { return velocity; }
-    void Velocity(double velocity) { this->velocity = velocity; }
-    bool Inverse(void) { return inverse; }
-    void Inverse(bool inverse) { this->inverse = inverse; }
-    bool Reverse(void) { return reverse; }
-    void Reverse(bool reverse) { this->reverse = reverse; }
+    int CommandId(void) const { return command_id; }
+    void CommandId(const int &command_id) { this->command_id = command_id; }
+    int FeedbackId(void) const { return feedback_id; }
+    void FeedbackId(const int &feedback_id) { this->feedback_id = feedback_id; }
+    double Effort(void) const { return effort; }
+    void Effort(const double &effort) { this->effort = effort; }
+    double Position(void) const { return position; }
+    void Position(const double &position) { this->position = position; }
+    int Rpm(void) const { return rpm; }
+    void Rpm(const int &rpm) { this->rpm = rpm; }
+    double Velocity(void) const { return velocity; }
+    void Velocity(const double &velocity) { this->velocity = velocity; }
+    bool Inverse(void) const { return inverse; }
+    void Inverse(const bool &inverse) { this->inverse = inverse; }
+    bool Reverse(void) const { return reverse; }
+    void Reverse(const bool &reverse) { this->reverse = reverse; }
 
   private:
     int command_id;
@@ -80,17 +80,17 @@ public:
   unsigned long Millis(void);
   bool TimeoutCheck(void);
 
-  bool SetDirection(bool direction);
-  void SetSpeed(const int speed);
+  bool SetDirection(const bool &direction);
+  void SetSpeed(const int &speed);
   motor_status_t MotorStatus(void);
 
-  void Drive(const bool drive);
+  void Drive(const bool &drive);
 
   ~WheelController() = default;
 
 private:
-  void EnableDrive(const bool state);
-  void Break(const bool kBreak);
+  void EnableDrive(const bool &state);
+  void Break(const bool &kBreak);
 
   pin_configuration_t pin_configuration_;
   motor_status_t motor_status_;

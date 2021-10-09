@@ -1,20 +1,20 @@
 /**
  * @file can_wrapper.cpp
  * @author Mergim Halimi (m.halimi123@gmail.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2021-10-09
- * 
+ *
  * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
- * 
+ *
  */
 #include "can_wrapper.hpp"
 
-bool CanWrapper::init(const pin_configuration_t &pinConfiguration) {
-  return CanWrapper::setup(pinConfiguration);
+bool CanWrapper::Init(const pin_configuration_t &pinConfiguration) {
+  return CanWrapper::Setup(pinConfiguration);
 }
 
-bool CanWrapper::setup(const pin_configuration_t &pinConfiguration) {
+bool CanWrapper::Setup(const pin_configuration_t &pinConfiguration) {
   mcp_can_ = MCP2515(pinConfiguration.can_mcp_rcv);
 
   mcp_can_.reset();
@@ -23,22 +23,15 @@ bool CanWrapper::setup(const pin_configuration_t &pinConfiguration) {
   return true;
 }
 
-bool CanWrapper::canIrqHandler(void) {
-  if (mcp_can_.readMessage(&can_msg_) != MCP2515::ERROR_OK) {
-    speed_pwm_ = getSpeedFromCanMsg();
-    direction_ = getDirectionFromCanMsg();
-
-    return true;
-  }
-
-  return false;
+bool CanWrapper::CommandHandler(void) {
+  return (mcp_can_.readMessage(&can_msg_) != MCP2515::ERROR_OK);
 }
 
-void CanWrapper::canFeedbackHandler(const can_frame_t &canMsg) {
-  mcp_can_.sendMessage(&canMsg);
+void CanWrapper::FeedbackHandler(const can_frame_t &CanMessage) {
+  mcp_can_.sendMessage(&CanMessage);
 }
 
-bool CanWrapper::setCanIdFilterMask(int canId) {
+bool CanWrapper::ConfigureCanIdFilterMask(const int &canId) {
   MCP2515::ERROR err = MCP2515::ERROR_FAIL;
 
   err = mcp_can_.setConfigMode();
@@ -55,17 +48,15 @@ bool CanWrapper::setCanIdFilterMask(int canId) {
   return ((err == MCP2515::ERROR_OK) ? true : false);
 }
 
-can_frame_t CanWrapper::getCanMsg(void) { return can_msg_; }
+can_frame_t CanWrapper::CanMessage(void) { return can_msg_; }
 
-bool CanWrapper::getWheelDirection(void) { return direction_; }
-
-bool CanWrapper::getDirectionFromCanMsg(void) {
-  return can_msg_.data[DIRECTION_BIT_INDEX];
+uint8_t CanWrapper::SpeedPwm(void) volatile {
+  return (can_msg_.data[DIRECTION_BIT_INDEX]
+              ? can_msg_.data[SPEED_BIT_INDEX] * -1
+              : can_msg_.data[SPEED_BIT_INDEX]);
 }
 
-uint8_t CanWrapper::getSpeed(void) { return speed_pwm_; }
-
-bool CanWrapper::cleanCanMsg(void) {
+bool CanWrapper::cleanCanMessage(void) {
   can_msg_ = {0, 8, {0}};
 
   return true;
@@ -74,8 +65,4 @@ bool CanWrapper::cleanCanMsg(void) {
 void CanWrapper::resetCanInterrupts(void) {
   mcp_can_.clearRXnOVRFlags();
   mcp_can_.clearInterrupts();
-}
-
-uint8_t CanWrapper::getSpeedFromCanMsg(void) {
-  return can_msg_.data[SPEED_BIT_INDEX];
 }

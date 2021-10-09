@@ -14,7 +14,7 @@ bool WheelController::Init(const pin_configuration_t &pinConfiguration) {
   return WheelController::Setup(); // todo send pins as argument
 }
 
-bool WheelController::Setup() {
+bool WheelController::Setup(void) {
   DDRD |= (1 << pin_configuration_.motor_direction);
   DDRD |= (1 << pin_configuration_.motor_brake);
   DDRD |= (1 << pin_configuration_.motor_enable);
@@ -35,7 +35,7 @@ bool WheelController::WheelSignalIrqHandler(void) {
 }
 
 // https://www.digikey.com/en/blog/using-bldc-hall-sensors-as-position-encoders-part-1
-bool WheelController::CalculateWheelOdometry() {
+bool WheelController::CalculateWheelOdometry(void) {
   std::call_once(first_odometry_tick_, [this]() { old_time_ = Millis(); });
   // todo Fix magic numbers, make constants
   time_taken_ = Millis() - old_time_;
@@ -62,7 +62,7 @@ bool WheelController::TimeoutCheck(void) {
   return (Millis() - timeout_ > kTimeoutMs);
 }
 
-bool WheelController::SetDirection(bool direction) {
+bool WheelController::SetDirection(const bool &direction) {
   motor_status_.Reverse(
       direction); // Todo, setDirection makes no sense, change name
 
@@ -75,7 +75,7 @@ bool WheelController::SetDirection(bool direction) {
   return true;
 }
 
-void WheelController::SetSpeed(const int speed) {
+void WheelController::SetSpeed(const int &speed) {
   if (speed == 0) {
     SPEED_CONTROL_PWM(static_cast<uint8_t>(abs(speed)));
     Drive(false);
@@ -94,7 +94,7 @@ WheelController::motor_status_t WheelController::MotorStatus(void) {
   return motor_status_;
 }
 
-void WheelController::EnableDrive(const bool enable) {
+void WheelController::EnableDrive(const bool &enable) {
   if (enable) {
     PORTD |= (1 << pin_configuration_.motor_enable);
   } else {
@@ -102,7 +102,7 @@ void WheelController::EnableDrive(const bool enable) {
   }
 }
 
-void WheelController::Break(const bool kBreak) {
+void WheelController::Break(const bool &kBreak) {
   if (kBreak) {
     PORTD |= (1 << pin_configuration_.motor_brake);
   } else {
@@ -110,7 +110,7 @@ void WheelController::Break(const bool kBreak) {
   }
 }
 
-void WheelController::Drive(const bool drive) {
+void WheelController::Drive(const bool &drive) {
   if (drive) {
     Break(false);
     _delay_ms(5);

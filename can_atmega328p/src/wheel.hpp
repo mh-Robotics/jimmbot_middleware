@@ -75,15 +75,17 @@ public:
    */
   typedef struct Properties {
   public:
-    uint8_t CommandId(void) { return command_id; }
-    void CommandId(uint8_t command_id) { this->command_id = command_id; }
-    uint8_t FeedbackId(void) { return feedback_id; }
-    void FeedbackId(uint8_t feedback_id) { this->feedback_id = feedback_id; }
-    bool Inverse(void) { return inverse; }
-    void Inverse(bool inverse) { this->inverse = inverse; }
+    uint8_t CommandId(void) const { return command_id; }
+    void CommandId(const uint8_t &command_id) { this->command_id = command_id; }
+    uint8_t FeedbackId(void) const { return feedback_id; }
+    void FeedbackId(const uint8_t &feedback_id) {
+      this->feedback_id = feedback_id;
+    }
+    bool Inverse(void) const { return inverse; }
+    void Inverse(const bool &inverse) { this->inverse = inverse; }
 
-    double Radius(void) { return kRadius; }
-    int PulsePerRevolution(void) { return kPulsePerRevolution; }
+    double Radius(void) const { return kRadius; }
+    int PulsePerRevolution(void) const { return kPulsePerRevolution; }
 
   private:
     uint8_t command_id;
@@ -129,7 +131,7 @@ private:
    * @return true Set finished sucessfully
    * @return false Set failed
    */
-  bool EnumToCanId(Wheel::Wheel_Enum wheelEnum);
+  bool EnumToCanId(const Wheel::Wheel_Enum &wheelEnum);
 
   /**
    * @brief @todo Add Doxy doc

@@ -36,7 +36,7 @@ public:
    * @param motorStatus
    * @return can_frame_t
    */
-  can_frame_t ParseToCan(WheelController::motor_status_t motorStatus);
+  can_frame_t ParseToCan(const WheelController::motor_status_t &motorStatus);
 
   /**
    * @brief @todo Add doxy doc
@@ -44,7 +44,7 @@ public:
    * @param canFrame
    * @return WheelController::motor_status_t
    */
-  WheelController::motor_status_t ParseFromCan(can_frame_t canFrame);
+  WheelController::motor_status_t ParseFromCan(const can_frame_t &canFrame);
 
   /**
    * @brief @todo Add doxy doc

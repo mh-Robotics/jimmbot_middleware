@@ -1,44 +1,165 @@
-#ifndef ___INTERFACE_WHEEL_CONTROLLER_H___
-#define ___INTERFACE_WHEEL_CONTROLLER_H___
-
-#include "wheel.hpp"
-#include "wheel_controller.hpp"
-#include "can_wrapper.hpp"
+/**
+ * @file iwheel_controller.hpp
+ * @author Mergim Halimi (m.halimi123@gmail.com)
+ * @brief
+ * @version 0.1
+ * @date 2021-10-09
+ *
+ * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
+ *
+ */
+#ifndef CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
+#define CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
 
 #include "can_packt.hpp"
+#include "can_wrapper.hpp"
+#include "wheel_controller.hpp"
 
-class IWheelController
-{
-  public:
-    IWheelController() = default;
+/**
+ * @brief @todo Add doxy doc
+ *
+ */
+class IWheelController {
+public:
+  /**
+   * @brief Construct a new IWheelController object
+   *
+   */
+  IWheelController() = default;
 
-    bool Init(const pin_configuration_t &pinConfiguration);
-    bool Start(void);
-    bool CommandReady(void);
-    void CommandReady(const bool flag);
-    bool FeedbackReady(void);
-    void FeedbackReady(const bool flag);
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @param pinConfiguration
+   * @return true
+   * @return false
+   */
+  bool Init(const pin_configuration_t &pinConfiguration);
 
-    bool updateCanMessage(void);
-    void resetCanInterrupts(void);
-    bool updateEmptyCanMessage(void);
-    
-    bool updateWheelSignal(void);
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool Start(void);
 
-    bool commandCallback(void);
-    bool feedbackCallback(void);
-    void diagnosticsCallback(void);
-    bool timeoutCheckCallback(void);
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool CommandReady(void);
 
-    ~IWheelController(void) = default;
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @param flag
+   */
+  void CommandReady(const bool &flag);
 
-  private:
-    void UpdateTimeout(void);
-    WheelController wheel_controller_;
-    CanWrapper can_wrapper_; //Inherit canpackt and remove canpackt instance here @todo
-    CanPackt canpressor_;
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool FeedbackReady(void);
 
-    volatile bool update_flag_;
-    volatile bool feedback_flag_;
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @param flag
+   */
+  void FeedbackReady(const bool &flag);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool UpdateCanMessage(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool UpdateEmptyCanMessage(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool UpdateWheelSignal(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
+  void ResetCanInterrupts(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool CommandCallback(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool FeedbackCallback(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
+  void DiagnosticsCallback(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   * @return true
+   * @return false
+   */
+  bool TimeoutCheckCallback(void);
+
+  /**
+   * @brief Destroy the IWheelController object
+   *
+   */
+  ~IWheelController(void) = default;
+
+private:
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
+  void UpdateTimeout(void);
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
+  WheelController wheel_controller_;
+  CanWrapper can_wrapper_;
+  CanPackt canpressor_;
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
+  volatile bool update_flag_;
+  volatile bool feedback_flag_;
 };
-#endif //___INTERFACE_MOTOR_CONTROLLER_H___
+#endif // CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_

@@ -46,7 +46,7 @@ Wheel::DetermineWheel(const pin_configuration_t &pinConfiguration) {
   return Wheel::Wheel_Enum::kUnspecified;
 }
 
-bool Wheel::EnumToCanId(Wheel::Wheel_Enum wheelEnum) {
+bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
   switch (wheelEnum) {
   case Wheel::Wheel_Enum::kFrontLeft: {
     properties_.CommandId(

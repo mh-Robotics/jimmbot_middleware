@@ -32,7 +32,7 @@ void configureTimer1(void) {
   cli();
 
   TCCR1A = TCCR1B = TCNT1 = TIMSK1 = 0;
-  OCR1A = 31250;
+  OCR1A = 31250; // todo constant magic number
   TCCR1B |= (1 << WGM12) | (1 << CS12);
   TIMSK1 |= (1 << OCIE1A);
 
@@ -60,10 +60,10 @@ void configureExternalInt1(void) {
 
 // moved clean cam nsg inside command callbackk. Check when to call, or if it is
 // called Check if motor does, bam bam bam.
-void timeoutCheckLoop(void) {
-  if (iWheelController.timeoutCheckCallback()) {
-    iWheelController.commandCallback();
-    iWheelController.feedbackCallback();
+void TimeoutCheckLoop(void) {
+  if (iWheelController.TimeoutCheckCallback()) {
+    iWheelController.CommandCallback();
+    iWheelController.FeedbackCallback();
   }
 }
 
@@ -90,7 +90,7 @@ int main() {
   ControllerInit();
 
   while (true) {
-    timeoutCheckLoop();
+    TimeoutCheckLoop();
   }
 
   return EXIT_SUCCESS;
@@ -102,8 +102,8 @@ int main() {
  */
 ISR(TIMER1_COMPA_vect) {
   if (interrupts_configured_.is_called && motor_started_.is_called) {
-#ifdef __DEBUG__
-    iWheelController.diagnosticsCallback();
+#ifndef NDEBUG
+    iWheelController.DiagnosticsCallback();
 #endif
   }
 }
@@ -114,16 +114,16 @@ ISR(TIMER1_COMPA_vect) {
  */
 ISR(INT0_vect) {
   if (interrupts_configured_.is_called && motor_started_.is_called) {
-    if (iWheelController.updateCanMessage() &&
+    if (iWheelController.UpdateCanMessage() &&
         iWheelController.CommandReady()) {
-      iWheelController.commandCallback();
+      iWheelController.CommandCallback();
     }
 
     if (iWheelController.FeedbackReady()) {
-      iWheelController.feedbackCallback();
+      iWheelController.FeedbackCallback();
     }
 
-    iWheelController.resetCanInterrupts();
+    iWheelController.ResetCanInterrupts();
   }
 }
 
