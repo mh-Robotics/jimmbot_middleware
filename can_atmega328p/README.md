@@ -17,3 +17,7 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
 ```
+
+todo - add these options too, and cleanup CMakeLists
+-DCMAKE_BUILD_DOC=On
+-DCMAKE_BUILD_TESTS=On
