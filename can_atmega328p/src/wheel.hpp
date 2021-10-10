@@ -7,17 +7,17 @@
  *
  * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
  * @license This project is released under the MIT License.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -94,23 +94,94 @@ public:
    */
   typedef struct Properties {
   public:
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @return uint8_t
+     */
     uint8_t CommandId(void) const { return command_id; }
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @param command_id
+     */
     void CommandId(const uint8_t &command_id) { this->command_id = command_id; }
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @return uint8_t
+     */
     uint8_t FeedbackId(void) const { return feedback_id; }
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @param feedback_id
+     */
     void FeedbackId(const uint8_t &feedback_id) {
       this->feedback_id = feedback_id;
     }
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @return true
+     * @return false
+     */
     bool Inverse(void) const { return inverse; }
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @param inverse
+     */
     void Inverse(const bool &inverse) { this->inverse = inverse; }
 
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @return double
+     */
     double Radius(void) const { return kRadius; }
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     * @return int
+     */
     int PulsePerRevolution(void) const { return kPulsePerRevolution; }
 
   private:
+    /**
+     * @brief @todo Add doxy doc
+     *
+     */
     uint8_t command_id;
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     */
     uint8_t feedback_id;
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     */
     bool inverse;
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     */
     const double kRadius{8.25};
+
+    /**
+     * @brief @todo Add doxy doc
+     *
+     */
     const int kPulsePerRevolution{90};
   } properties_t;
 

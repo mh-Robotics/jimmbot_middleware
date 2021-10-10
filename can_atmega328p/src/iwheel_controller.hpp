@@ -7,17 +7,17 @@
  *
  * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
  * @license This project is released under the MIT License.
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -171,7 +171,17 @@ private:
    *
    */
   WheelController wheel_controller_;
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
   CanWrapper can_wrapper_;
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
   CanPackt canpressor_;
 
   /**
@@ -179,6 +189,11 @@ private:
    *
    */
   volatile bool update_flag_;
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
   volatile bool feedback_flag_;
 };
 #endif // CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
