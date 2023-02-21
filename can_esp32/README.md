@@ -9,9 +9,9 @@ source esp-idf/export.sh
 
 ## motor_controller_ros_esp32
 
-This code subscribes to `/esp32/command/can_msg_array`, the ESP32 will transmit can messages, receive the feedback and publish on `/esp32/feedback/can_msg_array`
-The data received from Can as Feedback will be published on `/esp32/feedback/can_msg_array`
-The data published to `/esp32/command/can_msg_array` from the main computer, will be subscribed from ESP32 and transmitted into CanNetwork
+This code subscribes to `/esp32/command/can_msg`, the ESP32 will transmit can messages, receive the feedback and publish on `/esp32/feedback/can_msg`
+The data received from Can as Feedback will be published on `/esp32/feedback/can_msg`. The ID that will be received are only the ID's of the feedback messages from the wheels 4->7.
+The data published to `/esp32/command/can_msg` from the main computer, will be subscribed from ESP32 and transmitted into CanNetwork
 
 ### Build and Flash
 
@@ -27,6 +27,6 @@ To use WiFi:
 2. Enter WiFi and server details
 
 ```
-$ export ESPPORT=/dev/ttyUSB0
+$ export ESPPORT=/dev/esp32_ros_node
 $ idf.py build flash
 ```

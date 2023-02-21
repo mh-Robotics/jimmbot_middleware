@@ -29,18 +29,27 @@
  *
  */
 #include <esp32_ros_interface.h>
-
-#include "jimmbot_msgs/canFrame.h"
-#include "jimmbot_msgs/canFrameArray.h"
-#include <ros.h>
+#include <ros.h>  // for ros::*
 
 #include "driver/gpio.h"
 #include "driver/twai.h"
+#include "jimmbot_msgs/CanFrame.h"         // for jimmbot_msgs::CanFrame
+#include "jimmbot_msgs/CanFrameStamped.h"  // for jimmbot_msgs::CanFrameStamped
 
-constexpr int STACK_SIZE = 4096;
-constexpr int RX_TASK_PRIO = 8;
-constexpr int TX_TASK_PRIO = 9;
-constexpr int CAN_RX_TX_DELAY_MS = 10;
+constexpr auto kStackSize = 4096;
+constexpr auto kRxTaskPrio = 8;
+constexpr auto kTxTaskPrio = 9;
+constexpr auto kCanRxTxDelayMs = 100;
+constexpr auto kCanRxTxQueueLen = 10;
+
+constexpr auto kLightCanMsgId{0x31};
+
+constexpr auto kGpioCanTransmit{GPIO_NUM_21};
+constexpr auto kGpioCanReceive{GPIO_NUM_22};
+constexpr auto kGpioOutputLightLeft{GPIO_NUM_32};
+constexpr auto kGpioOutputLightRight{GPIO_NUM_33};
+constexpr auto kGpioOutputPinSel{(1ULL << kGpioOutputLightLeft) |
+                                 (1ULL << kGpioOutputLightRight)};
 
 static const twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
 
@@ -50,51 +59,50 @@ static const twai_filter_config_t f_config = {.acceptance_code = 0x00000004,
 
 static const twai_general_config_t g_config = {
     .mode = TWAI_MODE_NORMAL,
-    .tx_io = (gpio_num_t)GPIO_CAN_TRANSMIT,
-    .rx_io = (gpio_num_t)GPIO_CAN_RECEIVE,
-    .clkout_io = (gpio_num_t)TWAI_IO_UNUSED,
-    .bus_off_io = (gpio_num_t)TWAI_IO_UNUSED,
-    .tx_queue_len = 100,
-    .rx_queue_len = 100,
+    .tx_io = kGpioCanTransmit,
+    .rx_io = kGpioCanReceive,
+    .clkout_io = TWAI_IO_UNUSED,
+    .bus_off_io = TWAI_IO_UNUSED,
+    .tx_queue_len = kCanRxTxQueueLen,
+    .rx_queue_len = kCanRxTxQueueLen,
     .alerts_enabled = TWAI_ALERT_NONE,
     .clkout_divider = 0,
     .intr_flags = ESP_INTR_FLAG_LEVEL1};
 
-jimmbot_msgs::canFrameArray feedback_msg;
+jimmbot_msgs::CanFrameStamped feedback_msg;
 
-constexpr int ENABLE_LIGHT_LEFT_MSG_INDEX = 3;
-constexpr int ENABLE_LIGHT_RIGHT_MSG_INDEX = 7;
-constexpr int LIGHT_CAN_MSG_INDEX = 4;
+constexpr int kEnableLightLeftMsgIndex = 3;
+constexpr int kEnableLightRightMsgIndex = 7;
 
 ros::NodeHandle nh;
-void canFrameArrayFeedback(void);
-ros::Publisher canFrameArrayPublisher(PUBLISHER_FEEDBACK_TOPIC_CAN_MSG_ARRAY,
-                                      &feedback_msg);
-void canFrameArrayCallback(const jimmbot_msgs::canFrameArray &data_msg);
-ros::Subscriber<jimmbot_msgs::canFrameArray>
-    canFrameArraySubscriber(SUBSCRIBER_COMMAND_TOPIC_CAN_MSG_ARRAY,
-                            &canFrameArrayCallback);
+void canFrameFeedbackCallback(void);
+ros::Publisher canFramePublisher(kFeedbackTopicCanMsg, &feedback_msg);
+void canFrameCallback(const jimmbot_msgs::CanFrameStamped &data_msg);
+ros::Subscriber<jimmbot_msgs::CanFrameStamped> canFrameSubscriber(
+    kCommandTopicCanMsg, &canFrameCallback);
+
 static QueueHandle_t tx_task_queue;
 TaskHandle_t rxHandle = NULL;
 TaskHandle_t txHandle = NULL;
 
-const twai_message_t
-toTwaiMessage(const jimmbot_msgs::canFrame &jimmBotCanMessage) {
+const twai_message_t toTwaiMessage(
+    const jimmbot_msgs::CanFrameStamped &jimmBotCanMessage) {
   twai_message_t twai_msg;
 
-  twai_msg.extd = jimmBotCanMessage.is_extended;
-  twai_msg.rtr = jimmBotCanMessage.is_rtr;
-  twai_msg.identifier = jimmBotCanMessage.id;
-  twai_msg.data_length_code = jimmBotCanMessage.dlc;
+  twai_msg.extd = jimmBotCanMessage.can_frame.is_extended;
+  twai_msg.rtr = jimmBotCanMessage.can_frame.is_rtr;
+  twai_msg.identifier = jimmBotCanMessage.can_frame.id;
+  twai_msg.data_length_code = jimmBotCanMessage.can_frame.dlc;
   twai_msg.ss = 1;
-  memcpy(twai_msg.data, jimmBotCanMessage.data, jimmBotCanMessage.dlc);
+  memcpy(twai_msg.data, jimmBotCanMessage.can_frame.data,
+         jimmBotCanMessage.can_frame.dlc);
 
   return twai_msg;
 }
 
-const jimmbot_msgs::canFrame
-toJimmBotCanMessage(const twai_message_t &twai_msg) {
-  jimmbot_msgs::canFrame jimmBotCanMessage;
+const jimmbot_msgs::CanFrame toJimmBotCanMessage(
+    const twai_message_t &twai_msg) {
+  jimmbot_msgs::CanFrame jimmBotCanMessage;
 
   jimmBotCanMessage.is_extended = twai_msg.extd;
   jimmBotCanMessage.is_rtr = twai_msg.rtr;
@@ -107,60 +115,44 @@ toJimmBotCanMessage(const twai_message_t &twai_msg) {
 
 static void can_transmit_task(void *arg) {
   while (true) {
-    jimmbot_msgs::canFrameArray data_msg;
-
+    jimmbot_msgs::CanFrameStamped data_msg;
     if (xQueueReceive(tx_task_queue, &data_msg,
-                      pdMS_TO_TICKS(CAN_RX_TX_DELAY_MS)) == pdPASS) {
-      for (auto &frame : data_msg.can_frames) {
-        if (frame.id == LIGHT_MSG_ID) {
-          continue;
-        }
-        twai_message_t twai_msg = toTwaiMessage(frame);
-        twai_transmit(&twai_msg, pdMS_TO_TICKS(CAN_RX_TX_DELAY_MS));
-      }
+                      pdMS_TO_TICKS(kCanRxTxDelayMs)) == pdPASS) {
+      twai_message_t twai_msg = toTwaiMessage(data_msg);
+      twai_transmit(&twai_msg, pdMS_TO_TICKS(kCanRxTxDelayMs));
     }
   }
 }
 
 static void can_receive_task(void *arg) {
   while (true) {
-    // canFrameArrayFeedback();
-    // Todo Add a logic to fill a message with 4 wheel information
-    // And publish for 4 wheels.
-    vTaskDelay(pdMS_TO_TICKS(100)); // Remove when reactivated feedback array
+    twai_message_t rx_msg;
+    if (twai_receive(&rx_msg, pdMS_TO_TICKS(kCanRxTxDelayMs)) == ESP_OK) {
+      feedback_msg.header.frame_id = kFeedbackFrameId;
+      feedback_msg.header.stamp = nh.now();
+      feedback_msg.can_frame = toJimmBotCanMessage(rx_msg);
+
+      canFramePublisher.publish(&feedback_msg);
+    }
   }
 }
 
-void canFrameArrayCallback(const jimmbot_msgs::canFrameArray &data_msg) {
-  gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_LEFT,
-                 data_msg.can_frames[LIGHT_CAN_MSG_INDEX]
-                     .data[ENABLE_LIGHT_LEFT_MSG_INDEX]);
-  gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_RIGHT,
-                 data_msg.can_frames[LIGHT_CAN_MSG_INDEX]
-                     .data[ENABLE_LIGHT_RIGHT_MSG_INDEX]);
+void canFrameCallback(const jimmbot_msgs::CanFrameStamped &data_msg) {
+  if (data_msg.can_frame.id == kLightCanMsgId) {
+    gpio_set_level(kGpioOutputLightLeft,
+                   data_msg.can_frame.data[kEnableLightLeftMsgIndex]);
+    gpio_set_level(kGpioOutputLightRight,
+                   data_msg.can_frame.data[kEnableLightRightMsgIndex]);
+    return;
+  }
 
-  xQueueSend(tx_task_queue, &data_msg, pdMS_TO_TICKS(CAN_RX_TX_DELAY_MS));
-}
-
-void canFrameArrayFeedback(void) {
-  twai_message_t rx_msg;
-  twai_receive(&rx_msg, pdMS_TO_TICKS(CAN_RX_TX_DELAY_MS));
-  int index = rx_msg.identifier - CAN_MSG_COUNT;
-
-  feedback_msg.header.frame_id = "/jimmbot/hw/status";
-  feedback_msg.header.stamp = nh.now();
-  feedback_msg.can_frames[index] = toJimmBotCanMessage(rx_msg);
-
-  // CAN with index 5 reserved for other status from HW. @todo
-  // feedback_msg.can_frames[LIGHT_CAN_MSG_INDEX] = Add voltage and/or other
-  // information
-  canFrameArrayPublisher.publish(&feedback_msg);
+  xQueueSend(tx_task_queue, &data_msg, pdMS_TO_TICKS(kCanRxTxDelayMs));
 }
 
 esp_err_t can_init(void) {
   esp_err_t err;
 
-  tx_task_queue = xQueueCreate(1, sizeof(jimmbot_msgs::canFrameArray));
+  tx_task_queue = xQueueCreate(1, sizeof(jimmbot_msgs::CanFrameStamped));
 
   err = twai_driver_install(&g_config, &t_config, &f_config);
   err = twai_start();
@@ -173,6 +165,9 @@ esp_err_t can_destroy(void) {
 
   if (txHandle != NULL) {
     vTaskDelete(txHandle);
+  }
+  if (rxHandle != NULL) {
+    vTaskDelete(rxHandle);
   }
   vQueueDelete(tx_task_queue);
 
@@ -187,7 +182,7 @@ esp_err_t output_gpio_init(void) {
   gpio_config_t io_conf;
   io_conf.intr_type = (gpio_int_type_t)GPIO_PIN_INTR_DISABLE;
   io_conf.mode = GPIO_MODE_OUTPUT;
-  io_conf.pin_bit_mask = GPIO_OUTPUT_PIN_SEL;
+  io_conf.pin_bit_mask = kGpioOutputPinSel;
   io_conf.pull_down_en = (gpio_pulldown_t)0;
   io_conf.pull_up_en = (gpio_pullup_t)0;
 
@@ -198,23 +193,23 @@ esp_err_t output_gpio_init(void) {
 
 esp_err_t output_gpio_destroy(void) {
   esp_err_t err;
-  err = gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_LEFT, false);
-  err = gpio_set_level((gpio_num_t)GPIO_OUTPUT_LIGHT_RIGHT, false);
+  err = gpio_set_level(kGpioOutputLightLeft, false);
+  err = gpio_set_level(kGpioOutputLightRight, false);
 
   return err;
 }
 
 esp_err_t rosserial_setup(void) {
   nh.initNode();
-  nh.subscribe(canFrameArraySubscriber);
-  nh.advertise(canFrameArrayPublisher);
+  nh.subscribe(canFrameSubscriber);
+  nh.advertise(canFramePublisher);
 
-  xTaskCreatePinnedToCore(can_receive_task, "CAN_rx", STACK_SIZE, NULL,
-                          RX_TASK_PRIO, &rxHandle, tskNO_AFFINITY);
+  xTaskCreatePinnedToCore(can_receive_task, "CAN_rx", kStackSize, NULL,
+                          kRxTaskPrio, &rxHandle, tskNO_AFFINITY);
   configASSERT(rxHandle);
 
-  xTaskCreatePinnedToCore(can_transmit_task, "CAN_tx", STACK_SIZE, NULL,
-                          TX_TASK_PRIO, &txHandle, tskNO_AFFINITY);
+  xTaskCreatePinnedToCore(can_transmit_task, "CAN_tx", kStackSize, NULL,
+                          kTxTaskPrio, &txHandle, tskNO_AFFINITY);
   configASSERT(txHandle);
 
   return ESP_OK;
