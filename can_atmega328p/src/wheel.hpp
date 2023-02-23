@@ -30,9 +30,6 @@
 #ifndef CAN_ATMEGA328P_SRC_WHEEL_HPP_
 #define CAN_ATMEGA328P_SRC_WHEEL_HPP_
 
-#include <avr/io.h>
-#include <avr/pgmspace.h>
-
 #include "pin_configuration.hpp"
 
 /**
@@ -72,7 +69,7 @@ class Wheel {
     kEnd
   };
 
-public:
+ public:
   /**
    * @brief @todo Add Doxy doc
    *
@@ -93,7 +90,7 @@ public:
    *
    */
   typedef struct Properties {
-  public:
+   public:
     /**
      * @brief @todo Add doxy doc
      *
@@ -153,7 +150,7 @@ public:
      */
     int PulsePerRevolution(void) const { return kPulsePerRevolution; }
 
-  private:
+   private:
     /**
      * @brief @todo Add doxy doc
      *
@@ -198,14 +195,21 @@ public:
    * @return true
    * @return false
    */
-  bool Init(const pin_configuration_t &pinConfiguration);
+  bool Init(void);
 
   /**
    * @brief Returns the properties object
    *
    * @return properties_t
    */
-  properties_t Properties(void);
+  properties_t Properties(void) const;
+
+  /**
+   * @brief Returns the pin_configuration_t object
+   *
+   * @return pin_configuration_t
+   */
+  pin_configuration_t Configuration(void) const;
 
   /**
    * @brief Destroy the Wheel object
@@ -213,7 +217,7 @@ public:
    */
   ~Wheel() = default;
 
-private:
+ private:
   /**
    * @brief Sets the specific properties for wheel
    *
@@ -224,26 +228,22 @@ private:
   bool EnumToCanId(const Wheel::Wheel_Enum &wheelEnum);
 
   /**
-   * @brief @todo Add Doxy doc
-   *
-   * @param pinConfiguration
-   * @return true
-   * @return false
-   */
-  bool Setup(const pin_configuration_t &pinConfiguration);
-
-  /**
    * @brief Determines which wheel does this object belongs too
    *
-   * @param pinConfiguration
    * @return Wheel_Enum
    */
-  Wheel_Enum DetermineWheel(const pin_configuration_t &pinConfiguration);
+  Wheel_Enum DetermineWheel(void);
 
   /**
-   * @brief Wheel properties variable
+   * @brief Wheel properties_t object
    *
    */
   properties_t properties_;
+
+  /**
+   * @brief Wheel pin_configuration_t object
+   *
+   */
+  pin_configuration_t pin_configuration_;
 };
-#endif // CAN_ATMEGA328P_SRC_WHEEL_HPP_
+#endif  // CAN_ATMEGA328P_SRC_WHEEL_HPP_

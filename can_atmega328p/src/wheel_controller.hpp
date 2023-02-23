@@ -32,9 +32,6 @@
 #ifndef CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 
-#include <avr/interrupt.h>
-#include <avr/io.h>
-#include <avr/pgmspace.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -63,26 +60,26 @@ struct once_flag {
  * @param args
  */
 template <class Callable, class... Args>
-void inline call_once(once_flag &flag, Callable &&f, Args &&... args) {
+void inline call_once(once_flag &flag, Callable &&f, Args &&...args) {
   if (!flag.is_called) {
     f();
     flag.is_called = true;
   }
 }
-} // namespace std
+}  // namespace std
 
 /**
  * @brief @todo Add doxy doc
  *
  */
-class WheelController : private Wheel {
-public:
+class WheelController {
+ public:
   /**
    * @brief @todo Add doxy doc
    *
    */
   typedef struct MotorStatus {
-  public:
+   public:
     /**
      * @brief @todo Add doxy doc
      *
@@ -197,7 +194,7 @@ public:
      */
     void Reverse(const bool &reverse) { this->reverse = reverse; }
 
-  private:
+   private:
     /**
      * @brief @todo Add doxy doc
      *
@@ -260,7 +257,7 @@ public:
    * @return true
    * @return false
    */
-  bool Init(const pin_configuration_t &pinConfiguration);
+  bool Init(const Wheel &wheel);
 
   /**
    * @brief @todo Add doxy doc
@@ -276,7 +273,7 @@ public:
    * @return true
    * @return false
    */
-  bool WheelSignalIrqHandler(void);
+  void WheelSignalIrqHandler(void);
 
   /**
    * @brief @todo Add doxy doc
@@ -295,13 +292,6 @@ public:
   /**
    * @brief @todo Add doxy doc
    *
-   * @return unsigned long
-   */
-  unsigned long Millis(void);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
    * @return true
    * @return false
    */
@@ -314,7 +304,7 @@ public:
    * @return true
    * @return false
    */
-  bool SetDirection(const bool &direction);
+  void SetDirection(const bool &direction);
 
   /**
    * @brief Set the Speed object
@@ -343,7 +333,7 @@ public:
    */
   ~WheelController() = default;
 
-private:
+ private:
   /**
    * @brief @todo Add doxy doc
    *
@@ -362,20 +352,13 @@ private:
    * @brief @todo Add doxy doc
    *
    */
-  pin_configuration_t pin_configuration_;
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
   motor_status_t motor_status_;
 
   /**
    * @brief @todo Add doxy doc
    *
    */
-  Wheel wheel_; // @todo This needs to be removed. Find a way to use from
-                // inheritance
+  Wheel *wheel_;
 
   /**
    * @brief @todo Add doxy doc
@@ -407,4 +390,4 @@ private:
    */
   std::once_flag first_odometry_tick_;
 };
-#endif // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
+#endif  // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_

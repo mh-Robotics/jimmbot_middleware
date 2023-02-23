@@ -11,7 +11,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_subdirectory(can_atmega328p)
+# add_subdirectory(can_atmega328p)
 
 install(DIRECTORY
   ros_lib

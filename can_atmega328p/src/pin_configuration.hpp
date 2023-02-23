@@ -30,13 +30,14 @@
 #ifndef CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
 #define CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
 
+#include "Arduino.h"
+
 /**
  * @brief Pin Configuration structure that holds all the pin numbers and
  * connections for this firmware to work.
  *
  */
 typedef struct PinConfiguration {
-
   /**
    * @brief Holds the motor brake pin number
    *
@@ -126,11 +127,20 @@ typedef struct PinConfiguration {
    *
    */
   PinConfiguration()
-      : motor_brake{PD7}, motor_enable{PD4}, motor_signal{PD3},
-        motor_direction{PD5}, motor_speed{PD6}, can_mcp_irq{PD2},
-        can_mcp_rcv{PB2}, can_mcp_mosi{PB3}, can_mcp_miso{PB4},
-        can_mcp_sck{PB5}, wheel_front_left{PC0}, wheel_front_right{PC1},
-        wheel_back_left{PC2}, wheel_back_right{PC3} {}
+      : motor_brake{7},
+        motor_enable{4},
+        motor_signal{3},
+        motor_direction{5},
+        motor_speed{6},
+        can_mcp_irq{2},
+        can_mcp_rcv{10},
+        can_mcp_mosi{11},
+        can_mcp_miso{12},
+        can_mcp_sck{13},
+        wheel_front_left{A0},
+        wheel_front_right{A1},
+        wheel_back_left{A2},
+        wheel_back_right{A3} {}
 
   /**
    * @brief Construct a new Pin Configuration object with specified pin numbers
@@ -158,20 +168,21 @@ typedef struct PinConfiguration {
                    const uint8_t &wheelFrontLeft,
                    const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
                    const uint8_t &wheelBackRight)
-      : motor_brake{motorBrake}, motor_enable{motorEnable},
-        motor_signal{motorSignal}, motor_direction{motorDirection},
-        motor_speed{motorSpeed}, can_mcp_irq{canMcpIrq}, can_mcp_rcv{canMcpRcv},
-        can_mcp_mosi{canMcpMosi}, can_mcp_miso{canMcpMiso},
-        can_mcp_sck{canMcpSck}, wheel_front_left{wheelFrontLeft},
-        wheel_front_right{wheelFrontRight}, wheel_back_left{wheelBackLeft},
+      : motor_brake{motorBrake},
+        motor_enable{motorEnable},
+        motor_signal{motorSignal},
+        motor_direction{motorDirection},
+        motor_speed{motorSpeed},
+        can_mcp_irq{canMcpIrq},
+        can_mcp_rcv{canMcpRcv},
+        can_mcp_mosi{canMcpMosi},
+        can_mcp_miso{canMcpMiso},
+        can_mcp_sck{canMcpSck},
+        wheel_front_left{wheelFrontLeft},
+        wheel_front_right{wheelFrontRight},
+        wheel_back_left{wheelBackLeft},
         wheel_back_right{wheelBackRight} {}
 } pin_configuration_t;
-
-/**
- * @brief @todo Get rid of this macro
- *
- */
-#define SPEED_CONTROL_PWM(speed) ((OCR0A) = (speed))
 
 /**
  * @brief Index constant for direction byte in CanBus message
@@ -189,10 +200,6 @@ constexpr uint8_t kSpeedByteIndex = 7;
  * @brief Timeout constant [ms] if no CanBus message is received
  *
  */
-constexpr uint8_t kTimeoutMs = 255;
+constexpr uint8_t kTimeoutMs = 250;
 
-#include "drivers/include/millis.h"
-#include "drivers/include/spi.h"
-#include "drivers/include/usart.h"
-
-#endif // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
+#endif  // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_

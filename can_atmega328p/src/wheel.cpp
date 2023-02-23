@@ -30,33 +30,85 @@
  */
 #include "wheel.hpp"
 
-bool Wheel::Init(const pin_configuration_t &pinConfiguration) {
-  return Wheel::Setup(pinConfiguration);
+bool Wheel::Init() {
+  pinMode(Configuration().motor_direction, OUTPUT);
+  pinMode(Configuration().motor_brake, OUTPUT);
+  pinMode(Configuration().motor_enable, OUTPUT);
+  pinMode(Configuration().motor_signal, INPUT_PULLUP);
+  pinMode(Configuration().motor_speed, OUTPUT);
+
+  pinMode(Configuration().wheel_front_left, INPUT_PULLUP);
+  pinMode(Configuration().wheel_front_right, INPUT_PULLUP);
+  pinMode(Configuration().wheel_back_left, INPUT_PULLUP);
+  pinMode(Configuration().wheel_back_right, INPUT_PULLUP);
+
+  return EnumToCanId(DetermineWheel());
 }
 
-bool Wheel::Setup(const pin_configuration_t &pinConfiguration) {
-  DDRC &= ~(1 << pinConfiguration.wheel_front_left); // PC0 as Input
-  PORTC |= (1 << pinConfiguration.wheel_front_left); // Enable internal Pull Up
+Wheel::properties_t Wheel::Properties() const { return properties_; }
 
-  DDRC &= ~(1 << pinConfiguration.wheel_front_right); // PC1 as Input
-  PORTC |= (1 << pinConfiguration.wheel_front_right); // Enable internal Pull Up
+pin_configuration_t Wheel::Configuration() const { return pin_configuration_; }
 
-  DDRC &= ~(1 << pinConfiguration.wheel_back_left); // PC2 as Input
-  PORTC |= (1 << pinConfiguration.wheel_back_left); // Enable internal Pull Up
+bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
+  switch (wheelEnum) {
+    case Wheel::Wheel_Enum::kFrontLeft: {
+      properties_.CommandId(
+          static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontLeft));
+      properties_.FeedbackId(
+          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontLeft));
+      properties_.Inverse(false);
 
-  DDRC &= ~(1 << pinConfiguration.wheel_back_right); // PC3 as Input
-  PORTC |= (1 << pinConfiguration.wheel_back_right); // Enable internal Pull Up
+      return true;
+    }
 
-  return EnumToCanId(DetermineWheel(pinConfiguration));
+    case Wheel::Wheel_Enum::kFrontRight: {
+      properties_.CommandId(
+          static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontRight));
+      properties_.FeedbackId(
+          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontRight));
+      properties_.Inverse(true);
+
+      return true;
+    }
+
+    case Wheel::Wheel_Enum::kBackLeft: {
+      properties_.CommandId(
+          static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackLeft));
+      properties_.FeedbackId(
+          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackLeft));
+      properties_.Inverse(false);
+
+      return true;
+    }
+
+    case Wheel::Wheel_Enum::kBackRight: {
+      properties_.CommandId(
+          static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackRight));
+      properties_.FeedbackId(
+          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackRight));
+      properties_.Inverse(true);
+
+      return true;
+    }
+
+    default: {
+      properties_.CommandId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+      properties_.FeedbackId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+      properties_.Inverse(false);
+
+      return true;
+    }
+  }
+
+  return false;
 }
 
-Wheel::Wheel_Enum
-Wheel::DetermineWheel(const pin_configuration_t &pinConfiguration) {
-  if (!(PINC & (1 << pinConfiguration.wheel_front_left))) {
+Wheel::Wheel_Enum Wheel::DetermineWheel() {
+  if (!(digitalRead(Configuration().wheel_front_left))) {
     return Wheel::Wheel_Enum::kFrontLeft;
-  } else if (!(PINC & (1 << pinConfiguration.wheel_front_right))) {
+  } else if (!(digitalRead(Configuration().wheel_front_right))) {
     return Wheel::Wheel_Enum::kFrontRight;
-  } else if (!(PINC & (1 << pinConfiguration.wheel_back_left))) {
+  } else if (!(digitalRead(Configuration().wheel_back_left))) {
     return Wheel::Wheel_Enum::kBackLeft;
   } else {
     return Wheel::Wheel_Enum::kBackRight;
@@ -64,59 +116,3 @@ Wheel::DetermineWheel(const pin_configuration_t &pinConfiguration) {
 
   return Wheel::Wheel_Enum::kUnspecified;
 }
-
-bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
-  switch (wheelEnum) {
-  case Wheel::Wheel_Enum::kFrontLeft: {
-    properties_.CommandId(
-        static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontLeft));
-    properties_.FeedbackId(
-        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontLeft));
-    properties_.Inverse(false);
-
-    return true;
-  }
-
-  case Wheel::Wheel_Enum::kFrontRight: {
-    properties_.CommandId(
-        static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontRight));
-    properties_.FeedbackId(
-        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontRight));
-    properties_.Inverse(true);
-
-    return true;
-  }
-
-  case Wheel::Wheel_Enum::kBackLeft: {
-    properties_.CommandId(
-        static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackLeft));
-    properties_.FeedbackId(
-        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackLeft));
-    properties_.Inverse(false);
-
-    return true;
-  }
-
-  case Wheel::Wheel_Enum::kBackRight: {
-    properties_.CommandId(
-        static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackRight));
-    properties_.FeedbackId(
-        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackRight));
-    properties_.Inverse(true);
-
-    return true;
-  }
-
-  default: {
-    properties_.CommandId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
-    properties_.FeedbackId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
-    properties_.Inverse(false);
-
-    return true;
-  }
-  }
-
-  return false;
-}
-
-Wheel::properties_t Wheel::Properties() { return properties_; }

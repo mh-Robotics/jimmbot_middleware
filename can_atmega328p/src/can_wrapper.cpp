@@ -29,12 +29,10 @@
  */
 #include "can_wrapper.hpp"
 
-bool CanWrapper::Init(const pin_configuration_t &pinConfiguration) {
-  return CanWrapper::Setup(pinConfiguration);
-}
+bool CanWrapper::Init() { return CanWrapper::Setup(); }
 
-bool CanWrapper::Setup(const pin_configuration_t &pinConfiguration) {
-  mcp_can_ = MCP2515(pinConfiguration.can_mcp_rcv);
+bool CanWrapper::Setup() {
+  mcp_can_ = MCP2515();
 
   mcp_can_.reset();
   mcp_can_.setBitrate(CAN_500KBPS, MCP_8MHZ);
@@ -53,15 +51,12 @@ void CanWrapper::FeedbackHandler(const can_frame_t &CanMessage) {
 bool CanWrapper::ConfigureCanIdFilterMask(const int &canId) {
   MCP2515::ERROR err = MCP2515::ERROR_FAIL;
 
+  // Possible id's: [0, 1, 2, 3].
   err = mcp_can_.setConfigMode();
-  err = mcp_can_.setFilterMask(MCP2515::MASK0, false, 0x7FF);
+  err = mcp_can_.setFilterMask(MCP2515::MASK0, false, 0x03);
   err = mcp_can_.setFilter(MCP2515::RXF0, false, canId);
-  err = mcp_can_.setFilter(MCP2515::RXF1, false, canId);
-  err = mcp_can_.setFilterMask(MCP2515::MASK1, false, 0x7FF);
+  err = mcp_can_.setFilterMask(MCP2515::MASK1, false, 0x03);
   err = mcp_can_.setFilter(MCP2515::RXF2, false, canId);
-  err = mcp_can_.setFilter(MCP2515::RXF3, false, canId);
-  err = mcp_can_.setFilter(MCP2515::RXF4, false, canId);
-  err = mcp_can_.setFilter(MCP2515::RXF5, false, canId);
   err = mcp_can_.setNormalMode();
 
   return ((err == MCP2515::ERROR_OK) ? true : false);
@@ -69,7 +64,7 @@ bool CanWrapper::ConfigureCanIdFilterMask(const int &canId) {
 
 can_frame_t CanWrapper::CanMessage(void) { return can_msg_; }
 
-uint8_t CanWrapper::SpeedPwm(void) volatile {
+int CanWrapper::SpeedPwm(void) volatile {
   return (can_msg_.data[kDirectionByteIndex]
               ? can_msg_.data[kSpeedByteIndex] * -1
               : can_msg_.data[kSpeedByteIndex]);

@@ -1,12 +1,9 @@
 #ifndef _MCP2515_H_
 #define _MCP2515_H_
 
-#include <string.h>
-#include <util/delay.h>
+#include <SPI.h>
 
 #include "can.h"
-#include "millis.h"
-#include "spi.h"
 
 /*
  *  Speed 8M
@@ -203,7 +200,7 @@ enum CAN_CLKOUT {
 };
 
 class MCP2515 {
-public:
+ public:
   enum ERROR {
     ERROR_OK = 0,
     ERROR_FAIL = 1,
@@ -243,7 +240,7 @@ public:
     EFLG_EWARN = (1 << 0)
   };
 
-private:
+ private:
   static const uint8_t CANCTRL_REQOP = 0xE0;
   static const uint8_t CANCTRL_ABAT = 0x10;
   static const uint8_t CANCTRL_OSM = 0x08;
@@ -274,6 +271,10 @@ private:
   static const uint8_t RXBnCTRL_RXM_MASK = 0x60;
   static const uint8_t RXBnCTRL_RTR = 0x08;
   static const uint8_t RXB0CTRL_BUKT = 0x04;
+  static const uint8_t RXB0CTRL_FILHIT_MASK = 0x03;
+  static const uint8_t RXB1CTRL_FILHIT_MASK = 0x07;
+  static const uint8_t RXB0CTRL_FILHIT = 0x00;
+  static const uint8_t RXB1CTRL_FILHIT = 0x01;
 
   static const uint8_t MCP_SIDH = 0;
   static const uint8_t MCP_SIDL = 1;
@@ -399,7 +400,7 @@ private:
     MCP_RXB1DATA = 0x76
   };
 
-  static const uint32_t SPI_CLOCK = 10000000; // 10MHz
+  static const uint32_t DEFAULT_SPI_CLOCK = 10000000;  // 10MHz
 
   static const int N_TXBUFFERS = 3;
   static const int N_RXBUFFERS = 2;
@@ -418,8 +419,10 @@ private:
   } RXB[N_RXBUFFERS];
 
   uint8_t SPICS;
+  uint32_t SPI_CLOCK;
+  SPIClass *SPIn;
 
-private:
+ private:
   void startSPI();
   void endSPI();
 
@@ -435,8 +438,9 @@ private:
 
   void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
 
-public:
-  MCP2515(const uint8_t _CS = PB2);
+ public:
+  MCP2515(const uint8_t _CS = 10, const uint32_t _SPI_CLOCK = DEFAULT_SPI_CLOCK,
+          SPIClass *_SPI = nullptr);
   ERROR reset(void);
   ERROR setConfigMode();
   ERROR setListenOnlyMode();
@@ -464,6 +468,8 @@ public:
   void clearRXnOVR(void);
   void clearMERR();
   void clearERRIF();
+  uint8_t errorCountRX(void);
+  uint8_t errorCountTX(void);
 };
 
 #endif

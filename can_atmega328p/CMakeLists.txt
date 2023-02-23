@@ -33,9 +33,6 @@ include_directories(
 
 set(
   ${PROJECT_NAME}_drivers_src
-  src/drivers/src/spi.cpp
-  src/drivers/src/usart.cpp
-  src/drivers/src/millis.cpp
   src/drivers/src/mcp2515.cpp
 )
 

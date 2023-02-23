@@ -28,11 +28,30 @@
  * SOFTWARE.
  *
  */
-#include "can.h"
+#include "drivers/include/can.h"
 #include "wheel_controller.hpp"
 
 #ifndef CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
 #define CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
+
+typedef struct MotorStatus {
+    int can_id;
+    int command_id;
+    int effort;
+    double position;
+    int rpm;
+    double velocity;
+} ros_motor_status_t;
+
+// Define a bit-field struct to represent the compressed motor status data
+typedef struct __attribute__((packed)) {
+    uint32_t can_id : 11;
+    uint32_t command_id : 8;
+    uint32_t effort : 12;
+    uint32_t position : 20;
+    uint32_t rpm : 10;
+    uint32_t velocity : 24;
+} compressed_motor_status_t;
 
 /**
  * @brief @todo Add doxy doc

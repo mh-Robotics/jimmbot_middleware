@@ -39,7 +39,7 @@
  *
  */
 class IWheelController {
-public:
+ public:
   /**
    * @brief Construct a new IWheelController object
    *
@@ -49,11 +49,11 @@ public:
   /**
    * @brief @todo Add doxy doc
    *
-   * @param pinConfiguration
    * @return true
    * @return false
    */
-  bool Init(const pin_configuration_t &pinConfiguration);
+  bool Init(const WheelController &wheel_controller,
+            const CanWrapper &can_wrapper);
 
   /**
    * @brief @todo Add doxy doc
@@ -115,7 +115,7 @@ public:
    * @return true
    * @return false
    */
-  bool UpdateWheelSignal(void);
+  void UpdateWheelSignal(void);
 
   /**
    * @brief @todo Add doxy doc
@@ -142,12 +142,6 @@ public:
   /**
    * @brief @todo Add doxy doc
    *
-   */
-  void DiagnosticsCallback(void);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
    * @return true
    * @return false
    */
@@ -159,7 +153,7 @@ public:
    */
   ~IWheelController(void) = default;
 
-private:
+ private:
   /**
    * @brief @todo Add doxy doc
    *
@@ -170,13 +164,13 @@ private:
    * @brief @todo Add doxy doc
    *
    */
-  WheelController wheel_controller_;
+  WheelController *wheel_controller_;
 
   /**
    * @brief @todo Add doxy doc
    *
    */
-  CanWrapper can_wrapper_;
+  CanWrapper *can_wrapper_;
 
   /**
    * @brief @todo Add doxy doc
@@ -196,4 +190,4 @@ private:
    */
   volatile bool feedback_flag_;
 };
-#endif // CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
+#endif  // CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_

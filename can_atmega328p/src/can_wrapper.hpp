@@ -30,7 +30,7 @@
 #ifndef CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 #define CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 
-#include "mcp2515.h"
+#include "drivers/include/mcp2515.h"
 #include "pin_configuration.hpp"
 
 /**
@@ -48,11 +48,10 @@ public:
   /**
    * @brief @todo Add doxy doc
    *
-   * @param pinConfiguration
    * @return true
    * @return false
    */
-  bool Init(const pin_configuration_t &pinConfiguration);
+  bool Init(void);
 
   /**
    * @brief @todo Add doxy doc
@@ -88,9 +87,9 @@ public:
   /**
    * @brief @todo Add doxy doc
    *
-   * @return uint8_t
+   * @return int
    */
-  uint8_t SpeedPwm(void) volatile;
+  int SpeedPwm(void) volatile;
 
   /**
    * @brief @todo Add doxy doc
@@ -116,11 +115,10 @@ private:
   /**
    * @brief @todo Add doxy doc
    *
-   * @param pinConfiguration
    * @return true
    * @return false
    */
-  bool Setup(const pin_configuration_t &pinConfiguration);
+  bool Setup(void);
 
   /**
    * @brief @todo Add doxy doc
