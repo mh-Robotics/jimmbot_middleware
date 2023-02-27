@@ -37,11 +37,6 @@ bool IWheelController::Init(const WheelController &wheel_controller,
   return true;
 }
 
-bool IWheelController::Start(void) {
-  return can_wrapper_->ConfigureCanIdFilterMask(
-      wheel_controller_->MotorStatus().CommandId());
-}
-
 bool IWheelController::CommandReady(void) { return update_flag_; }
 
 void IWheelController::CommandReady(const bool &flag) { update_flag_ = flag; }
@@ -56,10 +51,6 @@ bool IWheelController::UpdateCanMessage(void) {
   UpdateTimeout();
   CommandReady(true);
   return can_wrapper_->CommandHandler();
-}
-
-void IWheelController::ResetCanInterrupts(void) {
-  can_wrapper_->resetCanInterrupts();
 }
 
 bool IWheelController::UpdateEmptyCanMessage(void) {
@@ -83,8 +74,7 @@ bool IWheelController::CommandCallback(void) {
 }
 
 bool IWheelController::FeedbackCallback(void) {
-  can_wrapper_->FeedbackHandler(
-      canpressor_.ParseToCan(wheel_controller_->MotorStatus()));
+  can_wrapper_->FeedbackHandler(wheel_controller_->WheelStatus());
   FeedbackReady(false);
 
   return true;

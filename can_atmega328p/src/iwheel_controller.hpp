@@ -30,7 +30,6 @@
 #ifndef CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
 
-#include "can_packt.hpp"
 #include "can_wrapper.hpp"
 #include "wheel_controller.hpp"
 
@@ -54,14 +53,6 @@ class IWheelController {
    */
   bool Init(const WheelController &wheel_controller,
             const CanWrapper &can_wrapper);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @return true
-   * @return false
-   */
-  bool Start(void);
 
   /**
    * @brief @todo Add doxy doc
@@ -120,12 +111,6 @@ class IWheelController {
   /**
    * @brief @todo Add doxy doc
    *
-   */
-  void ResetCanInterrupts(void);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
    * @return true
    * @return false
    */
@@ -171,12 +156,6 @@ class IWheelController {
    *
    */
   CanWrapper *can_wrapper_;
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
-  CanPackt canpressor_;
 
   /**
    * @brief @todo Add doxy doc

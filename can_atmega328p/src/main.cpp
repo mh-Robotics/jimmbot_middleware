@@ -64,11 +64,9 @@ void IsrEncoderPulse() { i_wheel_controller.UpdateWheelSignal(); }
 void setup() {
   wheel.Init();
   wheel_controller.Init(wheel);
-  can_wrapper.Init();
-
-  if (i_wheel_controller.Init(wheel_controller, can_wrapper)) {
-    i_wheel_controller.Start();
-  }
+  can_wrapper.Init(wheel.Properties().ReceiveId(),
+                   wheel.Properties().TransmitId());
+  i_wheel_controller.Init(wheel_controller, can_wrapper);
 
   attachInterrupt(digitalPinToInterrupt(wheel.Configuration().motor_signal),
                   IsrEncoderPulse, FALLING);
@@ -77,5 +75,5 @@ void setup() {
 void loop() {
   CanReceiveHandler();
   TimeoutCheckLoop();
-  delay(50);
+  delay(10);
 }

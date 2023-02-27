@@ -40,7 +40,6 @@ set(
   ${PROJECT_NAME}_src
   src/main.cpp
   src/can_wrapper.cpp
-  src/can_packt.cpp
   src/iwheel_controller.cpp
   src/wheel_controller.cpp
   src/wheel.cpp

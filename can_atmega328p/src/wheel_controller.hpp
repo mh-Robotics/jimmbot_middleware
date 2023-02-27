@@ -35,38 +35,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "stl_helper_functions.h"
 #include "wheel.hpp"
-
-namespace std {
-/**
- * @brief @todo Add doxy doc
- *
- */
-struct once_flag {
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
-  bool is_called = false;
-};
-
-/**
- * @brief @todo Add doxy doc
- *
- * @tparam Callable
- * @tparam Args
- * @param flag
- * @param f
- * @param args
- */
-template <class Callable, class... Args>
-void inline call_once(once_flag &flag, Callable &&f, Args &&...args) {
-  if (!flag.is_called) {
-    f();
-    flag.is_called = true;
-  }
-}
-}  // namespace std
 
 /**
  * @brief @todo Add doxy doc
@@ -78,7 +48,7 @@ class WheelController {
    * @brief @todo Add doxy doc
    *
    */
-  typedef struct MotorStatus {
+  typedef struct WheelStatus {
    public:
     /**
      * @brief @todo Add doxy doc
@@ -97,23 +67,9 @@ class WheelController {
     /**
      * @brief @todo Add doxy doc
      *
-     * @return int
-     */
-    int FeedbackId(void) const { return feedback_id; }
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     * @param feedback_id
-     */
-    void FeedbackId(const int &feedback_id) { this->feedback_id = feedback_id; }
-
-    /**
-     * @brief @todo Add doxy doc
-     *
      * @return double
      */
-    double Effort(void) const { return effort; }
+    int Effort(void) const { return effort; }
 
     /**
      * @brief @todo Add doxy doc
@@ -164,85 +120,13 @@ class WheelController {
      */
     void Velocity(const double &velocity) { this->velocity = velocity; }
 
-    /**
-     * @brief @todo Add doxy doc
-     *
-     * @return true
-     * @return false
-     */
-    bool Inverse(void) const { return inverse; }
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     * @param inverse
-     */
-    void Inverse(const bool &inverse) { this->inverse = inverse; }
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     * @return true
-     * @return false
-     */
-    bool Reverse(void) const { return reverse; }
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     * @param reverse
-     */
-    void Reverse(const bool &reverse) { this->reverse = reverse; }
-
    private:
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    int command_id;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    int feedback_id;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    double effort;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    double position;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    int rpm;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    double velocity;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    bool inverse;
-
-    /**
-     * @brief @todo Add doxy doc
-     *
-     */
-    bool reverse;
-  } motor_status_t;
+    int command_id{0};
+    int effort{10};
+    double position{0.0};
+    int rpm{0};
+    double velocity{0.0};
+  } wheel_status_t;
 
   /**
    * @brief Construct a new Wheel Controller object
@@ -316,9 +200,9 @@ class WheelController {
   /**
    * @brief @todo Add doxy doc
    *
-   * @return motor_status_t
+   * @return wheel_status_t
    */
-  motor_status_t MotorStatus(void);
+  wheel_status_t WheelStatus(void);
 
   /**
    * @brief @todo Add doxy doc
@@ -337,13 +221,6 @@ class WheelController {
   /**
    * @brief @todo Add doxy doc
    *
-   * @param state
-   */
-  void EnableDrive(const bool &state);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
    * @param kBreak
    */
   void Break(const bool &kBreak);
@@ -352,7 +229,7 @@ class WheelController {
    * @brief @todo Add doxy doc
    *
    */
-  motor_status_t motor_status_;
+  wheel_status_t wheel_status_;
 
   /**
    * @brief @todo Add doxy doc
@@ -370,19 +247,25 @@ class WheelController {
    * @brief @todo Add doxy doc
    *
    */
-  volatile unsigned long old_time_{0};
+  volatile double old_time_{0};
 
   /**
    * @brief @todo Add doxy doc
    *
    */
-  volatile unsigned long time_taken_{0};
+  volatile double time_taken_{0};
 
   /**
    * @brief @todo Add doxy doc
    *
    */
-  volatile unsigned long signal_counter_{0};
+  volatile signed long signal_counter_{0};
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
+  volatile double last_pulse_time_{0};
 
   /**
    * @brief @todo Add doxy doc

@@ -76,11 +76,11 @@ class Wheel {
    */
   enum class Command : uint8_t {
     kBegin = 0,
-    kMotorOff = kBegin,
-    kMotorOn,
-    kMotorStatus,
-    kMotorStatusUpdate,
-    kMotorSpeed,
+    kWheelOff = kBegin,
+    kWheelOn,
+    kWheelStatus,
+    kWheelStatusUpdate,
+    kWheelSpeed,
     kUnspecified,
     kEnd
   };
@@ -96,28 +96,28 @@ class Wheel {
      *
      * @return uint8_t
      */
-    uint8_t CommandId(void) const { return command_id; }
+    uint8_t ReceiveId(void) const { return command_id; }
 
     /**
      * @brief @todo Add doxy doc
      *
      * @param command_id
      */
-    void CommandId(const uint8_t &command_id) { this->command_id = command_id; }
+    void ReceiveId(const uint8_t &command_id) { this->command_id = command_id; }
 
     /**
      * @brief @todo Add doxy doc
      *
      * @return uint8_t
      */
-    uint8_t FeedbackId(void) const { return feedback_id; }
+    uint8_t TransmitId(void) const { return feedback_id; }
 
     /**
      * @brief @todo Add doxy doc
      *
      * @param feedback_id
      */
-    void FeedbackId(const uint8_t &feedback_id) {
+    void TransmitId(const uint8_t &feedback_id) {
       this->feedback_id = feedback_id;
     }
 
@@ -127,14 +127,14 @@ class Wheel {
      * @return true
      * @return false
      */
-    bool Inverse(void) const { return inverse; }
+    bool Reverse(void) const { return reverse; }
 
     /**
      * @brief @todo Add doxy doc
      *
-     * @param inverse
+     * @param reverse
      */
-    void Inverse(const bool &inverse) { this->inverse = inverse; }
+    void Reverse(const bool &reverse) { this->reverse = reverse; }
 
     /**
      * @brief @todo Add doxy doc
@@ -155,19 +155,19 @@ class Wheel {
      * @brief @todo Add doxy doc
      *
      */
-    uint8_t command_id;
+    uint8_t command_id{0x00};
 
     /**
      * @brief @todo Add doxy doc
      *
      */
-    uint8_t feedback_id;
+    uint8_t feedback_id{0x00};
 
     /**
      * @brief @todo Add doxy doc
      *
      */
-    bool inverse;
+    bool reverse{false};
 
     /**
      * @brief @todo Add doxy doc

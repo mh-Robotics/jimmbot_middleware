@@ -30,15 +30,17 @@
 #ifndef CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 #define CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 
-#include "drivers/include/mcp2515.h"
-#include "pin_configuration.hpp"
+#include "can_packt.hpp"  // for PackCompressed<> and UnpackCompressed<>
+#include "drivers/include/mcp2515.h"  // for MCP2515
+#include "pin_configuration.hpp"      // for PinConfiguration
+#include "wheel_controller.hpp"       // for WheelController::wheel_status_t
 
 /**
  * @brief @todo Add doxy doc
  *
  */
 class CanWrapper {
-public:
+ public:
   /**
    * @brief Construct a new Can Wrapper object
    *
@@ -51,7 +53,7 @@ public:
    * @return true
    * @return false
    */
-  bool Init(void);
+  bool Init(int transmit_id, int receive_id);
 
   /**
    * @brief @todo Add doxy doc
@@ -66,7 +68,7 @@ public:
    *
    * @param CanMessage
    */
-  void FeedbackHandler(const can_frame_t &CanMessage);
+  void FeedbackHandler(const WheelController::wheel_status_t &wheel_status);
 
   /**
    * @brief @todo Add doxy doc
@@ -100,25 +102,19 @@ public:
   bool cleanCanMessage(void);
 
   /**
-   * @brief @todo Add doxy doc
-   *
-   */
-  void resetCanInterrupts(void);
-
-  /**
    * @brief Destroy the Can Wrapper object
    *
    */
   ~CanWrapper() = default;
 
-private:
+ private:
   /**
    * @brief @todo Add doxy doc
    *
    * @return true
    * @return false
    */
-  bool Setup(void);
+  bool Setup(int receive_id);
 
   /**
    * @brief @todo Add doxy doc
@@ -130,6 +126,12 @@ private:
    * @brief @todo Add doxy doc
    *
    */
+  CanPackt *canpressor_;
+
+  /**
+   * @brief @todo Add doxy doc
+   *
+   */
   can_frame_t can_msg_{0, 8, {0}};
 };
-#endif // CAN_WRAPPER_H_
+#endif  // CAN_WRAPPER_H_

@@ -28,29 +28,20 @@
  * SOFTWARE.
  *
  */
-#include "drivers/include/can.h"
-#include "wheel_controller.hpp"
+#include "drivers/include/can.h"   // for can_frame_t
+#include "stl_helper_functions.h"  // for std::*
+#include "wheel_controller.hpp"    // for WheelController::MotorStatus
 
 #ifndef CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
 #define CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
 
-typedef struct MotorStatus {
-    int can_id;
-    int command_id;
-    int effort;
-    double position;
-    int rpm;
-    double velocity;
-} ros_motor_status_t;
-
 // Define a bit-field struct to represent the compressed motor status data
 typedef struct __attribute__((packed)) {
-    uint32_t can_id : 11;
-    uint32_t command_id : 8;
-    uint32_t effort : 12;
-    uint32_t position : 20;
-    uint32_t rpm : 10;
-    uint32_t velocity : 24;
+  uint32_t command_id : 8;
+  uint32_t effort : 12;
+  int32_t position : 19;  // 1 sign bit + 18 bits for magnitude
+  uint32_t rpm : 10;
+  int32_t velocity : 23;  // 1 sign bit + 22 bits for magnitude
 } compressed_motor_status_t;
 
 /**
@@ -58,91 +49,88 @@ typedef struct __attribute__((packed)) {
  *
  */
 class CanPackt {
-public:
+ public:
   /**
    * @brief Construct a new Can Packt object
    *
    */
-  CanPackt(void) = default;
+  CanPackt(int transmit_id, int receive_id)
+      : transmit_id_(transmit_id), receive_id_(receive_id){};
 
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @param motorStatus
-   * @return can_frame_t
-   */
-  can_frame_t ParseToCan(const WheelController::motor_status_t &motorStatus);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @param canFrame
-   * @return WheelController::motor_status_t
-   */
-  WheelController::motor_status_t ParseFromCan(const can_frame_t &canFrame);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @tparam inType
-   * @tparam outType
-   * @param data
-   * @return outType
-   */
-  template <typename inType, typename outType> outType compress(inType &data) {
-    outType _temp;
-
-    return outType{_temp};
+  template <typename inType, typename outType>
+  outType PackCompressed(const inType &data) {
+    return outType{};
   }
 
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @tparam inType
-   * @tparam outType
-   * @param msg
-   * @return outType
-   */
-  template <typename inType, typename outType> outType decompress(inType &msg) {
-    outType _temp;
-
-    return _temp;
+  template <typename inType, typename outType>
+  outType UnpackCompressed(const inType &data) {
+    return outType{};
   }
 
-private:
-  /**
-   * @brief
-   *
-   * @tparam T
-   * @param number
-   * @return int
-   */
-  template <typename T> int addPrecision(T number) {
-    return (number * kPrecision);
-  }
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @tparam T
-   * @param number
-   * @return double
-   */
-  template <typename T> double removePrecision(T number) {
-    return (number * kReversePrecision);
-  }
-
-  /**
-   * @brief
-   *
-   */
-  int kPrecision{100};
-
-  /**
-   * @brief
-   *
-   */
-  double kReversePrecision{0.01};
+ private:
+  int transmit_id_{0x00};
+  int receive_id_{0x00};
 };
 
-#endif // CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
+/**
+ * @brief
+ *
+ * @tparam
+ * @param data
+ * @return can_frame_t
+ */
+template <>
+inline can_frame_t
+CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
+    const WheelController::wheel_status_t &wheel_status) {
+  can_frame_t canFrame;
+  canFrame.can_id = transmit_id_;
+  canFrame.can_dlc = CAN_MAX_DLEN;
+
+  // Compress the motor status data into a bit-field struct
+  compressed_wheel_status_t compressed_status;
+  compressed_status.command_id = wheel_status.CommandId();
+  compressed_status.effort = wheel_status.Effort() & 0xFFF;
+  compressed_status.position =
+      static_cast<int32_t>(wheel_status.Position() * 100);
+  compressed_status.rpm = wheel_status.Rpm() & 0x3FF;
+  compressed_status.velocity =
+      static_cast<int32_t>(wheel_status.Velocity() * 100);
+
+  // Copy the compressed data into the CAN frame
+  ::memcpy(canFrame.data, &compressed_status,
+           sizeof(compressed_wheel_status_t));
+
+  return canFrame;
+}
+
+/**
+ * @brief @todo Add doxy doc
+ *
+ * @tparam inType
+ * @tparam outType
+ * @param msg
+ * @return outType
+ */
+template <>
+inline WheelController::wheel_status_t
+CanPackt::UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
+    const can_frame_t &can_frame) {
+  WheelController::wheel_status_t wheel_status;
+
+  // Extract the compressed data from the CAN frame
+  compressed_wheel_status_t compressed_status;
+  ::memcpy(&compressed_status, can_frame.data,
+           sizeof(compressed_wheel_status_t));
+
+  // Unpack the compressed data into the motor status struct
+  wheel_status.CommandId(compressed_status.command_id);
+  wheel_status.Effort(compressed_status.effort);
+  wheel_status.Position(static_cast<double>(compressed_status.position) / 100);
+  wheel_status.Rpm(compressed_status.rpm);
+  wheel_status.Velocity(static_cast<double>(compressed_status.velocity) / 100);
+
+  return wheel_status;
+}
+
+#endif  // CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_

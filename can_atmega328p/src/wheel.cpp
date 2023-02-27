@@ -52,49 +52,46 @@ pin_configuration_t Wheel::Configuration() const { return pin_configuration_; }
 bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
   switch (wheelEnum) {
     case Wheel::Wheel_Enum::kFrontLeft: {
-      properties_.CommandId(
+      properties_.ReceiveId(
           static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontLeft));
-      properties_.FeedbackId(
+      properties_.TransmitId(
           static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontLeft));
-      properties_.Inverse(false);
 
       return true;
     }
 
     case Wheel::Wheel_Enum::kFrontRight: {
-      properties_.CommandId(
+      properties_.ReceiveId(
           static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontRight));
-      properties_.FeedbackId(
+      properties_.TransmitId(
           static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontRight));
-      properties_.Inverse(true);
 
       return true;
     }
 
     case Wheel::Wheel_Enum::kBackLeft: {
-      properties_.CommandId(
+      properties_.ReceiveId(
           static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackLeft));
-      properties_.FeedbackId(
+      properties_.TransmitId(
           static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackLeft));
-      properties_.Inverse(false);
 
       return true;
     }
 
     case Wheel::Wheel_Enum::kBackRight: {
-      properties_.CommandId(
+      properties_.ReceiveId(
           static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackRight));
-      properties_.FeedbackId(
+      properties_.TransmitId(
           static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackRight));
-      properties_.Inverse(true);
 
       return true;
     }
 
     default: {
-      properties_.CommandId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
-      properties_.FeedbackId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
-      properties_.Inverse(false);
+      properties_.ReceiveId(
+          static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+      properties_.TransmitId(
+          static_cast<uint8_t>(Wheel::CanId::kUnspecified));
 
       return true;
     }
