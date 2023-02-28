@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.0.2)
 project(MotorController
         VERSION 0.5.0
         DESCRIPTION "Firmware to control the motor hub of jimmBOT"

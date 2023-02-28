@@ -1,5 +1,5 @@
 /**
- * @file iwheel_controller.hpp
+ * @file iwheel_controller.h
  * @author Mergim Halimi (m.halimi123@gmail.com)
  * @brief
  * @version 0.1
@@ -30,8 +30,8 @@
 #ifndef CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
 
-#include "can_wrapper.hpp"
-#include "wheel_controller.hpp"
+#include "can_wrapper.h"       // for CanWrapper
+#include "wheel_controller.h"  // for WheelController
 
 /**
  * @brief Interface for a wheel controller.

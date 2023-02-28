@@ -1,5 +1,5 @@
 /**
- * @file can_packt.hpp
+ * @file can_packt.h
  * @author Mergim Halimi (m.halimi123@gmail.com)
  * @brief A class for packing and unpacking compressed CAN messages.
  * @version 0.1
@@ -28,7 +28,7 @@
  *
  */
 #include "drivers/include/can.h"  // for can_frame_t
-#include "wheel_controller.hpp"   // for WheelController::wheel_status_t
+#include "wheel_controller.h"     // for WheelController::wheel_status_t
 
 #ifndef CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
 #define CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
@@ -69,7 +69,16 @@ class CanPackt {
    */
   template <typename inType, typename outType>
   outType PackCompressed(const inType &data) {
-    return outType{};
+    static_assert(sizeof(inType) <= CAN_MAX_DLEN,
+                  "Struct is larger than CAN message data field size");
+
+    can_frame_t canFrame;
+    canFrame.can_id = transmit_id_;
+    canFrame.can_dlc = CAN_MAX_DLEN;
+
+    ::memcpy(canFrame.data, &data, sizeof(inType));
+
+    return canFrame;
   }
 
   /**
@@ -82,8 +91,14 @@ class CanPackt {
    * @return the unpacked wheel status data structure
    */
   template <typename inType, typename outType>
-  outType UnpackCompressed(const inType &data) {
-    return outType{};
+  outType UnpackCompressed(const inType &can_frame) {
+    static_assert(sizeof(outType) <= CAN_MAX_DLEN,
+                  "Struct is larger than CAN message data field size");
+
+    outType data;
+    ::memcpy(&data, can_frame.data, sizeof(outType));
+
+    return data;
   }
 
  private:
@@ -154,5 +169,4 @@ CanPackt::UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
 
   return wheel_status;
 }
-
 #endif  // CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_

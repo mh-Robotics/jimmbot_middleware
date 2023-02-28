@@ -29,7 +29,7 @@
  * SOFTWARE.
  *
  */
-#include "wheel_controller.hpp"
+#include "wheel_controller.h"  // for WheelController
 
 bool WheelController::Init(const Wheel &wheel) {
   wheel_ = &wheel;
@@ -49,7 +49,6 @@ void WheelController::WheelSignalIrqHandler(void) {
   CalculateWheelOdometry();
 }
 
-// https://www.digikey.com/en/blog/using-bldc-hall-sensors-as-position-encoders-part-1
 bool WheelController::CalculateWheelOdometry(void) {
   std::call_once(first_odometry_tick_, [this]() { old_time_ = ::micros(); });
   time_taken_ = ::micros() - old_time_;
@@ -74,10 +73,10 @@ bool WheelController::TimeoutCheck(void) {
   return (::micros() - timeout_ >= kTimeoutMs);
 }
 
-// True = forward, False = reverse
 void WheelController::SetDirection(bool direction) {
   wheel_->Properties().Reverse(!direction);
 
+  // Active Low: Direction clockwise
   digitalWrite(wheel_->Configuration().motor_direction, direction);
 }
 
@@ -96,8 +95,14 @@ WheelController::wheel_status_t WheelController::WheelStatus(void) {
   return wheel_status_;
 }
 
-void WheelController::Break(bool kBreak) {
-  digitalWrite(wheel_->Configuration().motor_brake, kBreak);
+void WheelController::Brake(bool kBrake) {
+  // Active High: Brake applied
+  digitalWrite(wheel_->Configuration().motor_brake, kBrake);
 }
 
-void WheelController::Drive(bool drive) { Break(!drive); }
+void WheelController::Stop(bool kStop) {
+  // Active Low: Drive disabled
+  digitalWrite(wheel_->Configuration().motor_stop, !kStop);
+}
+
+void WheelController::Drive(bool drive) { Brake(!drive); }

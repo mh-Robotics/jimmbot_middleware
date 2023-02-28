@@ -30,10 +30,10 @@
  * SOFTWARE.
  *
  */
-#include "can_wrapper.hpp"        // for CanWrapper
-#include "iwheel_controller.hpp"  // for IWheelController
-#include "wheel.hpp"              // for Wheel
-#include "wheel_controller.hpp"   // for WheelController
+#include "can_wrapper.h"        // for CanWrapper
+#include "iwheel_controller.h"  // for IWheelController
+#include "wheel.h"              // for Wheel
+#include "wheel_controller.h"   // for WheelController
 
 Wheel wheel;
 WheelController wheel_controller;

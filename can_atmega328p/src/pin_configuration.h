@@ -1,5 +1,5 @@
 /**
- * @file pin_configuration.hpp
+ * @file pin_configuration.h
  * @author Mergim Halimi (m.halimi123@gmail.com)
  * @brief Pin Configuration structure that holds all the pin numbers and
  * connections for this firmware to work.
@@ -31,7 +31,7 @@
 #ifndef CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
 #define CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
 
-#include "Arduino.h"
+#include "Arduino.h"  // for digital*, analogWrite()
 
 /**
  * @brief Pin Configuration structure that holds all the pin numbers and
@@ -46,10 +46,10 @@ typedef struct PinConfiguration {
   uint8_t motor_brake;
 
   /**
-   * @brief Holds the motor enable pin number
+   * @brief Holds the motor stop pin number
    *
    */
-  uint8_t motor_enable;
+  uint8_t motor_stop;
 
   /**
    * @brief Holds the motor encoder pin number
@@ -129,7 +129,7 @@ typedef struct PinConfiguration {
    */
   PinConfiguration()
       : motor_brake{7},
-        motor_enable{4},
+        motor_stop{4},
         motor_signal{3},
         motor_direction{5},
         motor_speed{6},
@@ -170,7 +170,7 @@ typedef struct PinConfiguration {
                    const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
                    const uint8_t &wheelBackRight)
       : motor_brake{motorBrake},
-        motor_enable{motorEnable},
+        motor_stop{motorEnable},
         motor_signal{motorSignal},
         motor_direction{motorDirection},
         motor_speed{motorSpeed},
@@ -202,5 +202,4 @@ constexpr uint8_t kSpeedByteIndex = 7;
  *
  */
 constexpr uint8_t kTimeoutMs = 250;
-
 #endif  // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
