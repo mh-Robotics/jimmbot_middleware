@@ -27,146 +27,131 @@
  * SOFTWARE.
  *
  */
-#ifndef CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
-#define CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
+#ifndef CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
+#define CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
 
 #include "can_wrapper.hpp"
 #include "wheel_controller.hpp"
 
 /**
- * @brief @todo Add doxy doc
+ * @brief Interface for a wheel controller.
  *
  */
 class IWheelController {
  public:
   /**
-   * @brief Construct a new IWheelController object
+   * @brief Construct a new IWheelController object.
    *
    */
   IWheelController() = default;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Initializes the wheel controller with a specified WheelController
+   * object and CanWrapper object.
    *
-   * @return true
-   * @return false
+   * @param wheel_controller The WheelController object.
+   * @param can_wrapper The CanWrapper object.
+   * @return true if initialization is successful, false otherwise.
    */
-  bool Init(const WheelController &wheel_controller,
-            const CanWrapper &can_wrapper);
+  bool Init(WheelController &wheel_controller, CanWrapper &can_wrapper);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Returns the status of the CommandReady flag.
    *
-   * @return true
-   * @return false
+   * @return true if the CommandReady flag is set, false otherwise.
    */
-  bool CommandReady(void);
+  bool CommandReady(void) const;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Sets the CommandReady flag to the specified value.
    *
-   * @param flag
+   * @param flag The value to set the CommandReady flag to.
    */
-  void CommandReady(const bool &flag);
+  void CommandReady(bool flag);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Returns the status of the FeedbackReady flag.
    *
-   * @return true
-   * @return false
+   * @return true if the FeedbackReady flag is set, false otherwise.
    */
-  bool FeedbackReady(void);
+  bool FeedbackReady(void) const;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Sets the FeedbackReady flag to the specified value.
    *
-   * @param flag
+   * @param flag The value to set the FeedbackReady flag to.
    */
-  void FeedbackReady(const bool &flag);
+  void FeedbackReady(bool flag);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Updates the CAN message for the wheel controller.
    *
-   * @return true
-   * @return false
+   * @return true if the update is successful, false otherwise.
    */
   bool UpdateCanMessage(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Updates the empty CAN message for the wheel controller.
    *
-   * @return true
-   * @return false
+   * @return true if the update is successful, false otherwise.
    */
-  bool UpdateEmptyCanMessage(void);
+  bool UpdateEmptyCanMessage(void) const;
 
   /**
-   * @brief @todo Add doxy doc
-   *
-   * @return true
-   * @return false
+   * @brief Updates the wheel signal for the wheel controller.
    */
-  void UpdateWheelSignal(void);
+  void UpdateWheelSignal(void) const;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Callback function for the command.
    *
-   * @return true
-   * @return false
+   * @return true if the callback is successful, false otherwise.
    */
   bool CommandCallback(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Callback function for the feedback.
    *
-   * @return true
-   * @return false
+   * @return true if the callback is successful, false otherwise.
    */
   bool FeedbackCallback(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Callback function for the timeout check.
    *
-   * @return true
-   * @return false
+   * @return true if the callback is successful, false otherwise.
    */
-  bool TimeoutCheckCallback(void);
+  bool TimeoutCheckCallback(void) const;
 
   /**
-   * @brief Destroy the IWheelController object
-   *
+   * @brief Destroy the IWheelController object.
    */
   ~IWheelController(void) = default;
 
  private:
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief Updates the timeout for the wheel controller.
    */
-  void UpdateTimeout(void);
+  void UpdateTimeout(void) const;
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief The WheelController object for the wheel controller.
    */
-  WheelController *wheel_controller_;
+  WheelController *wheel_controller_{nullptr};
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief The CanWrapper object for the wheel controller.
    */
-  CanWrapper *can_wrapper_;
+  CanWrapper *can_wrapper_{nullptr};
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief Flag for updating the wheel controller.
    */
   volatile bool update_flag_;
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief Flag for feedback from the wheel controller.
    */
   volatile bool feedback_flag_;
 };
-#endif  // CAN_ATMEGA328P_SRC_INTERFACE_WHEEL_CONTROLLER_HPP_
+#endif  // CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_

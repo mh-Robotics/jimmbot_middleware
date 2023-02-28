@@ -29,10 +29,9 @@
  */
 #include "can_wrapper.hpp"
 
-bool CanWrapper::Init(int transmit_id, int receive_id) {
+bool CanWrapper::Init(uint8_t transmit_id, uint8_t receive_id) {
   canpressor_ = new CanPackt(transmit_id, receive_id);
-
-  return CanWrapper::Setup(receive_id);
+  return Setup(receive_id);
 }
 
 bool CanWrapper::Setup(int receive_id) {
@@ -41,8 +40,6 @@ bool CanWrapper::Setup(int receive_id) {
 
   err = mcp_can_.reset();
   err = mcp_can_.setBitrate(CAN_500KBPS, MCP_8MHZ);
-
-  // Possible id's: [0, 1, 2, 3].
   err = mcp_can_.setConfigMode();
   err = mcp_can_.setFilterMask(MCP2515::MASK0, false, 0x03);
   err = mcp_can_.setFilter(MCP2515::RXF0, false, receive_id);
@@ -50,15 +47,15 @@ bool CanWrapper::Setup(int receive_id) {
   err = mcp_can_.setFilter(MCP2515::RXF2, false, receive_id);
   err = mcp_can_.setNormalMode();
 
-  return ((err == MCP2515::ERROR_OK) ? true : false);
+  return err == MCP2515::ERROR_OK;
 }
 
 bool CanWrapper::CommandHandler(void) {
-  return (mcp_can_.readMessage(&can_msg_) != MCP2515::ERROR_OK);
+  return mcp_can_.readMessage(&can_msg_) != MCP2515::ERROR_OK;
 }
 
 void CanWrapper::FeedbackHandler(
-    const WheelController::wheel_status_t &wheel_status) {
+    const WheelController::wheel_status_t& wheel_status) {
   mcp_can_.sendMessage(
       &canpressor_->PackCompressed<WheelController::wheel_status_t,
                                    can_frame_t>(wheel_status));
@@ -67,9 +64,8 @@ void CanWrapper::FeedbackHandler(
 can_frame_t CanWrapper::CanMessage(void) { return can_msg_; }
 
 int CanWrapper::SpeedPwm(void) volatile {
-  return (can_msg_.data[kDirectionByteIndex]
-              ? can_msg_.data[kSpeedByteIndex] * -1
-              : can_msg_.data[kSpeedByteIndex]);
+  return can_msg_.data[kDirectionByteIndex] ? -can_msg_.data[kSpeedByteIndex]
+                                            : can_msg_.data[kSpeedByteIndex];
 }
 
 bool CanWrapper::cleanCanMessage(void) {

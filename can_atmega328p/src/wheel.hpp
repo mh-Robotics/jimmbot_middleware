@@ -33,13 +33,11 @@
 #include "pin_configuration.hpp"
 
 /**
- * @brief @todo Add Doxy doc
- *
+ * @brief A class representing a wheel
  */
 class Wheel {
   /**
-   * @brief @todo Add Doxy doc
-   *
+   * @brief An enum representing the different wheels
    */
   enum class Wheel_Enum : uint8_t {
     kBegin = 0,
@@ -52,8 +50,7 @@ class Wheel {
   };
 
   /**
-   * @brief @todo Add Doxy doc
-   *
+   * @brief An enum representing the different CAN IDs
    */
   enum class CanId : uint8_t {
     kBegin = 0,
@@ -71,8 +68,7 @@ class Wheel {
 
  public:
   /**
-   * @brief @todo Add Doxy doc
-   *
+   * @brief An enum representing the different commands
    */
   enum class Command : uint8_t {
     kBegin = 0,
@@ -86,163 +82,152 @@ class Wheel {
   };
 
   /**
-   * @brief Properties strucutre that hold the wheel stats
-   *
+   * @brief A structure representing the properties of a wheel
    */
   typedef struct Properties {
    public:
     /**
-     * @brief @todo Add doxy doc
+     * @brief Get the receive ID of the wheel
      *
-     * @return uint8_t
+     * @return The receive ID of the wheel
      */
     uint8_t ReceiveId(void) const { return command_id; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Set the receive ID of the wheel
      *
-     * @param command_id
+     * @param command_id The receive ID of the wheel
      */
     void ReceiveId(const uint8_t &command_id) { this->command_id = command_id; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Get the transmit ID of the wheel
      *
-     * @return uint8_t
+     * @return The transmit ID of the wheel
      */
     uint8_t TransmitId(void) const { return feedback_id; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Set the transmit ID of the wheel
      *
-     * @param feedback_id
+     * @param feedback_id The transmit ID of the wheel
      */
     void TransmitId(const uint8_t &feedback_id) {
       this->feedback_id = feedback_id;
     }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Get whether the wheel is reversed
      *
-     * @return true
-     * @return false
+     * @return True if the wheel is reversed, false otherwise
      */
     bool Reverse(void) const { return reverse; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Set whether the wheel is reversed
      *
-     * @param reverse
+     * @param reverse True if the wheel is reversed, false otherwise
      */
     void Reverse(const bool &reverse) { this->reverse = reverse; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Get the radius of the wheel
      *
-     * @return double
+     * @return double The radius in centimeters
      */
     double Radius(void) const { return kRadius; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Get the number of encoder pulses per revolution of the wheel
      *
-     * @return int
+     * @return int The number of pulses
      */
     int PulsePerRevolution(void) const { return kPulsePerRevolution; }
 
    private:
     /**
-     * @brief @todo Add doxy doc
-     *
+     * @brief The CAN ID for sending commands to the wheel
      */
     uint8_t command_id{0x00};
 
     /**
-     * @brief @todo Add doxy doc
-     *
+     * @brief The CAN ID for receiving feedback from the wheel
      */
     uint8_t feedback_id{0x00};
 
     /**
-     * @brief @todo Add doxy doc
-     *
+     * @brief Whether the wheel is reversed
      */
     bool reverse{false};
 
     /**
-     * @brief @todo Add doxy doc
-     *
+     * @brief The radius of the wheel in centimeters
      */
     const double kRadius{8.25};
 
     /**
-     * @brief @todo Add doxy doc
-     *
+     * @brief The number of encoder pulses per revolution of the wheel
      */
     const int kPulsePerRevolution{90};
   } properties_t;
 
   /**
    * @brief Construct a new Wheel object
-   *
    */
   Wheel(void) = default;
 
   /**
-   * @brief @todo Add Doxy doc
+   * @brief Initialize the Wheel object with given pin configuration
    *
-   * @param pinConfiguration
-   * @return true
-   * @return false
+   * @param pinConfiguration The pin configuration to be used for the wheel
+   * @return true Initialization successful
+   * @return false Initialization failed
    */
   bool Init(void);
 
   /**
-   * @brief Returns the properties object
+   * @brief Returns the properties object for this wheel
    *
-   * @return properties_t
+   * @return properties_t The properties object for this wheel
    */
   properties_t Properties(void) const;
 
   /**
-   * @brief Returns the pin_configuration_t object
+   * @brief Returns the pin configuration object for this wheel
    *
-   * @return pin_configuration_t
+   * @return pin_configuration_t The pin configuration object for this wheel
    */
   pin_configuration_t Configuration(void) const;
 
   /**
    * @brief Destroy the Wheel object
-   *
    */
   ~Wheel() = default;
 
  private:
   /**
-   * @brief Sets the specific properties for wheel
+   * @brief Sets the specific properties for the wheel
    *
-   * @param wheelEnum Specific wheel
-   * @return true Set finished sucessfully
-   * @return false Set failed
+   * @param wheelEnum The specific wheel to set properties for
+   * @return true Setting properties successful
+   * @return false Setting properties failed
    */
   bool EnumToCanId(const Wheel::Wheel_Enum &wheelEnum);
 
   /**
-   * @brief Determines which wheel does this object belongs too
+   * @brief Determines which wheel this object belongs to
    *
-   * @return Wheel_Enum
+   * @return Wheel_Enum The enum value of the wheel this object belongs to
    */
   Wheel_Enum DetermineWheel(void);
 
   /**
-   * @brief Wheel properties_t object
-   *
+   * @brief The properties object for this wheel
    */
   properties_t properties_;
 
   /**
-   * @brief Wheel pin_configuration_t object
-   *
+   * @brief The pin configuration object for this wheel
    */
   pin_configuration_t pin_configuration_;
 };

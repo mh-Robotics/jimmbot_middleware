@@ -34,62 +34,61 @@
 bool WheelController::Init(const Wheel &wheel) {
   wheel_ = &wheel;
 
-  return WheelController::Setup();
-}
-
-bool WheelController::Setup() {
   Drive(false);
 
   return true;
 }
 
 void WheelController::WheelSignalIrqHandler(void) {
-  wheel_->Properties().Reverse() ? signal_counter_-- : signal_counter_++;
+  if (wheel_->Properties().Reverse()) {
+    signal_counter_--;
+  } else {
+    signal_counter_++;
+  }
+
   CalculateWheelOdometry();
 }
 
 // https://www.digikey.com/en/blog/using-bldc-hall-sensors-as-position-encoders-part-1
 bool WheelController::CalculateWheelOdometry(void) {
-  std::call_once(first_odometry_tick_, [this]() { old_time_ = ::millis(); });
-  time_taken_ = ::millis() - old_time_;
+  std::call_once(first_odometry_tick_, [this]() { old_time_ = ::micros(); });
+  time_taken_ = ::micros() - old_time_;
   wheel_status_.Effort(10);
   double circumference = 2 * M_PI * wheel_->Properties().Radius();
   wheel_status_.Position(
-      (circumference / wheel_->Properties().PulsePerRevolution()) *
-      signal_counter_ / 100);  // Pose in CM
+      (circumference * signal_counter_) /
+      (100 * wheel_->Properties().PulsePerRevolution()));  // Pose in CM
+
   wheel_status_.Rpm(
       (1 / (time_taken_ * wheel_->Properties().PulsePerRevolution())) * 60.0);
-  wheel_status_.Velocity(wheel_status_.Position() / time_taken_);
 
-  old_time_ = ::millis();
+  wheel_status_.Velocity((circumference * wheel_status_.Rpm() * 60) / 3600);
+
+  old_time_ = ::micros();
   return true;
 }
 
-void WheelController::UpdateTimeout(void) { timeout_ = ::millis(); }
+void WheelController::UpdateTimeout(void) { timeout_ = ::micros(); }
 
 bool WheelController::TimeoutCheck(void) {
-  return (::millis() - timeout_ >= kTimeoutMs);
+  return (::micros() - timeout_ >= kTimeoutMs);
 }
 
 // True = forward, False = reverse
-void WheelController::SetDirection(const bool &direction) {
+void WheelController::SetDirection(bool direction) {
   wheel_->Properties().Reverse(!direction);
 
   digitalWrite(wheel_->Configuration().motor_direction, direction);
 }
 
-void WheelController::SetSpeed(const int &speed) {
-  if (speed == 0) {
-    analogWrite(wheel_->Configuration().motor_speed, abs(speed));
+void WheelController::SetSpeed(int speed) {
+  int abs_speed = abs(speed);
+  if (abs_speed == 0) {
     Drive(false);
-  } else if (speed > 0) {
+  } else {
     Drive(true);
-    SetDirection(true);
-    analogWrite(wheel_->Configuration().motor_speed, abs(speed));
-  } else if (speed < 0) {
-    Drive(true);
-    SetDirection(false);
-    analogWrite(wheel_->Configuration().motor_speed, abs(speed));
+    SetDirection(speed > 0);
+    analogWrite(wheel_->Configuration().motor_speed, abs_speed);
   }
 }
 
@@ -97,8 +96,8 @@ WheelController::wheel_status_t WheelController::WheelStatus(void) {
   return wheel_status_;
 }
 
-void WheelController::Break(const bool &kBreak) {
+void WheelController::Break(bool kBreak) {
   digitalWrite(wheel_->Configuration().motor_brake, kBreak);
 }
 
-void WheelController::Drive(const bool &drive) { Break(!drive); }
+void WheelController::Drive(bool drive) { Break(!drive); }

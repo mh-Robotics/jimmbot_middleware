@@ -1,8 +1,7 @@
 /**
  * @file can_packt.hpp
  * @author Mergim Halimi (m.halimi123@gmail.com)
- * @brief CanPackt class declaration that is used to parse ::can_frame message
- * to WheelController::MotorStatus and vice-versa.
+ * @brief A class for packing and unpacking compressed CAN messages.
  * @version 0.1
  * @date 2021-10-09
  *
@@ -28,56 +27,78 @@
  * SOFTWARE.
  *
  */
-#include "drivers/include/can.h"   // for can_frame_t
-#include "stl_helper_functions.h"  // for std::*
-#include "wheel_controller.hpp"    // for WheelController::MotorStatus
+#include "drivers/include/can.h"  // for can_frame_t
+#include "wheel_controller.hpp"   // for WheelController::wheel_status_t
 
 #ifndef CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
 #define CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
 
-// Define a bit-field struct to represent the compressed motor status data
+/**
+ * @brief Defines a bit-field struct to represent the compressed motor status
+ * data
+ */
 typedef struct __attribute__((packed)) {
-  uint32_t command_id : 8;
-  uint32_t effort : 12;
-  int32_t position : 19;  // 1 sign bit + 18 bits for magnitude
-  uint32_t rpm : 10;
-  int32_t velocity : 23;  // 1 sign bit + 22 bits for magnitude
-} compressed_motor_status_t;
+  uint32_t command_id : 8; /**< Command ID */
+  uint32_t effort : 12;    /**< Effort */
+  int32_t position : 19;   /**< Position: 1 sign bit + 18 bits for magnitude */
+  uint32_t rpm : 10;       /**< RPM */
+  int32_t velocity : 23;   /**< Velocity: 1 sign bit + 22 bits for magnitude */
+} compressed_wheel_status_t;
 
 /**
- * @brief @todo Add doxy doc
- *
+ * @brief A class for packing and unpacking compressed CAN messages
  */
 class CanPackt {
  public:
   /**
    * @brief Construct a new Can Packt object
    *
+   * @param transmit_id the ID of the transmitter node
+   * @param receive_id the ID of the receiver node
    */
-  CanPackt(int transmit_id, int receive_id)
+  CanPackt(uint8_t transmit_id, uint8_t receive_id)
       : transmit_id_(transmit_id), receive_id_(receive_id){};
 
+  /**
+   * @brief Packs a compressed wheel status data structure into a CAN frame
+   *
+   * @tparam inType the input data type (must be a wheel_status_t)
+   * @tparam outType the output data type (must be a can_frame_t)
+   * @param data the input data to pack
+   * @return the packed CAN frame
+   */
   template <typename inType, typename outType>
   outType PackCompressed(const inType &data) {
     return outType{};
   }
 
+  /**
+   * @brief Unpacks a compressed wheel status CAN frame into a wheel status data
+   * structure
+   *
+   * @tparam inType the input data type (must be a can_frame_t)
+   * @tparam outType the output data type (must be a wheel_status_t)
+   * @param msg the CAN frame to unpack
+   * @return the unpacked wheel status data structure
+   */
   template <typename inType, typename outType>
   outType UnpackCompressed(const inType &data) {
     return outType{};
   }
 
  private:
-  int transmit_id_{0x00};
-  int receive_id_{0x00};
+  uint8_t transmit_id_{0x00}; /**< The ID of the transmitter node */
+  uint8_t receive_id_{0x00};  /**< The ID of the receiver node */
 };
 
 /**
- * @brief
+ * @brief Specialization of the PackCompressed template function for packing a
+ * wheel_status_t into a can_frame_t
  *
- * @tparam
- * @param data
- * @return can_frame_t
+ * @tparam inType The type of the input data.
+ * @tparam outType The type of the output data.
+ * @param wheel_status The input data to pack.
+ * @return The packed data as a CAN frame.
  */
 template <>
 inline can_frame_t
@@ -105,12 +126,13 @@ CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
 }
 
 /**
- * @brief @todo Add doxy doc
+ * @brief Specialization of the PackCompressed template function for unpacking a
+ * can_frame_t into a wheel_status_t
  *
- * @tparam inType
- * @tparam outType
- * @param msg
- * @return outType
+ * @tparam inType The type of the input data.
+ * @tparam outType The type of the output data.
+ * @param can_frame_t The input data to pack.
+ * @return The packed data as a wheel status data structure.
  */
 template <>
 inline WheelController::wheel_status_t

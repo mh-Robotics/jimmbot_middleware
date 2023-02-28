@@ -1,7 +1,9 @@
 # MotorController Firmware
-## TODO Add readme info
+This is the firmware code for the motor hub of jimmBOT. This README file provides information on how to build the code and what to expect.
+## Building the code
 
-### Release build disables UART
+### Release build
+A release build disables UART.
 ```bash
 mkdir build
 cd build
@@ -9,8 +11,8 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 cmake --build .
 ```
 
-### Debug build enables UART and prints data to serial
-#### Todo: add serial information, baud rate 
+### Debug build
+A debug build enables UART and prints data to serial. The baud rate for the serial communication is not specified in the code, so it needs to be set manually in your terminal program.
 ```bash
 mkdir build
 cd build
@@ -18,6 +20,33 @@ cmake -DCMAKE_BUILD_TYPE=Debug ..
 cmake --build .
 ```
 
-todo - add these options too, and cleanup CMakeLists
--DCMAKE_BUILD_DOC=On
--DCMAKE_BUILD_TESTS=On
+### Additional build options
+To build the documentation and tests, use the following options:
+```bash
+cmake -DCMAKE_BUILD_DOC=On ..
+cmake -DCMAKE_BUILD_TESTS=On ..
+```
+
+## Hardware Setup
+Connect your motor hub to your computer via USB. If the firmware is running, it should enumerate as a virtual serial port. The port name varies depending on your system. On Linux, it will typically be /dev/ttyACM0 or /dev/ttyACM1. On Windows, it will typically be COM3 or COM4. You can use a terminal program such as PuTTY or TeraTerm to communicate with the motor hub.
+
+## Communication Protocol
+The motor hub communicates with a host computer over a serial connection. The protocol is ASCII-based, with each command and response terminated by a newline character (\n).
+
+### Command Format
+The command frame format is:
+```
+| ID (2 bytes) | Length (1 byte) | Data (up to 8 bytes) |
+```
+
+#### Command ID
+The command ID is a 2-byte field that identifies the type of command being sent. The lower byte specifies the command type, while the upper byte specifies the target motor ID. For example, the command ID 0x0123 might indicate a speed command for motor ID 0x23.
+
+#### Command Length
+The command length field is a 1-byte value that specifies the number of bytes of data in the command frame. This can be between 0 and 8 bytes.
+
+#### Command Data
+The command data field contains the actual data for the command. The contents of this field depend on the command type and may be empty for some commands.
+
+## License
+This code is licensed under the MIT License. See the LICENSE file for details.

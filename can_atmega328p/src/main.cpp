@@ -30,9 +30,10 @@
  * SOFTWARE.
  *
  */
-#include "iwheel_controller.hpp"
-#include "wheel.hpp"
-#include "wheel_controller.hpp"
+#include "can_wrapper.hpp"        // for CanWrapper
+#include "iwheel_controller.hpp"  // for IWheelController
+#include "wheel.hpp"              // for Wheel
+#include "wheel_controller.hpp"   // for WheelController
 
 Wheel wheel;
 WheelController wheel_controller;
@@ -69,7 +70,7 @@ void setup() {
   i_wheel_controller.Init(wheel_controller, can_wrapper);
 
   attachInterrupt(digitalPinToInterrupt(wheel.Configuration().motor_signal),
-                  IsrEncoderPulse, FALLING);
+                  IsrEncoderPulse, RISING);
 }
 
 void loop() {

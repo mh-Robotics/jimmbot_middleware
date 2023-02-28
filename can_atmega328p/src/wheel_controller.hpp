@@ -1,13 +1,12 @@
 /**
  * @file wheel_controller.hpp
  * @author Mergim Halimi (m.halimi123@gmail.com)
- * @brief WheelController class declaration that initializes the controller and
- * instantiates a Wheel. It controls and sets the logic as requested from CanBus
- * message.
+ * @brief Declaration of the WheelController class that controls a Wheel object
+ * according to messages received over CanBus.
  * @version 0.1
  * @date 2021-10-09
  *
- * @copyright Copyright (c) 2021, mhRobotics, Inc., All rights reserved.
+ * @copyright Copyright (c) 2021, mhRobotics
  * @license This project is released under the MIT License.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,91 +31,78 @@
 #ifndef CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 
-#include <math.h>
-#include <stdlib.h>
-
 #include "stl_helper_functions.h"
 #include "wheel.hpp"
 
 /**
- * @brief @todo Add doxy doc
+ * @brief Controls a Wheel object according to messages received over CanBus.
  *
  */
 class WheelController {
  public:
   /**
-   * @brief @todo Add doxy doc
+   * @brief Struct that contains the status of the Wheel.
    *
    */
   typedef struct WheelStatus {
    public:
     /**
-     * @brief @todo Add doxy doc
-     *
-     * @return int
+     * @brief Gets the command ID associated with the WheelStatus.
      */
     int CommandId(void) const { return command_id; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Sets the command ID associated with the WheelStatus.
      *
-     * @param command_id
+     * @param command_id The command ID to set.
      */
     void CommandId(const int &command_id) { this->command_id = command_id; }
 
     /**
-     * @brief @todo Add doxy doc
-     *
-     * @return double
+     * @brief Gets the effort value associated with the WheelStatus.
      */
     int Effort(void) const { return effort; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Sets the effort value associated with the WheelStatus.
      *
-     * @param effort
+     * @param effort The effort value to set.
      */
-    void Effort(const double &effort) { this->effort = effort; }
+    void Effort(const int &effort) { this->effort = effort; }
 
     /**
-     * @brief @todo Add doxy doc
-     *
-     * @return double
+     * @brief Gets the position value associated with the WheelStatus.
      */
     double Position(void) const { return position; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Sets the position value associated with the WheelStatus.
      *
-     * @param position
+     * @param position The position value to set.
      */
     void Position(const double &position) { this->position = position; }
 
     /**
-     * @brief @todo Add doxy doc
-     *
-     * @return int
+     * @brief Gets the RPM value associated with the WheelStatus.
      */
     int Rpm(void) const { return rpm; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Sets the RPM value associated with the WheelStatus.
      *
-     * @param rpm
+     * @param rpm The RPM value to set.
      */
     void Rpm(const int &rpm) { this->rpm = rpm; }
 
     /**
-     * @brief @todo Add doxy doc
-     *
-     * @return double
+     * @brief Gets the velocity value associated with the WheelStatus.
      */
     double Velocity(void) const { return velocity; }
 
     /**
-     * @brief @todo Add doxy doc
+     * @brief Sets the velocity value associated with the WheelStatus.
      *
-     * @param velocity
+     * @param velocity The velocity value to set.
      */
     void Velocity(const double &velocity) { this->velocity = velocity; }
 
@@ -130,147 +116,90 @@ class WheelController {
 
   /**
    * @brief Construct a new Wheel Controller object
-   *
    */
   WheelController(void) = default;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Initializes the wheel controller with the given wheel.
    *
-   * @param pinConfiguration
-   * @return true
-   * @return false
+   * @param wheel The wheel to be controlled.
+   * @return true if initialization was successful, false otherwise.
    */
   bool Init(const Wheel &wheel);
 
   /**
-   * @brief @todo Add doxy doc
-   *
-   * @return true
-   * @return false
-   */
-  bool Setup(void);
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   * @return true
-   * @return false
+   * @brief Handles the wheel signal IRQ.
    */
   void WheelSignalIrqHandler(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Calculates the wheel odometry.
    *
-   * @return true
-   * @return false
+   * @return true if odometry was calculated, false otherwise.
    */
   bool CalculateWheelOdometry(void);
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief Updates the timeout value.
    */
   void UpdateTimeout(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Checks if the timeout has occurred.
    *
-   * @return true
-   * @return false
+   * @return true if the timeout has occurred, false otherwise.
    */
   bool TimeoutCheck(void);
 
   /**
-   * @brief Set the Direction object
+   * @brief Sets the direction of the wheel.
    *
-   * @param direction
-   * @return true
-   * @return false
+   * @param direction The direction of the wheel (true for forward, false for
+   * backward).
    */
-  void SetDirection(const bool &direction);
+  void SetDirection(bool direction);
 
   /**
-   * @brief Set the Speed object
+   * @brief Sets the speed of the wheel.
    *
-   * @param speed
+   * @param speed The speed of the wheel (in RPM).
    */
-  void SetSpeed(const int &speed);
+  void SetSpeed(int speed);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Gets the current status of the wheel.
    *
-   * @return wheel_status_t
+   * @return The current status of the wheel.
    */
   wheel_status_t WheelStatus(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Drives the wheel.
    *
-   * @param drive
+   * @param drive true to drive the wheel, false to stop it.
    */
-  void Drive(const bool &drive);
+  void Drive(bool drive);
 
   /**
-   * @brief Destroy the Wheel Controller object
-   *
+   * @brief Destroys the Wheel Controller object.
    */
   ~WheelController() = default;
 
  private:
   /**
-   * @brief @todo Add doxy doc
+   * @brief Applies the brake to the wheel.
    *
-   * @param kBreak
+   * @param kBreak true to apply the brake, false to release it.
    */
-  void Break(const bool &kBreak);
+  void Break(bool kBreak);
 
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
-  wheel_status_t wheel_status_;
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
-  Wheel *wheel_;
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
+  wheel_status_t wheel_status_{};
+  Wheel *wheel_{nullptr};
   volatile unsigned long timeout_{0};
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
   volatile double old_time_{0};
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
   volatile double time_taken_{0};
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
   volatile signed long signal_counter_{0};
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
   volatile double last_pulse_time_{0};
-
-  /**
-   * @brief @todo Add doxy doc
-   *
-   */
   std::once_flag first_odometry_tick_;
 };
 #endif  // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_

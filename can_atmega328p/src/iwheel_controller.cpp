@@ -29,23 +29,20 @@
  */
 #include "iwheel_controller.hpp"
 
-bool IWheelController::Init(const WheelController &wheel_controller,
-                            const CanWrapper &can_wrapper) {
+bool IWheelController::Init(WheelController& wheel_controller,
+                            CanWrapper& can_wrapper) {
   wheel_controller_ = &wheel_controller;
   can_wrapper_ = &can_wrapper;
-
   return true;
 }
 
-bool IWheelController::CommandReady(void) { return update_flag_; }
+bool IWheelController::CommandReady() const { return update_flag_; }
 
-void IWheelController::CommandReady(const bool &flag) { update_flag_ = flag; }
+void IWheelController::CommandReady(bool flag) { update_flag_ = flag; }
 
-bool IWheelController::FeedbackReady(void) { return feedback_flag_; }
+bool IWheelController::FeedbackReady(void) const { return feedback_flag_; }
 
-void IWheelController::FeedbackReady(const bool &flag) {
-  feedback_flag_ = flag;
-}
+void IWheelController::FeedbackReady(bool flag) { feedback_flag_ = flag; }
 
 bool IWheelController::UpdateCanMessage(void) {
   UpdateTimeout();
@@ -53,15 +50,15 @@ bool IWheelController::UpdateCanMessage(void) {
   return can_wrapper_->CommandHandler();
 }
 
-bool IWheelController::UpdateEmptyCanMessage(void) {
+bool IWheelController::UpdateEmptyCanMessage(void) const {
   return can_wrapper_->cleanCanMessage();
 }
 
-void IWheelController::UpdateTimeout(void) {
+void IWheelController::UpdateTimeout(void) const {
   wheel_controller_->UpdateTimeout();
 }
 
-void IWheelController::UpdateWheelSignal(void) {
+void IWheelController::UpdateWheelSignal(void) const {
   wheel_controller_->WheelSignalIrqHandler();
 }
 
@@ -80,6 +77,6 @@ bool IWheelController::FeedbackCallback(void) {
   return true;
 }
 
-bool IWheelController::TimeoutCheckCallback(void) {
+bool IWheelController::TimeoutCheckCallback(void) const {
   return wheel_controller_->TimeoutCheck();
 }

@@ -36,101 +36,94 @@
 #include "wheel_controller.hpp"       // for WheelController::wheel_status_t
 
 /**
- * @brief @todo Add doxy doc
- *
+ * @brief A wrapper class for the MCP2515 CAN controller
  */
 class CanWrapper {
  public:
   /**
    * @brief Construct a new Can Wrapper object
-   *
    */
   CanWrapper(void) = default;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Initializes the CAN controller with the given transmit and receive
+   * IDs
    *
-   * @return true
-   * @return false
+   * @param transmit_id The transmit ID for the CAN controller
+   * @param receive_id The receive ID for the CAN controller
+   * @return true if initialization was successful, false otherwise
    */
-  bool Init(int transmit_id, int receive_id);
+  bool Init(uint8_t transmit_id, uint8_t receive_id);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Reads a message from the CAN bus
    *
-   * @return true
-   * @return false
+   * @return true if a message was successfully read, false otherwise
    */
   bool CommandHandler(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Sends a message to the CAN bus
    *
-   * @param CanMessage
+   * @param wheel_status The wheel status data to be sent
    */
   void FeedbackHandler(const WheelController::wheel_status_t &wheel_status);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Configures the CAN ID filter mask for the given CAN ID
    *
-   * @param canId
-   * @return true
-   * @return false
+   * @param canId The CAN ID to configure the filter mask for
+   * @return true if the configuration was successful, false otherwise
    */
   bool ConfigureCanIdFilterMask(const int &canId);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Returns the latest CAN message received
    *
-   * @return can_frame_t
+   * @return The latest CAN message received
    */
   can_frame_t CanMessage(void);
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Returns the speed value from the latest received CAN message
    *
-   * @return int
+   * @return The speed value from the latest received CAN message
    */
   int SpeedPwm(void) volatile;
 
   /**
-   * @brief @todo Add doxy doc
+   * @brief Clears the current CAN message
    *
-   * @return true
-   * @return false
+   * @return true if the message was cleared successfully, false otherwise
    */
   bool cleanCanMessage(void);
 
   /**
    * @brief Destroy the Can Wrapper object
-   *
    */
   ~CanWrapper() = default;
 
  private:
   /**
-   * @brief @todo Add doxy doc
+   * @brief Sets up the MCP2515 CAN controller with the given receive ID
    *
-   * @return true
-   * @return false
+   * @param receive_id The receive ID for the CAN controller
+   * @return true if setup was successful, false otherwise
    */
   bool Setup(int receive_id);
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief The MCP2515 CAN controller instance
    */
   MCP2515 mcp_can_;
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief The CanPackt instance for compressed message packing
    */
-  CanPackt *canpressor_;
+  CanPackt *canpressor_{nullptr};
 
   /**
-   * @brief @todo Add doxy doc
-   *
+   * @brief The latest CAN message received
    */
   can_frame_t can_msg_{0, 8, {0}};
 };

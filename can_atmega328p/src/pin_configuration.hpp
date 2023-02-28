@@ -1,7 +1,8 @@
 /**
  * @file pin_configuration.hpp
  * @author Mergim Halimi (m.halimi123@gmail.com)
- * @brief
+ * @brief Pin Configuration structure that holds all the pin numbers and
+ * connections for this firmware to work.
  * @version 0.1
  * @date 2021-10-09
  *
