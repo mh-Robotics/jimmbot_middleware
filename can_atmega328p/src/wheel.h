@@ -1,5 +1,5 @@
 /**
- * @file wheel.hpp
+ * @file wheel.h
  * @author Mergim Halimi (m.halimi123@gmail.com)
  * @brief Wheel class declaration that initializes the wheel and its properties.
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef CAN_ATMEGA328P_SRC_WHEEL_HPP_
 #define CAN_ATMEGA328P_SRC_WHEEL_HPP_
 
-#include "pin_configuration.hpp"
+#include "pin_configuration.h"  // for PinConfiguration
 
 /**
  * @brief A class representing a wheel

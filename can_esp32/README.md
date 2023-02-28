@@ -1,32 +1,26 @@
-# MotorController ROS Node
+# WheelController ROS Node
+This repository holds the firmware for the WheelController ROS Node, which allows communication between ROS Master and the motors through serial communication and the CAN Network.
 
-This repository holds the firmware for MotorController ROS Node. It will communicate with ROS Master through serial communication, will get ros msgs array, and it will transfer the 
-messages in CAN Network for the motors to listen and to perform.
+## Prerequisites
+To compile this code, the ESP-IDF must be installed on your system. You can install ESP-IDF by following the instructions on the Espressif website.
 
-ESP-IDF needs to be installed in order for this to compile
+## Usage
 
-source esp-idf/export.sh
-
-## motor_controller_ros_esp32
-
-This code subscribes to `/esp32/command/can_msg`, the ESP32 will transmit can messages, receive the feedback and publish on `/esp32/feedback/can_msg`
-The data received from Can as Feedback will be published on `/esp32/feedback/can_msg`. The ID that will be received are only the ID's of the feedback messages from the wheels 4->7.
-The data published to `/esp32/command/can_msg` from the main computer, will be subscribed from ESP32 and transmitted into CanNetwork
+This code subscribes to the topic `/esp32/command/can_msg`, which receives messages from the main computer and transmits them to the motors through the CAN Network. Feedback from the motors is published on the topic `/esp32/feedback/can_msg`. Only feedback messages from wheels 4 to 7 are received by this node.
 
 ### Build and Flash
 
-Generate the ROS libraries prior to building this example as instructed in the [README](../README.md) of root directory (If done already, ignore)
-
-Default mode of rosserial communication is over UART.
-
-To use WiFi:
-1. Enable rosserial over WiFi
-
-`idf.py menuconfig` -> `Component config` -> `rosserial` ->`rosserial over WiFi using TCP`
-
-2. Enter WiFi and server details
+Before building this code, ensure that you have generated the ROS libraries as instructed in the [README](../README.md) of the root directory. If you haven't done this yet, please refer to the instructions in that file.
 
 ```
 $ export ESPPORT=/dev/esp32_ros_node
 $ idf.py build flash
 ```
+Once you have flashed the code onto the ESP32, you can start using the WheelController ROS Node to control your motors.
+
+To use WiFi instead of the default UART communication mode, follow these steps:
+1. Enable rosserial over WiFi
+
+`idf.py menuconfig` -> `Component config` -> `rosserial` ->`rosserial over WiFi using TCP`
+
+2. Enter WiFi and server details

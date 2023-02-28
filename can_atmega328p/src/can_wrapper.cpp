@@ -27,7 +27,7 @@
  * SOFTWARE.
  *
  */
-#include "can_wrapper.hpp"
+#include "can_wrapper.h" // for CanWrapper
 
 bool CanWrapper::Init(uint8_t transmit_id, uint8_t receive_id) {
   canpressor_ = new CanPackt(transmit_id, receive_id);

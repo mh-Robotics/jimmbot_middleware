@@ -1,5 +1,5 @@
 /**
- * @file wheel_controller.hpp
+ * @file wheel_controller.h
  * @author Mergim Halimi (m.halimi123@gmail.com)
  * @brief Declaration of the WheelController class that controls a Wheel object
  * according to messages received over CanBus.
@@ -31,8 +31,8 @@
 #ifndef CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 
-#include "stl_helper_functions.h"
-#include "wheel.hpp"
+#include "stl_helper_functions.h"  // for std::call_once
+#include "wheel.h"                 // for Wheel
 
 /**
  * @brief Controls a Wheel object according to messages received over CanBus.
@@ -189,9 +189,16 @@ class WheelController {
   /**
    * @brief Applies the brake to the wheel.
    *
-   * @param kBreak true to apply the brake, false to release it.
+   * @param kBrake true to apply the brake, false to release it.
    */
-  void Break(bool kBreak);
+  void Brake(bool kBrake);
+
+  /**
+   * @brief Disables the drive of the wheel.
+   *
+   * @param kStop true to disable the drive, false to enable it.
+   */
+  void Stop(bool kStop);
 
   wheel_status_t wheel_status_{};
   Wheel *wheel_{nullptr};

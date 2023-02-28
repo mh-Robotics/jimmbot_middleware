@@ -1,5 +1,5 @@
 /**
- * @file can_wrapper.hpp
+ * @file can_wrapper.h
  * @author Mergim Halimi (m.halimi123@gmail.com)
  * @brief
  * @version 0.1
@@ -30,10 +30,10 @@
 #ifndef CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 #define CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 
-#include "can_packt.hpp"  // for PackCompressed<> and UnpackCompressed<>
+#include "can_packt.h"  // for PackCompressed<> and UnpackCompressed<>
 #include "drivers/include/mcp2515.h"  // for MCP2515
-#include "pin_configuration.hpp"      // for PinConfiguration
-#include "wheel_controller.hpp"       // for WheelController::wheel_status_t
+#include "pin_configuration.h"        // for PinConfiguration
+#include "wheel_controller.h"         // for WheelController::wheel_status_t
 
 /**
  * @brief A wrapper class for the MCP2515 CAN controller

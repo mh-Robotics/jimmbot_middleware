@@ -27,7 +27,7 @@
  * SOFTWARE.
  *
  */
-#include "iwheel_controller.hpp"
+#include "iwheel_controller.h"  // for IWheelController
 
 bool IWheelController::Init(WheelController& wheel_controller,
                             CanWrapper& can_wrapper) {

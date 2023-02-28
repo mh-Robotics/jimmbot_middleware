@@ -28,12 +28,12 @@
  * SOFTWARE.
  *
  */
-#include "wheel.hpp"
+#include "wheel.h"  // for Wheel
 
 bool Wheel::Init() {
   pinMode(Configuration().motor_direction, OUTPUT);
   pinMode(Configuration().motor_brake, OUTPUT);
-  pinMode(Configuration().motor_enable, OUTPUT);
+  pinMode(Configuration().motor_stop, OUTPUT);
   pinMode(Configuration().motor_signal, INPUT_PULLUP);
   pinMode(Configuration().motor_speed, OUTPUT);
 
@@ -88,10 +88,8 @@ bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
     }
 
     default: {
-      properties_.ReceiveId(
-          static_cast<uint8_t>(Wheel::CanId::kUnspecified));
-      properties_.TransmitId(
-          static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+      properties_.ReceiveId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+      properties_.TransmitId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
 
       return true;
     }

@@ -2,7 +2,6 @@
 #define STL_HELPER_FUNCTIONS_H_
 
 namespace std {
-
 /**
  * @brief An object that can be used to ensure that a function is called only
  * once.
@@ -38,7 +37,5 @@ void inline call_once(once_flag &flag, Callable &&f, Args &&...args) {
     flag.is_called = true;
   }
 }
-
 }  // namespace std
-
 #endif  // STL_HELPER_FUNCTIONS_H_
