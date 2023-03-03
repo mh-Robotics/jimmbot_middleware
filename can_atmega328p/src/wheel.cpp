@@ -49,7 +49,7 @@ Wheel::properties_t Wheel::Properties() const { return properties_; }
 
 pin_configuration_t Wheel::Configuration() const { return pin_configuration_; }
 
-bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
+bool Wheel::EnumToCanId(const Wheel::Wheel_Enum& wheelEnum) {
   switch (wheelEnum) {
     case Wheel::Wheel_Enum::kFrontLeft: {
       properties_.ReceiveId(

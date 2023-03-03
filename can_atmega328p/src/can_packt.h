@@ -68,7 +68,7 @@ class CanPackt {
    * @return the packed CAN frame
    */
   template <typename inType, typename outType>
-  outType PackCompressed(const inType &data) {
+  outType PackCompressed(const inType& data) {
     static_assert(sizeof(inType) <= CAN_MAX_DLEN,
                   "Struct is larger than CAN message data field size");
 
@@ -91,7 +91,7 @@ class CanPackt {
    * @return the unpacked wheel status data structure
    */
   template <typename inType, typename outType>
-  outType UnpackCompressed(const inType &can_frame) {
+  outType UnpackCompressed(const inType& can_frame) {
     static_assert(sizeof(outType) <= CAN_MAX_DLEN,
                   "Struct is larger than CAN message data field size");
 
@@ -118,7 +118,7 @@ class CanPackt {
 template <>
 inline can_frame_t
 CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
-    const WheelController::wheel_status_t &wheel_status) {
+    const WheelController::wheel_status_t& wheel_status) {
   can_frame_t canFrame;
   canFrame.can_id = transmit_id_;
   canFrame.can_dlc = CAN_MAX_DLEN;
@@ -152,7 +152,7 @@ CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
 template <>
 inline WheelController::wheel_status_t
 CanPackt::UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
-    const can_frame_t &can_frame) {
+    const can_frame_t& can_frame) {
   WheelController::wheel_status_t wheel_status;
 
   // Extract the compressed data from the CAN frame

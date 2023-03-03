@@ -31,7 +31,7 @@
  */
 #include "wheel_controller.h"  // for WheelController
 
-bool WheelController::Init(const Wheel &wheel) {
+bool WheelController::Init(const Wheel& wheel) {
   wheel_ = &wheel;
 
   Drive(false);
@@ -80,15 +80,19 @@ void WheelController::SetDirection(bool direction) {
   digitalWrite(wheel_->Configuration().motor_direction, direction);
 }
 
-void WheelController::SetSpeed(int speed) {
-  int abs_speed = abs(speed);
-  if (abs_speed == 0) {
+void WheelController::SetSpeed(uint8_t speed) {
+  if (speed == 0) {
     Drive(false);
   } else {
     Drive(true);
-    SetDirection(speed > 0);
-    analogWrite(wheel_->Configuration().motor_speed, abs_speed);
   }
+
+  analogWrite(wheel_->Configuration().motor_speed, speed);
+}
+
+void WheelController::SetSpeedAndDirection(uint8_t speed, bool direction) {
+  SetDirection(direction);
+  SetSpeed(speed);
 }
 
 WheelController::wheel_status_t WheelController::WheelStatus(void) {

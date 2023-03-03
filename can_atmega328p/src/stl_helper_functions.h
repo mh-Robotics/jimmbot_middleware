@@ -31,7 +31,7 @@ struct once_flag {
  * @param args Additional arguments to be passed to the function.
  */
 template <class Callable, class... Args>
-void inline call_once(once_flag &flag, Callable &&f, Args &&...args) {
+void inline call_once(once_flag& flag, Callable&& f, Args&&... args) {
   if (!flag.is_called) {
     f();
     flag.is_called = true;

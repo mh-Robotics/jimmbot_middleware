@@ -30,16 +30,16 @@
 #ifndef CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 #define CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 
-#include "can_packt.h"  // for PackCompressed<> and UnpackCompressed<>
-#include "drivers/include/mcp2515.h"  // for MCP2515
-#include "pin_configuration.h"        // for PinConfiguration
-#include "wheel_controller.h"         // for WheelController::wheel_status_t
+#include "can_packt.h" // for PackCompressed<> and UnpackCompressed<>
+#include "drivers/include/mcp2515.h" // for MCP2515
+#include "pin_configuration.h"       // for PinConfiguration
+#include "wheel_controller.h"        // for WheelController::wheel_status_t
 
 /**
  * @brief A wrapper class for the MCP2515 CAN controller
  */
 class CanWrapper {
- public:
+public:
   /**
    * @brief Construct a new Can Wrapper object
    */
@@ -84,12 +84,21 @@ class CanWrapper {
    */
   can_frame_t CanMessage(void);
 
+  WheelController::wheel_status_t WheelStatus(void) volatile;
+
   /**
    * @brief Returns the speed value from the latest received CAN message
    *
    * @return The speed value from the latest received CAN message
    */
-  int SpeedPwm(void) volatile;
+  uint8_t SpeedPwm(void) volatile;
+
+  /**
+   * @brief Returns the speed value from the latest received CAN message
+   *
+   * @return The speed value from the latest received CAN message
+   */
+  bool Direction(void) volatile;
 
   /**
    * @brief Clears the current CAN message
@@ -103,7 +112,7 @@ class CanWrapper {
    */
   ~CanWrapper() = default;
 
- private:
+private:
   /**
    * @brief Sets up the MCP2515 CAN controller with the given receive ID
    *
@@ -113,9 +122,31 @@ class CanWrapper {
   bool Setup(int receive_id);
 
   /**
+   * @brief Converts the angular speed to linear speed. Given an angular speed
+   * in radians per second, this function calculates and returns the linear
+   * speed in meters per second.
+   *
+   * @param speed The angular speed in radians per second.
+   * @return The linear speed in meters per second.
+   */
+  double angularToLinear(const double &speed) const;
+
+  /**
+   * @brief Converts a double speed value to an 8-bit unsigned integer value.
+   * Given a double precision floating point speed value, this function scales
+   * and rounds it to an 8-bit unsigned integer value between 0 and 255.
+   *
+   * @param speed The double precision floating point speed value to be
+   * converted.
+   * @return The 8-bit unsigned integer representation of the given speed value,
+   * between 0 and 255.
+   */
+  const uint8_t convertSpeedToUint8(const double &speed) const;
+
+  /**
    * @brief The MCP2515 CAN controller instance
    */
-  MCP2515 mcp_can_;
+  MCP2515 *mcp_can_{nullptr};
 
   /**
    * @brief The CanPackt instance for compressed message packing
@@ -126,5 +157,10 @@ class CanWrapper {
    * @brief The latest CAN message received
    */
   can_frame_t can_msg_{0, 8, {0}};
+
+  /**
+   * @brief The latest WheelStatus received, unpacked from CAN message
+   */
+  WheelController::wheel_status_t wheel_status;
 };
-#endif  // CAN_WRAPPER_H_
+#endif // CAN_WRAPPER_H_

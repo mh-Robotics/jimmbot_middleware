@@ -56,7 +56,7 @@ class WheelController {
      *
      * @param command_id The command ID to set.
      */
-    void CommandId(const int &command_id) { this->command_id = command_id; }
+    void CommandId(const int& command_id) { this->command_id = command_id; }
 
     /**
      * @brief Gets the effort value associated with the WheelStatus.
@@ -68,7 +68,7 @@ class WheelController {
      *
      * @param effort The effort value to set.
      */
-    void Effort(const int &effort) { this->effort = effort; }
+    void Effort(const int& effort) { this->effort = effort; }
 
     /**
      * @brief Gets the position value associated with the WheelStatus.
@@ -80,7 +80,7 @@ class WheelController {
      *
      * @param position The position value to set.
      */
-    void Position(const double &position) { this->position = position; }
+    void Position(const double& position) { this->position = position; }
 
     /**
      * @brief Gets the RPM value associated with the WheelStatus.
@@ -92,7 +92,7 @@ class WheelController {
      *
      * @param rpm The RPM value to set.
      */
-    void Rpm(const int &rpm) { this->rpm = rpm; }
+    void Rpm(const int& rpm) { this->rpm = rpm; }
 
     /**
      * @brief Gets the velocity value associated with the WheelStatus.
@@ -104,7 +104,7 @@ class WheelController {
      *
      * @param velocity The velocity value to set.
      */
-    void Velocity(const double &velocity) { this->velocity = velocity; }
+    void Velocity(const double& velocity) { this->velocity = velocity; }
 
    private:
     int command_id{0};
@@ -125,7 +125,7 @@ class WheelController {
    * @param wheel The wheel to be controlled.
    * @return true if initialization was successful, false otherwise.
    */
-  bool Init(const Wheel &wheel);
+  bool Init(const Wheel& wheel);
 
   /**
    * @brief Handles the wheel signal IRQ.
@@ -162,9 +162,18 @@ class WheelController {
   /**
    * @brief Sets the speed of the wheel.
    *
-   * @param speed The speed of the wheel (in RPM).
+   * @param speed The speed of the wheel (in PWM 0-255).
    */
-  void SetSpeed(int speed);
+  void SetSpeed(uint8_t speed);
+
+  /**
+   * @brief Sets the speed and direction of the wheel.
+   *
+   * @param speed The speed of the wheel (in PWM 0-255).
+   * @param direction The direction of the wheel (true for forward, false for
+   * backward).
+   */
+  void SetSpeedAndDirection(uint8_t speed, bool direction);
 
   /**
    * @brief Gets the current status of the wheel.
@@ -201,7 +210,7 @@ class WheelController {
   void Stop(bool kStop);
 
   wheel_status_t wheel_status_{};
-  Wheel *wheel_{nullptr};
+  Wheel* wheel_{nullptr};
   volatile unsigned long timeout_{0};
   volatile double old_time_{0};
   volatile double time_taken_{0};
