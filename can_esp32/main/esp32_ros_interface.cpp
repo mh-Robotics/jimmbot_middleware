@@ -29,12 +29,12 @@
  *
  */
 #include <esp32_ros_interface.h>
-#include <ros.h>  // for ros::*
+#include <ros.h> // for ros::*
 
-#include "driver/gpio.h"
-#include "driver/twai.h"
-#include "jimmbot_msgs/CanFrame.h"         // for jimmbot_msgs::CanFrame
-#include "jimmbot_msgs/CanFrameStamped.h"  // for jimmbot_msgs::CanFrameStamped
+#include "driver/gpio.h"                  // for gpio_*
+#include "driver/twai.h"                  // for twai_*
+#include "jimmbot_msgs/CanFrame.h"        // for jimmbot_msgs::CanFrame
+#include "jimmbot_msgs/CanFrameStamped.h" // for jimmbot_msgs::CanFrameStamped
 
 constexpr auto kStackSize = 4096;
 constexpr auto kRxTaskPrio = 8;
@@ -78,15 +78,15 @@ ros::NodeHandle nh;
 void canFrameFeedbackCallback(void);
 ros::Publisher canFramePublisher(kFeedbackTopicCanMsg, &feedback_msg);
 void canFrameCallback(const jimmbot_msgs::CanFrameStamped &data_msg);
-ros::Subscriber<jimmbot_msgs::CanFrameStamped> canFrameSubscriber(
-    kCommandTopicCanMsg, &canFrameCallback);
+ros::Subscriber<jimmbot_msgs::CanFrameStamped>
+    canFrameSubscriber(kCommandTopicCanMsg, &canFrameCallback);
 
 static QueueHandle_t tx_task_queue;
 TaskHandle_t rxHandle = NULL;
 TaskHandle_t txHandle = NULL;
 
-const twai_message_t toTwaiMessage(
-    const jimmbot_msgs::CanFrameStamped &jimmBotCanMessage) {
+const twai_message_t
+toTwaiMessage(const jimmbot_msgs::CanFrameStamped &jimmBotCanMessage) {
   twai_message_t twai_msg;
 
   twai_msg.extd = jimmBotCanMessage.can_frame.is_extended;
@@ -100,8 +100,8 @@ const twai_message_t toTwaiMessage(
   return twai_msg;
 }
 
-const jimmbot_msgs::CanFrame toJimmBotCanMessage(
-    const twai_message_t &twai_msg) {
+const jimmbot_msgs::CanFrame
+toJimmBotCanMessage(const twai_message_t &twai_msg) {
   jimmbot_msgs::CanFrame jimmBotCanMessage;
 
   jimmBotCanMessage.is_extended = twai_msg.extd;

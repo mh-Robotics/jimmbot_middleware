@@ -98,7 +98,7 @@ class Wheel {
      *
      * @param command_id The receive ID of the wheel
      */
-    void ReceiveId(const uint8_t &command_id) { this->command_id = command_id; }
+    void ReceiveId(const uint8_t& command_id) { this->command_id = command_id; }
 
     /**
      * @brief Get the transmit ID of the wheel
@@ -112,7 +112,7 @@ class Wheel {
      *
      * @param feedback_id The transmit ID of the wheel
      */
-    void TransmitId(const uint8_t &feedback_id) {
+    void TransmitId(const uint8_t& feedback_id) {
       this->feedback_id = feedback_id;
     }
 
@@ -128,7 +128,7 @@ class Wheel {
      *
      * @param reverse True if the wheel is reversed, false otherwise
      */
-    void Reverse(const bool &reverse) { this->reverse = reverse; }
+    void Reverse(const bool& reverse) { this->reverse = reverse; }
 
     /**
      * @brief Get the radius of the wheel
@@ -212,7 +212,7 @@ class Wheel {
    * @return true Setting properties successful
    * @return false Setting properties failed
    */
-  bool EnumToCanId(const Wheel::Wheel_Enum &wheelEnum);
+  bool EnumToCanId(const Wheel::Wheel_Enum& wheelEnum);
 
   /**
    * @brief Determines which wheel this object belongs to

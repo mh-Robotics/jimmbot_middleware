@@ -63,7 +63,8 @@ void IWheelController::UpdateWheelSignal(void) const {
 }
 
 bool IWheelController::CommandCallback(void) {
-  wheel_controller_->SetSpeed(can_wrapper_->SpeedPwm());
+  wheel_controller_->SetSpeedAndDirection(can_wrapper_->SpeedPwm(),
+                                          can_wrapper_->Direction());
   CommandReady(false);
   FeedbackReady(true);
 

@@ -161,14 +161,14 @@ typedef struct PinConfiguration {
    * @param wheelBackLeft uint8_t PinNumber passed when called
    * @param wheelBackRight uint8_t PinNumber passed when called
    */
-  PinConfiguration(const uint8_t &motorBrake, const uint8_t &motorEnable,
-                   const uint8_t &motorSignal, const uint8_t &motorDirection,
-                   const uint8_t &motorSpeed, const uint8_t &canMcpIrq,
-                   const uint8_t &canMcpRcv, const uint8_t &canMcpMosi,
-                   const uint8_t &canMcpMiso, const uint8_t &canMcpSck,
-                   const uint8_t &wheelFrontLeft,
-                   const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
-                   const uint8_t &wheelBackRight)
+  PinConfiguration(const uint8_t& motorBrake, const uint8_t& motorEnable,
+                   const uint8_t& motorSignal, const uint8_t& motorDirection,
+                   const uint8_t& motorSpeed, const uint8_t& canMcpIrq,
+                   const uint8_t& canMcpRcv, const uint8_t& canMcpMosi,
+                   const uint8_t& canMcpMiso, const uint8_t& canMcpSck,
+                   const uint8_t& wheelFrontLeft,
+                   const uint8_t& wheelFrontRight, const uint8_t& wheelBackLeft,
+                   const uint8_t& wheelBackRight)
       : motor_brake{motorBrake},
         motor_stop{motorEnable},
         motor_signal{motorSignal},
@@ -184,18 +184,6 @@ typedef struct PinConfiguration {
         wheel_back_left{wheelBackLeft},
         wheel_back_right{wheelBackRight} {}
 } pin_configuration_t;
-
-/**
- * @brief Index constant for direction byte in CanBus message
- *
- */
-constexpr uint8_t kDirectionByteIndex = 6;
-
-/**
- * @brief Index constant for speed byte in CanBus message
- *
- */
-constexpr uint8_t kSpeedByteIndex = 7;
 
 /**
  * @brief Timeout constant [ms] if no CanBus message is received

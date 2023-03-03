@@ -53,7 +53,7 @@ class IWheelController {
    * @param can_wrapper The CanWrapper object.
    * @return true if initialization is successful, false otherwise.
    */
-  bool Init(WheelController &wheel_controller, CanWrapper &can_wrapper);
+  bool Init(WheelController& wheel_controller, CanWrapper& can_wrapper);
 
   /**
    * @brief Returns the status of the CommandReady flag.
@@ -137,12 +137,12 @@ class IWheelController {
   /**
    * @brief The WheelController object for the wheel controller.
    */
-  WheelController *wheel_controller_{nullptr};
+  WheelController* wheel_controller_{nullptr};
 
   /**
    * @brief The CanWrapper object for the wheel controller.
    */
-  CanWrapper *can_wrapper_{nullptr};
+  CanWrapper* can_wrapper_{nullptr};
 
   /**
    * @brief Flag for updating the wheel controller.

@@ -9,7 +9,7 @@ const struct MCP2515::RXBn_REGS MCP2515::RXB[N_RXBUFFERS] = {
     {MCP_RXB0CTRL, MCP_RXB0SIDH, MCP_RXB0DATA, CANINTF_RX0IF},
     {MCP_RXB1CTRL, MCP_RXB1SIDH, MCP_RXB1DATA, CANINTF_RX1IF}};
 
-MCP2515::MCP2515(const uint8_t _CS, const uint32_t _SPI_CLOCK, SPIClass *_SPI) {
+MCP2515::MCP2515(const uint8_t _CS, const uint32_t _SPI_CLOCK, SPIClass* _SPI) {
   if (_SPI != nullptr) {
     SPIn = _SPI;
   } else {
@@ -489,7 +489,7 @@ MCP2515::ERROR MCP2515::setClkOut(const CAN_CLKOUT divisor) {
   return ERROR_OK;
 }
 
-void MCP2515::prepareId(uint8_t *buffer, const bool ext, const uint32_t id) {
+void MCP2515::prepareId(uint8_t* buffer, const bool ext, const uint32_t id) {
   uint16_t canid = (uint16_t)(id & 0x0FFFF);
 
   if (ext) {
@@ -575,12 +575,12 @@ MCP2515::ERROR MCP2515::setFilter(const RXF num, const bool ext,
 }
 
 MCP2515::ERROR MCP2515::sendMessage(const TXBn txbn,
-                                    const struct can_frame *frame) {
+                                    const struct can_frame* frame) {
   if (frame->can_dlc > CAN_MAX_DLEN) {
     return ERROR_FAILTX;
   }
 
-  const struct TXBn_REGS *txbuf = &TXB[txbn];
+  const struct TXBn_REGS* txbuf = &TXB[txbn];
 
   uint8_t data[13];
 
@@ -605,7 +605,7 @@ MCP2515::ERROR MCP2515::sendMessage(const TXBn txbn,
   return ERROR_OK;
 }
 
-MCP2515::ERROR MCP2515::sendMessage(const struct can_frame *frame) {
+MCP2515::ERROR MCP2515::sendMessage(const struct can_frame* frame) {
   if (frame->can_dlc > CAN_MAX_DLEN) {
     return ERROR_FAILTX;
   }
@@ -613,7 +613,7 @@ MCP2515::ERROR MCP2515::sendMessage(const struct can_frame *frame) {
   TXBn txBuffers[N_TXBUFFERS] = {TXB0, TXB1, TXB2};
 
   for (int i = 0; i < N_TXBUFFERS; i++) {
-    const struct TXBn_REGS *txbuf = &TXB[txBuffers[i]];
+    const struct TXBn_REGS* txbuf = &TXB[txBuffers[i]];
     uint8_t ctrlval = readRegister(txbuf->CTRL);
     if ((ctrlval & TXB_TXREQ) == 0) {
       return sendMessage(txBuffers[i], frame);
@@ -623,8 +623,8 @@ MCP2515::ERROR MCP2515::sendMessage(const struct can_frame *frame) {
   return ERROR_ALLTXBUSY;
 }
 
-MCP2515::ERROR MCP2515::readMessage(const RXBn rxbn, struct can_frame *frame) {
-  const struct RXBn_REGS *rxb = &RXB[rxbn];
+MCP2515::ERROR MCP2515::readMessage(const RXBn rxbn, struct can_frame* frame) {
+  const struct RXBn_REGS* rxb = &RXB[rxbn];
 
   uint8_t tbufdata[5];
 
@@ -659,7 +659,7 @@ MCP2515::ERROR MCP2515::readMessage(const RXBn rxbn, struct can_frame *frame) {
   return ERROR_OK;
 }
 
-MCP2515::ERROR MCP2515::readMessage(struct can_frame *frame) {
+MCP2515::ERROR MCP2515::readMessage(struct can_frame* frame) {
   ERROR rc;
   uint8_t stat = getStatus();
 

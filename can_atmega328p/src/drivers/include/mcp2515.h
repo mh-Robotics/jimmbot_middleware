@@ -420,7 +420,7 @@ class MCP2515 {
 
   uint8_t SPICS;
   uint32_t SPI_CLOCK;
-  SPIClass *SPIn;
+  SPIClass* SPIn;
 
  private:
   void startSPI();
@@ -436,11 +436,11 @@ class MCP2515 {
   void modifyRegister(const REGISTER reg, const uint8_t mask,
                       const uint8_t data);
 
-  void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
+  void prepareId(uint8_t* buffer, const bool ext, const uint32_t id);
 
  public:
   MCP2515(const uint8_t _CS = 10, const uint32_t _SPI_CLOCK = DEFAULT_SPI_CLOCK,
-          SPIClass *_SPI = nullptr);
+          SPIClass* _SPI = nullptr);
   ERROR reset(void);
   ERROR setConfigMode();
   ERROR setListenOnlyMode();
@@ -452,10 +452,10 @@ class MCP2515 {
   ERROR setBitrate(const CAN_SPEED canSpeed, const CAN_CLOCK canClock);
   ERROR setFilterMask(const MASK num, const bool ext, const uint32_t ulData);
   ERROR setFilter(const RXF num, const bool ext, const uint32_t ulData);
-  ERROR sendMessage(const TXBn txbn, const can_frame_t *frame);
-  ERROR sendMessage(const can_frame_t *frame);
-  ERROR readMessage(const RXBn rxbn, can_frame_t *frame);
-  ERROR readMessage(can_frame_t *frame);
+  ERROR sendMessage(const TXBn txbn, const can_frame_t* frame);
+  ERROR sendMessage(const can_frame_t* frame);
+  ERROR readMessage(const RXBn rxbn, can_frame_t* frame);
+  ERROR readMessage(can_frame_t* frame);
   bool checkReceive(void);
   bool checkError(void);
   uint8_t getErrorFlags(void);
