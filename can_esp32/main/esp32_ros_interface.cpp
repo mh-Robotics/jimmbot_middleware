@@ -72,7 +72,9 @@ static const twai_general_config_t g_config = {
 jimmbot_msgs::CanFrameStamped feedback_msg;
 
 constexpr int kEnableLightLeftMsgIndex = 3;
+bool leftLightOn{false};
 constexpr int kEnableLightRightMsgIndex = 7;
+bool rightLightOn{false};
 
 ros::NodeHandle nh;
 void canFrameFeedbackCallback(void);
@@ -139,10 +141,15 @@ static void can_receive_task(void *arg) {
 
 void canFrameCallback(const jimmbot_msgs::CanFrameStamped &data_msg) {
   if (data_msg.can_frame.id == kLightCanMsgId) {
-    gpio_set_level(kGpioOutputLightLeft,
-                   data_msg.can_frame.data[kEnableLightLeftMsgIndex]);
-    gpio_set_level(kGpioOutputLightRight,
-                   data_msg.can_frame.data[kEnableLightRightMsgIndex]);
+    if (leftLightOn != data_msg.can_frame.data[kEnableLightLeftMsgIndex]) {
+      leftLightOn = data_msg.can_frame.data[kEnableLightLeftMsgIndex];
+      gpio_set_level(kGpioOutputLightLeft, leftLightOn);
+    }
+    if (rightLightOn != data_msg.can_frame.data[kEnableLightRightMsgIndex]) {
+      rightLightOn = data_msg.can_frame.data[kEnableLightRightMsgIndex];
+      gpio_set_level(kGpioOutputLightRight, rightLightOn);
+    }
+
     return;
   }
 

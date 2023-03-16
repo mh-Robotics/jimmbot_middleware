@@ -30,15 +30,15 @@
 #ifndef CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
 
-#include "can_wrapper.h"       // for CanWrapper
-#include "wheel_controller.h"  // for WheelController
+#include "can_wrapper.h"      // for CanWrapper
+#include "wheel_controller.h" // for WheelController
 
 /**
  * @brief Interface for a wheel controller.
  *
  */
 class IWheelController {
- public:
+public:
   /**
    * @brief Construct a new IWheelController object.
    *
@@ -53,7 +53,7 @@ class IWheelController {
    * @param can_wrapper The CanWrapper object.
    * @return true if initialization is successful, false otherwise.
    */
-  bool Init(WheelController& wheel_controller, CanWrapper& can_wrapper);
+  bool Init(WheelController &wheel_controller, CanWrapper &can_wrapper);
 
   /**
    * @brief Returns the status of the CommandReady flag.
@@ -128,7 +128,7 @@ class IWheelController {
    */
   ~IWheelController(void) = default;
 
- private:
+private:
   /**
    * @brief Updates the timeout for the wheel controller.
    */
@@ -137,12 +137,12 @@ class IWheelController {
   /**
    * @brief The WheelController object for the wheel controller.
    */
-  WheelController* wheel_controller_{nullptr};
+  WheelController *wheel_controller_{nullptr};
 
   /**
    * @brief The CanWrapper object for the wheel controller.
    */
-  CanWrapper* can_wrapper_{nullptr};
+  CanWrapper *can_wrapper_{nullptr};
 
   /**
    * @brief Flag for updating the wheel controller.
@@ -154,4 +154,4 @@ class IWheelController {
    */
   volatile bool feedback_flag_;
 };
-#endif  // CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
+#endif // CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_

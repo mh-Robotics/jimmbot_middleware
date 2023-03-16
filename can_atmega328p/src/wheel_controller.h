@@ -31,21 +31,21 @@
 #ifndef CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 #define CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
 
-#include "stl_helper_functions.h"  // for std::call_once
-#include "wheel.h"                 // for Wheel
+#include "stl_helper_functions.h" // for std::call_once
+#include "wheel.h"                // for Wheel
 
 /**
  * @brief Controls a Wheel object according to messages received over CanBus.
  *
  */
 class WheelController {
- public:
+public:
   /**
    * @brief Struct that contains the status of the Wheel.
    *
    */
   typedef struct WheelStatus {
-   public:
+  public:
     /**
      * @brief Gets the command ID associated with the WheelStatus.
      */
@@ -56,19 +56,19 @@ class WheelController {
      *
      * @param command_id The command ID to set.
      */
-    void CommandId(const int& command_id) { this->command_id = command_id; }
+    void CommandId(const int &command_id) { this->command_id = command_id; }
 
     /**
      * @brief Gets the effort value associated with the WheelStatus.
      */
-    int Effort(void) const { return effort; }
+    double Effort(void) const { return effort; }
 
     /**
      * @brief Sets the effort value associated with the WheelStatus.
      *
      * @param effort The effort value to set.
      */
-    void Effort(const int& effort) { this->effort = effort; }
+    void Effort(const double &effort) { this->effort = effort; }
 
     /**
      * @brief Gets the position value associated with the WheelStatus.
@@ -80,7 +80,7 @@ class WheelController {
      *
      * @param position The position value to set.
      */
-    void Position(const double& position) { this->position = position; }
+    void Position(const double &position) { this->position = position; }
 
     /**
      * @brief Gets the RPM value associated with the WheelStatus.
@@ -92,7 +92,7 @@ class WheelController {
      *
      * @param rpm The RPM value to set.
      */
-    void Rpm(const int& rpm) { this->rpm = rpm; }
+    void Rpm(const int &rpm) { this->rpm = rpm; }
 
     /**
      * @brief Gets the velocity value associated with the WheelStatus.
@@ -104,11 +104,11 @@ class WheelController {
      *
      * @param velocity The velocity value to set.
      */
-    void Velocity(const double& velocity) { this->velocity = velocity; }
+    void Velocity(const double &velocity) { this->velocity = velocity; }
 
-   private:
+  private:
     int command_id{0};
-    int effort{10};
+    double effort{10.0};
     double position{0.0};
     int rpm{0};
     double velocity{0.0};
@@ -125,7 +125,7 @@ class WheelController {
    * @param wheel The wheel to be controlled.
    * @return true if initialization was successful, false otherwise.
    */
-  bool Init(const Wheel& wheel);
+  bool Init(const Wheel &wheel);
 
   /**
    * @brief Handles the wheel signal IRQ.
@@ -194,7 +194,7 @@ class WheelController {
    */
   ~WheelController() = default;
 
- private:
+private:
   /**
    * @brief Applies the brake to the wheel.
    *
@@ -210,7 +210,7 @@ class WheelController {
   void Stop(bool kStop);
 
   wheel_status_t wheel_status_{};
-  Wheel* wheel_{nullptr};
+  Wheel *wheel_{nullptr};
   volatile unsigned long timeout_{0};
   volatile double old_time_{0};
   volatile double time_taken_{0};
@@ -218,4 +218,4 @@ class WheelController {
   volatile double last_pulse_time_{0};
   std::once_flag first_odometry_tick_;
 };
-#endif  // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
+#endif // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_

@@ -27,10 +27,10 @@
  * SOFTWARE.
  *
  */
-#include "iwheel_controller.h"  // for IWheelController
+#include "iwheel_controller.h" // for IWheelController
 
-bool IWheelController::Init(WheelController& wheel_controller,
-                            CanWrapper& can_wrapper) {
+bool IWheelController::Init(WheelController &wheel_controller,
+                            CanWrapper &can_wrapper) {
   wheel_controller_ = &wheel_controller;
   can_wrapper_ = &can_wrapper;
   return true;

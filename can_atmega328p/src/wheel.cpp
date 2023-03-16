@@ -28,7 +28,7 @@
  * SOFTWARE.
  *
  */
-#include "wheel.h"  // for Wheel
+#include "wheel.h" // for Wheel
 
 bool Wheel::Init() {
   pinMode(Configuration().motor_direction, OUTPUT);
@@ -49,50 +49,50 @@ Wheel::properties_t Wheel::Properties() const { return properties_; }
 
 pin_configuration_t Wheel::Configuration() const { return pin_configuration_; }
 
-bool Wheel::EnumToCanId(const Wheel::Wheel_Enum& wheelEnum) {
+bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
   switch (wheelEnum) {
-    case Wheel::Wheel_Enum::kFrontLeft: {
-      properties_.ReceiveId(
-          static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontLeft));
-      properties_.TransmitId(
-          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontLeft));
+  case Wheel::Wheel_Enum::kFrontLeft: {
+    properties_.ReceiveId(
+        static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontLeft));
+    properties_.TransmitId(
+        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontLeft));
 
-      return true;
-    }
+    return true;
+  }
 
-    case Wheel::Wheel_Enum::kFrontRight: {
-      properties_.ReceiveId(
-          static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontRight));
-      properties_.TransmitId(
-          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontRight));
+  case Wheel::Wheel_Enum::kFrontRight: {
+    properties_.ReceiveId(
+        static_cast<uint8_t>(Wheel::CanId::kCommandWheelFrontRight));
+    properties_.TransmitId(
+        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelFrontRight));
 
-      return true;
-    }
+    return true;
+  }
 
-    case Wheel::Wheel_Enum::kBackLeft: {
-      properties_.ReceiveId(
-          static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackLeft));
-      properties_.TransmitId(
-          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackLeft));
+  case Wheel::Wheel_Enum::kBackLeft: {
+    properties_.ReceiveId(
+        static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackLeft));
+    properties_.TransmitId(
+        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackLeft));
 
-      return true;
-    }
+    return true;
+  }
 
-    case Wheel::Wheel_Enum::kBackRight: {
-      properties_.ReceiveId(
-          static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackRight));
-      properties_.TransmitId(
-          static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackRight));
+  case Wheel::Wheel_Enum::kBackRight: {
+    properties_.ReceiveId(
+        static_cast<uint8_t>(Wheel::CanId::kCommandWheelBackRight));
+    properties_.TransmitId(
+        static_cast<uint8_t>(Wheel::CanId::kFeedbackWheelBackRight));
 
-      return true;
-    }
+    return true;
+  }
 
-    default: {
-      properties_.ReceiveId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
-      properties_.TransmitId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+  default: {
+    properties_.ReceiveId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
+    properties_.TransmitId(static_cast<uint8_t>(Wheel::CanId::kUnspecified));
 
-      return true;
-    }
+    return true;
+  }
   }
 
   return false;

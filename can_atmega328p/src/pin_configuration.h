@@ -31,7 +31,8 @@
 #ifndef CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
 #define CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
 
-#include "Arduino.h"  // for digital*, analogWrite()
+#include "Arduino.h" // for digital*, analogWrite()
+#include "stdint.h"  // for uint8_t
 
 /**
  * @brief Pin Configuration structure that holds all the pin numbers and
@@ -128,20 +129,10 @@ typedef struct PinConfiguration {
    *
    */
   PinConfiguration()
-      : motor_brake{7},
-        motor_stop{4},
-        motor_signal{3},
-        motor_direction{5},
-        motor_speed{6},
-        can_mcp_irq{2},
-        can_mcp_rcv{10},
-        can_mcp_mosi{11},
-        can_mcp_miso{12},
-        can_mcp_sck{13},
-        wheel_front_left{A0},
-        wheel_front_right{A1},
-        wheel_back_left{A2},
-        wheel_back_right{A3} {}
+      : motor_brake{7}, motor_stop{4}, motor_signal{3}, motor_direction{5},
+        motor_speed{6}, can_mcp_irq{2}, can_mcp_rcv{10}, can_mcp_mosi{11},
+        can_mcp_miso{12}, can_mcp_sck{13}, wheel_front_left{A0},
+        wheel_front_right{A1}, wheel_back_left{A2}, wheel_back_right{A3} {}
 
   /**
    * @brief Construct a new Pin Configuration object with specified pin numbers
@@ -161,27 +152,20 @@ typedef struct PinConfiguration {
    * @param wheelBackLeft uint8_t PinNumber passed when called
    * @param wheelBackRight uint8_t PinNumber passed when called
    */
-  PinConfiguration(const uint8_t& motorBrake, const uint8_t& motorEnable,
-                   const uint8_t& motorSignal, const uint8_t& motorDirection,
-                   const uint8_t& motorSpeed, const uint8_t& canMcpIrq,
-                   const uint8_t& canMcpRcv, const uint8_t& canMcpMosi,
-                   const uint8_t& canMcpMiso, const uint8_t& canMcpSck,
-                   const uint8_t& wheelFrontLeft,
-                   const uint8_t& wheelFrontRight, const uint8_t& wheelBackLeft,
-                   const uint8_t& wheelBackRight)
-      : motor_brake{motorBrake},
-        motor_stop{motorEnable},
-        motor_signal{motorSignal},
-        motor_direction{motorDirection},
-        motor_speed{motorSpeed},
-        can_mcp_irq{canMcpIrq},
-        can_mcp_rcv{canMcpRcv},
-        can_mcp_mosi{canMcpMosi},
-        can_mcp_miso{canMcpMiso},
-        can_mcp_sck{canMcpSck},
-        wheel_front_left{wheelFrontLeft},
-        wheel_front_right{wheelFrontRight},
-        wheel_back_left{wheelBackLeft},
+  PinConfiguration(const uint8_t &motorBrake, const uint8_t &motorEnable,
+                   const uint8_t &motorSignal, const uint8_t &motorDirection,
+                   const uint8_t &motorSpeed, const uint8_t &canMcpIrq,
+                   const uint8_t &canMcpRcv, const uint8_t &canMcpMosi,
+                   const uint8_t &canMcpMiso, const uint8_t &canMcpSck,
+                   const uint8_t &wheelFrontLeft,
+                   const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
+                   const uint8_t &wheelBackRight)
+      : motor_brake{motorBrake}, motor_stop{motorEnable},
+        motor_signal{motorSignal}, motor_direction{motorDirection},
+        motor_speed{motorSpeed}, can_mcp_irq{canMcpIrq}, can_mcp_rcv{canMcpRcv},
+        can_mcp_mosi{canMcpMosi}, can_mcp_miso{canMcpMiso},
+        can_mcp_sck{canMcpSck}, wheel_front_left{wheelFrontLeft},
+        wheel_front_right{wheelFrontRight}, wheel_back_left{wheelBackLeft},
         wheel_back_right{wheelBackRight} {}
 } pin_configuration_t;
 
@@ -190,4 +174,4 @@ typedef struct PinConfiguration {
  *
  */
 constexpr uint8_t kTimeoutMs = 250;
-#endif  // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
+#endif // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_

@@ -84,7 +84,13 @@ public:
    */
   can_frame_t CanMessage(void);
 
-  WheelController::wheel_status_t WheelStatus(void) volatile;
+  /**
+   * @brief Returns the latest WheelStatus unpacked from latest CAN message
+   * received
+   *
+   * @return The latest WheelStatus unpacked
+   */
+  WheelController::wheel_status_t WheelStatus(void);
 
   /**
    * @brief Returns the speed value from the latest received CAN message
@@ -120,16 +126,6 @@ private:
    * @return true if setup was successful, false otherwise
    */
   bool Setup(int receive_id);
-
-  /**
-   * @brief Converts the angular speed to linear speed. Given an angular speed
-   * in radians per second, this function calculates and returns the linear
-   * speed in meters per second.
-   *
-   * @param speed The angular speed in radians per second.
-   * @return The linear speed in meters per second.
-   */
-  double angularToLinear(const double &speed) const;
 
   /**
    * @brief Converts a double speed value to an 8-bit unsigned integer value.

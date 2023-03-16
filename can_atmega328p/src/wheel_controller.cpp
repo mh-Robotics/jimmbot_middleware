@@ -29,9 +29,9 @@
  * SOFTWARE.
  *
  */
-#include "wheel_controller.h"  // for WheelController
+#include "wheel_controller.h" // for WheelController
 
-bool WheelController::Init(const Wheel& wheel) {
+bool WheelController::Init(const Wheel &wheel) {
   wheel_ = &wheel;
 
   Drive(false);
@@ -56,7 +56,7 @@ bool WheelController::CalculateWheelOdometry(void) {
   double circumference = 2 * M_PI * wheel_->Properties().Radius();
   wheel_status_.Position(
       (circumference * signal_counter_) /
-      (100 * wheel_->Properties().PulsePerRevolution()));  // Pose in CM
+      (100 * wheel_->Properties().PulsePerRevolution())); // Pose in CM
 
   wheel_status_.Rpm(
       (1 / (time_taken_ * wheel_->Properties().PulsePerRevolution())) * 60.0);

@@ -27,15 +27,15 @@
  * SOFTWARE.
  *
  */
-#include "can_wrapper.h"  // for CanWrapper
+#include "can_wrapper.h" // for CanWrapper
 
 #include "wheel.h"
 #include "wheel_controller.h"
 
 namespace {
-constexpr auto kWheelMaxSpeed{4.0};
+constexpr auto kWheelMaxSpeed{4.92};
 constexpr auto kWheelDiameter{0.1651};
-}  // namespace
+} // namespace
 
 bool CanWrapper::Init(uint8_t transmit_id, uint8_t receive_id) {
   canpressor_ = new CanPackt(transmit_id, receive_id);
@@ -61,28 +61,30 @@ bool CanWrapper::Setup(int receive_id) {
 bool CanWrapper::CommandHandler(void) {
   return mcp_can_->readMessage(&can_msg_) != MCP2515::ERROR_OK;
 }
-
+// creating a loopback can message
 void CanWrapper::FeedbackHandler(
-    const WheelController::wheel_status_t& wheel_status) {
+    const WheelController::wheel_status_t &wheel_status) {
   mcp_can_->sendMessage(
       &canpressor_->PackCompressed<WheelController::wheel_status_t,
                                    can_frame_t>(wheel_status));
+
+  // DEBUG Only when we want to test loopback msg.
+  // mcp_can_->sendMessage(
+  //     &canpressor_->PackCompressed<WheelController::wheel_status_t,
+  //                                  can_frame_t>(WheelStatus()));
 }
 
+// since no mutex, we need to use volatile for this
 can_frame_t CanWrapper::CanMessage(void) { return can_msg_; }
 
-WheelController::wheel_status_t CanWrapper::WheelStatus(void) volatile {
+WheelController::wheel_status_t CanWrapper::WheelStatus(void) {
   return canpressor_
       ->UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
           CanMessage());
 }
 
-double CanWrapper::angularToLinear(const double& speed) const {
-  return speed * kWheelDiameter;
-}
-
-const uint8_t CanWrapper::convertSpeedToUint8(const double& speed) const {
-  return (angularToLinear(speed) * UINT8_MAX / kWheelMaxSpeed);
+const uint8_t CanWrapper::convertSpeedToUint8(const double &speed) const {
+  return (speed * UINT8_MAX / kWheelMaxSpeed);
 }
 
 uint8_t CanWrapper::SpeedPwm(void) volatile {
