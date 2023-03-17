@@ -138,7 +138,7 @@ typedef struct PinConfiguration {
    * @brief Construct a new Pin Configuration object with specified pin numbers
    *
    * @param motorBrake uint8_t PinNumber passed when called
-   * @param motorEnable uint8_t PinNumber passed when called
+   * @param motorStop uint8_t PinNumber passed when called
    * @param motorSignal uint8_t PinNumber passed when called
    * @param motorDirection uint8_t PinNumber passed when called
    * @param motorSpeed uint8_t PinNumber passed when called
@@ -152,7 +152,7 @@ typedef struct PinConfiguration {
    * @param wheelBackLeft uint8_t PinNumber passed when called
    * @param wheelBackRight uint8_t PinNumber passed when called
    */
-  PinConfiguration(const uint8_t &motorBrake, const uint8_t &motorEnable,
+  PinConfiguration(const uint8_t &motorBrake, const uint8_t &motorStop,
                    const uint8_t &motorSignal, const uint8_t &motorDirection,
                    const uint8_t &motorSpeed, const uint8_t &canMcpIrq,
                    const uint8_t &canMcpRcv, const uint8_t &canMcpMosi,
@@ -160,7 +160,7 @@ typedef struct PinConfiguration {
                    const uint8_t &wheelFrontLeft,
                    const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
                    const uint8_t &wheelBackRight)
-      : motor_brake{motorBrake}, motor_stop{motorEnable},
+      : motor_brake{motorBrake}, motor_stop{motorStop},
         motor_signal{motorSignal}, motor_direction{motorDirection},
         motor_speed{motorSpeed}, can_mcp_irq{canMcpIrq}, can_mcp_rcv{canMcpRcv},
         can_mcp_mosi{canMcpMosi}, can_mcp_miso{canMcpMiso},
@@ -173,5 +173,8 @@ typedef struct PinConfiguration {
  * @brief Timeout constant [ms] if no CanBus message is received
  *
  */
-constexpr uint8_t kTimeoutMs = 250;
+constexpr auto kTimeoutMillis{250};
+constexpr auto kTimeoutMicros{kTimeoutMillis * 1000};
+constexpr auto kWheelPowerInWatt{300};
+constexpr auto kMinVelocityToEffort{0.5};
 #endif // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_

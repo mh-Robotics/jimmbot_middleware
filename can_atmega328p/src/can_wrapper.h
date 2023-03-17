@@ -82,7 +82,7 @@ public:
    *
    * @return The latest CAN message received
    */
-  can_frame_t CanMessage(void);
+  can_frame_t CanMessage(void) const;
 
   /**
    * @brief Returns the latest WheelStatus unpacked from latest CAN message
@@ -90,21 +90,21 @@ public:
    *
    * @return The latest WheelStatus unpacked
    */
-  WheelController::wheel_status_t WheelStatus(void);
+  WheelController::wheel_status_t WheelCommandStatus(void) const;
 
   /**
    * @brief Returns the speed value from the latest received CAN message
    *
    * @return The speed value from the latest received CAN message
    */
-  uint8_t SpeedPwm(void) volatile;
+  uint8_t SpeedPwm(void) const;
 
   /**
    * @brief Returns the speed value from the latest received CAN message
    *
    * @return The speed value from the latest received CAN message
    */
-  bool Direction(void) volatile;
+  bool Direction(void) const;
 
   /**
    * @brief Clears the current CAN message
@@ -137,7 +137,7 @@ private:
    * @return The 8-bit unsigned integer representation of the given speed value,
    * between 0 and 255.
    */
-  const uint8_t convertSpeedToUint8(const double &speed) const;
+  const uint8_t convertSpeedToUint8(const double &speed) const volatile;
 
   /**
    * @brief The MCP2515 CAN controller instance

@@ -72,7 +72,7 @@ bool IWheelController::CommandCallback(void) {
 }
 
 bool IWheelController::FeedbackCallback(void) {
-  can_wrapper_->FeedbackHandler(wheel_controller_->WheelStatus());
+  can_wrapper_->FeedbackHandler(wheel_controller_->WheelFeedbackStatus());
   FeedbackReady(false);
 
   return true;

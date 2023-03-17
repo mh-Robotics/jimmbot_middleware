@@ -118,20 +118,6 @@ public:
     }
 
     /**
-     * @brief Get whether the wheel is reversed
-     *
-     * @return True if the wheel is reversed, false otherwise
-     */
-    bool Reverse(void) const { return reverse; }
-
-    /**
-     * @brief Set whether the wheel is reversed
-     *
-     * @param reverse True if the wheel is reversed, false otherwise
-     */
-    void Reverse(const bool &reverse) { this->reverse = reverse; }
-
-    /**
      * @brief Get the radius of the wheel
      *
      * @return double The radius in centimeters

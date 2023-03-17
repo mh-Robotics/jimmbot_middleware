@@ -108,7 +108,7 @@ public:
 
   private:
     int command_id{0};
-    double effort{10.0};
+    double effort{1.0};
     double position{0.0};
     int rpm{0};
     double velocity{0.0};
@@ -149,7 +149,7 @@ public:
    *
    * @return true if the timeout has occurred, false otherwise.
    */
-  bool TimeoutCheck(void);
+  bool TimeoutCheck(void) const;
 
   /**
    * @brief Sets the direction of the wheel.
@@ -164,7 +164,7 @@ public:
    *
    * @param speed The speed of the wheel (in PWM 0-255).
    */
-  void SetSpeed(uint8_t speed);
+  void SetSpeed(uint8_t speed) const;
 
   /**
    * @brief Sets the speed and direction of the wheel.
@@ -173,21 +173,21 @@ public:
    * @param direction The direction of the wheel (true for forward, false for
    * backward).
    */
-  void SetSpeedAndDirection(uint8_t speed, bool direction);
+  void SetSpeedAndDirection(uint8_t speed, bool direction) const;
 
   /**
    * @brief Gets the current status of the wheel.
    *
    * @return The current status of the wheel.
    */
-  wheel_status_t WheelStatus(void);
+  wheel_status_t WheelFeedbackStatus(void) const;
 
   /**
    * @brief Drives the wheel.
    *
    * @param drive true to drive the wheel, false to stop it.
    */
-  void Drive(bool drive);
+  void Drive(bool drive) const;
 
   /**
    * @brief Destroys the Wheel Controller object.
@@ -200,22 +200,22 @@ private:
    *
    * @param kBrake true to apply the brake, false to release it.
    */
-  void Brake(bool kBrake);
+  void Brake(bool kBrake) const;
 
   /**
    * @brief Disables the drive of the wheel.
    *
    * @param kStop true to disable the drive, false to enable it.
    */
-  void Stop(bool kStop);
+  void Stop(bool kStop) const;
 
-  wheel_status_t wheel_status_{};
-  Wheel *wheel_{nullptr};
+  mutable wheel_status_t wheel_feedback_status_{};
+  const Wheel *wheel_{nullptr};
+  volatile bool is_reverse_{false};
   volatile unsigned long timeout_{0};
-  volatile double old_time_{0};
+  volatile unsigned long old_time_{0};
   volatile double time_taken_{0};
   volatile signed long signal_counter_{0};
-  volatile double last_pulse_time_{0};
   std::once_flag first_odometry_tick_;
 };
 #endif // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_

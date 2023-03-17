@@ -65,6 +65,8 @@ void CanReceiveHandler() {
 void IsrEncoderPulse() { i_wheel_controller.UpdateWheelSignal(); }
 
 void setup() {
+  // Serial.begin(9600);
+
   wheel.Init();
   wheel_controller.Init(wheel);
   can_wrapper.Init(wheel.Properties().TransmitId(),
@@ -77,6 +79,8 @@ void setup() {
 
 void loop() {
   CanReceiveHandler();
-  // TimeoutCheckLoop();
-  delay(25);
+  TimeoutCheckLoop();
+  // Loop needs to be updated at a rate of 20 Hz.
+  // @todo(jimmyhalimi): Update to timer interrupt.
+  delay(50);
 }

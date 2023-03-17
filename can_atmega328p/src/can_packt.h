@@ -41,7 +41,7 @@
 using CompressedWheelStatus =
     struct __attribute__((packed)) CompressedWheelStatus {
   uint8_t command_id : 7; /**< Command ID (7 bits), Range 0 to 127 */
-  uint8_t effort : 7;     /**< Effort (7 bits), Range 0 to 127 */
+  int8_t effort : 7;      /**< Effort (7 bits), Range -64 to 63 */
   int32_t position : 22;  /**< Position (1 sign bit + 21 bits for magnitude),
                              Range -2,097,151 to 2,097,151. */
   uint16_t rpm : 10;      /**< RPM (10 bits), Range 0 to 1023  */
