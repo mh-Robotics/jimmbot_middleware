@@ -43,10 +43,10 @@ using CompressedWheelStatus =
   uint8_t command_id : 7; /**< Command ID (7 bits), Range 0 to 127 */
   int8_t effort : 7;      /**< Effort (7 bits), Range -64 to 63 */
   int32_t position : 22;  /**< Position (1 sign bit + 21 bits for magnitude),
-                             Range -2,097,151 to 2,097,151. */
+                             Range  -9999.99 to 9999.99 */
   uint16_t rpm : 10;      /**< RPM (10 bits), Range 0 to 1023  */
-  int8_t
-      velocity : 8; /**< Velocity (signed 8-bit magnitude), Range -127 to 127 */
+  int8_t velocity : 8;    /**< Velocity (signed 8-bit magnitude), Range -5.95
+                             to 5.95 */
 };
 /**
  * @brief A class for packing and unpacking compressed CAN messages
