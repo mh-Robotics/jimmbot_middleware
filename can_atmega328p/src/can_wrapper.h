@@ -33,6 +33,7 @@
 #include "can_packt.h" // for PackCompressed<> and UnpackCompressed<>
 #include "drivers/include/mcp2515.h" // for MCP2515
 #include "pin_configuration.h"       // for PinConfiguration
+#include "speed_to_pwm.h"            // for SpeedToPwm
 #include "wheel_controller.h"        // for WheelController::wheel_status_t
 
 /**
@@ -128,18 +129,6 @@ private:
   bool Setup(int receive_id);
 
   /**
-   * @brief Converts a double speed value to an 8-bit unsigned integer value.
-   * Given a double precision floating point speed value, this function scales
-   * and rounds it to an 8-bit unsigned integer value between 0 and 255.
-   *
-   * @param speed The double precision floating point speed value to be
-   * converted.
-   * @return The 8-bit unsigned integer representation of the given speed value,
-   * between 0 and 255.
-   */
-  const uint8_t convertSpeedToUint8(const double &speed) const volatile;
-
-  /**
    * @brief The MCP2515 CAN controller instance
    */
   MCP2515 *mcp_can_{nullptr};
@@ -148,6 +137,11 @@ private:
    * @brief The CanPackt instance for compressed message packing
    */
   CanPackt *canpressor_{nullptr};
+
+  /**
+   * @brief The SpeedToPWM instance for speed to PWM mapping
+   */
+  SpeedToPWM *speedmapper_{nullptr};
 
   /**
    * @brief The latest CAN message received

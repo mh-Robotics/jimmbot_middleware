@@ -65,8 +65,6 @@ void CanReceiveHandler() {
 void IsrEncoderPulse() { i_wheel_controller.UpdateWheelSignal(); }
 
 void setup() {
-  // Serial.begin(9600);
-
   wheel.Init();
   wheel_controller.Init(wheel);
   can_wrapper.Init(wheel.Properties().TransmitId(),

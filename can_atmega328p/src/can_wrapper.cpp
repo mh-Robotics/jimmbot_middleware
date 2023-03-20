@@ -32,17 +32,9 @@
 #include "wheel.h"
 #include "wheel_controller.h"
 
-namespace {
-/**
- * @brief Max speed in m/s of the 300 Watt wheel hub measured with the formulas
- * already implemeted to calculate the speed when analogWrite is set to 255 and
- * the voltage in the robot is 29.4V DC.
- */
-constexpr auto kWheelMaxSpeed{7.65};
-} // namespace
-
 bool CanWrapper::Init(uint8_t transmit_id, uint8_t receive_id) {
   canpressor_ = new CanPackt(transmit_id, receive_id);
+  speedmapper_ = new SpeedToPWM();
   return Setup(receive_id);
 }
 
@@ -96,13 +88,8 @@ WheelController::wheel_status_t CanWrapper::WheelCommandStatus(void) const {
           CanMessage());
 }
 
-const uint8_t CanWrapper::convertSpeedToUint8(const double &speed) const
-    volatile {
-  return (abs(speed) * UINT8_MAX / kWheelMaxSpeed);
-}
-
 uint8_t CanWrapper::SpeedPwm(void) const {
-  return convertSpeedToUint8(WheelCommandStatus().Velocity());
+  return speedmapper_->GetPWM(WheelCommandStatus().Velocity());
 }
 
 bool CanWrapper::Direction(void) const {

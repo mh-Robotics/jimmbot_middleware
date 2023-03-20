@@ -169,12 +169,33 @@ typedef struct PinConfiguration {
         wheel_back_right{wheelBackRight} {}
 } pin_configuration_t;
 
+namespace {
 /**
  * @brief Timeout constant [ms] if no CanBus message is received
- *
  */
 constexpr auto kTimeoutMillis{250};
+
+/**
+ * @brief Timeout constant [micros] if no CanBus message is received
+ */
 constexpr auto kTimeoutMicros{kTimeoutMillis * 1000};
+
+/**
+ * @brief The HUB Wheel power [Watt]
+ */
 constexpr auto kWheelPowerInWatt{300};
+
+/**
+ * @brief The HUB Wheel power [Watt]
+ */
 constexpr auto kMinVelocityToEffort{0.5};
+
+/**
+ * @brief Max speed in m/s of the 300 Watt wheel hub measured with the formulas
+ * already implemeted to calculate the speed when analogWrite is set to 255 and
+ * the voltage in the robot is 29.4V DC.
+ */
+// constexpr auto kWheelMaxSpeed{7.65};
+constexpr auto kWheelMaxSpeed{2.20};
+} // namespace
 #endif // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_

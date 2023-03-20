@@ -94,12 +94,6 @@ bool WheelController::CalculateWheelOdometry(void) {
   //   wheel_feedback_status_.Effort(sign * kWheelPowerInWatt / kVelocity);
   // }
 
-  // Serial.println("wheel_feedback_status_:");
-  // Serial.print("RPM:");
-  // Serial.println(wheel_feedback_status_.Rpm());
-  // Serial.print("Velocity:");
-  // Serial.println(wheel_feedback_status_.Velocity());
-
   old_time_ = current_time;
   return true;
 }
@@ -124,8 +118,6 @@ void WheelController::SetSpeed(uint8_t speed) const {
     Drive(true);
   }
 
-  // @todo(jimmyhalimi): Set a map for speed to pwm or a PID, currently roufly
-  // calculating the values
   analogWrite(wheel_->Configuration().motor_speed, speed);
 }
 
