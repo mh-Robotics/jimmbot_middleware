@@ -28,11 +28,14 @@
  *
  */
 #include "drivers/include/can.h" // for can_frame_t
-#include "stdint.h"              // for int Data Types
 #include "wheel_controller.h"    // for WheelController::wheel_status_t
 
-#ifndef CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
-#define CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <cstdint>      // for int Data Types
+#include <cstring>      // for std::memcpy
+
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_
 
 /**
  * @brief Defines a bit-field struct to represent the compressed motor status
@@ -79,7 +82,7 @@ public:
     canFrame.can_id = transmit_id_;
     canFrame.can_dlc = CAN_MAX_DLEN;
 
-    memcpy(canFrame.data, &wheel_status, sizeof(inType));
+    std::memcpy(canFrame.data, &wheel_status, sizeof(inType));
 
     return canFrame;
   }
@@ -99,7 +102,7 @@ public:
                   "Struct is larger than CAN message data field size");
 
     outType data;
-    memcpy(&data, can_frame.data, sizeof(outType));
+    std::memcpy(&data, can_frame.data, sizeof(outType));
 
     return data;
   }
@@ -140,7 +143,7 @@ CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
       static_cast<int8_t>(wheel_status.Velocity() * 20);
 
   // Copy the compressed data into the CAN frame
-  memcpy(canFrame.data, &compressed_status, sizeof(CompressedWheelStatus));
+  std::memcpy(canFrame.data, &compressed_status, sizeof(CompressedWheelStatus));
 
   return canFrame;
 }
@@ -165,7 +168,8 @@ CanPackt::UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
 
   // Extract the compressed data from the CAN frame
   CompressedWheelStatus compressed_status;
-  memcpy(&compressed_status, can_frame.data, sizeof(CompressedWheelStatus));
+  std::memcpy(&compressed_status, can_frame.data,
+              sizeof(CompressedWheelStatus));
 
   // Unpack the compressed data into the motor status struct
   wheel_status.CommandId(static_cast<int>(compressed_status.command_id));
@@ -176,4 +180,4 @@ CanPackt::UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
 
   return wheel_status;
 }
-#endif // CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_

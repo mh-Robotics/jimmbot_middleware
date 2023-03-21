@@ -1,4 +1,6 @@
 #include "../include/mcp2515.h"
+#include <avr/io.h>     // for DDR* and PORT*
+#include <util/delay.h> // for _delay_ms
 
 const struct MCP2515::TXBn_REGS MCP2515::TXB[MCP2515::N_TXBUFFERS] = {
     {MCP_TXB0CTRL, MCP_TXB0SIDH, MCP_TXB0DATA},
@@ -19,17 +21,17 @@ MCP2515::MCP2515(const uint8_t _CS, const uint32_t _SPI_CLOCK, SPIClass *_SPI) {
 
   SPICS = _CS;
   SPI_CLOCK = _SPI_CLOCK;
-  pinMode(SPICS, OUTPUT);
+  DDRB |= (1 << SPICS);
   endSPI();
 }
 
 void MCP2515::startSPI() {
   SPIn->beginTransaction(SPISettings(SPI_CLOCK, MSBFIRST, SPI_MODE0));
-  digitalWrite(SPICS, LOW);
+  PORTB &= ~(1 << SPICS);
 }
 
 void MCP2515::endSPI() {
-  digitalWrite(SPICS, HIGH);
+  PORTB |= (1 << SPICS);
   SPIn->endTransaction();
 }
 
@@ -38,7 +40,7 @@ MCP2515::ERROR MCP2515::reset(void) {
   SPIn->transfer(INSTRUCTION_RESET);
   endSPI();
 
-  delay(10);
+  _delay_ms(10);
 
   uint8_t zeros[14];
   memset(zeros, 0, sizeof(zeros));

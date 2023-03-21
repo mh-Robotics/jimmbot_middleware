@@ -28,11 +28,12 @@
  * SOFTWARE.
  *
  */
-#ifndef CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
-#define CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_
 
-#include "Arduino.h" // for digital*, analogWrite()
-#include "stdint.h"  // for uint8_t
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <avr/io.h>     // for avr pins P*
+#include <cstdint>      // for uint8_t
 
 /**
  * @brief Pin Configuration structure that holds all the pin numbers and
@@ -127,12 +128,33 @@ typedef struct PinConfiguration {
   /**
    * @brief Construct a new Pin Configuration object with default pin numbers
    *
+   *     ATMEL ATMEGA328P / ARDUINO
+   *
+   *                   +-\/-+
+   *             PC6  1|    |28  PC5 (AI 5)
+   *       (D 0) PD0  2|    |27  PC4 (AI 4)
+   *       (D 1) PD1  3|    |26  PC3 (AI 3)
+   *       (D 2) PD2  4|    |25  PC2 (AI 2)
+   *  PWM+ (D 3) PD3  5|    |24  PC1 (AI 1)
+   *       (D 4) PD4  6|    |23  PC0 (AI 0)
+   *             VCC  7|    |22  GND
+   *             GND  8|    |21  AREF
+   *             PB6  9|    |20  AVCC
+   *             PB7 10|    |19  PB5 (D 13)
+   *  PWM+ (D 5) PD5 11|    |18  PB4 (D 12)
+   *  PWM+ (D 6) PD6 12|    |17  PB3 (D 11) PWM
+   *       (D 7) PD7 13|    |16  PB2 (D 10) PWM
+   *       (D 8) PB0 14|    |15  PB1 (D 9) PWM
+   *                   +----+
+   *
+   *  (PWM+ indicates the additional PWM pins on the ATmega168.)
    */
   PinConfiguration()
-      : motor_brake{7}, motor_stop{4}, motor_signal{3}, motor_direction{5},
-        motor_speed{6}, can_mcp_irq{2}, can_mcp_rcv{10}, can_mcp_mosi{11},
-        can_mcp_miso{12}, can_mcp_sck{13}, wheel_front_left{A0},
-        wheel_front_right{A1}, wheel_back_left{A2}, wheel_back_right{A3} {}
+      : motor_brake{PD7}, motor_stop{PD4}, motor_signal{PD3},
+        motor_direction{PD5}, motor_speed{PD6}, can_mcp_irq{PD2},
+        can_mcp_rcv{PB2}, can_mcp_mosi{PB3}, can_mcp_miso{PB4},
+        can_mcp_sck{PB5}, wheel_front_left{PC0}, wheel_front_right{PC1},
+        wheel_back_left{PC2}, wheel_back_right{PC3} {}
 
   /**
    * @brief Construct a new Pin Configuration object with specified pin numbers
@@ -168,34 +190,4 @@ typedef struct PinConfiguration {
         wheel_front_right{wheelFrontRight}, wheel_back_left{wheelBackLeft},
         wheel_back_right{wheelBackRight} {}
 } pin_configuration_t;
-
-namespace {
-/**
- * @brief Timeout constant [ms] if no CanBus message is received
- */
-constexpr auto kTimeoutMillis{250};
-
-/**
- * @brief Timeout constant [micros] if no CanBus message is received
- */
-constexpr auto kTimeoutMicros{kTimeoutMillis * 1000};
-
-/**
- * @brief The HUB Wheel power [Watt]
- */
-constexpr auto kWheelPowerInWatt{300};
-
-/**
- * @brief The HUB Wheel power [Watt]
- */
-constexpr auto kMinVelocityToEffort{0.5};
-
-/**
- * @brief Max speed in m/s of the 300 Watt wheel hub measured with the formulas
- * already implemeted to calculate the speed when analogWrite is set to 255 and
- * the voltage in the robot is 29.4V DC.
- */
-// constexpr auto kWheelMaxSpeed{7.65};
-constexpr auto kWheelMaxSpeed{2.20};
-} // namespace
-#endif // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_

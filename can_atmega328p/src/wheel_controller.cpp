@@ -29,8 +29,14 @@
  * SOFTWARE.
  *
  */
-#include "wheel_controller.h" // for WheelController
-#include "pin_configuration.h"
+#include "wheel_controller.h"  // for WheelController
+#include "constants.h"         // for k*
+#include "pin_configuration.h" // for PinConfiguration and k*
+
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <cmath>        // for M_PI
+
+#include "Arduino.h"
 
 bool WheelController::Init(const Wheel &wheel) {
   wheel_ = &wheel;
@@ -42,7 +48,7 @@ bool WheelController::Init(const Wheel &wheel) {
   return true;
 }
 
-void WheelController::WheelSignalIrqHandler(void) {
+void WheelController::WheelSignalIrqHandler() {
   if (is_reverse_) {
     if (signal_counter_ == INT32_MIN) {
       signal_counter_ = 0;
@@ -60,7 +66,7 @@ void WheelController::WheelSignalIrqHandler(void) {
   CalculateWheelOdometry();
 }
 
-bool WheelController::CalculateWheelOdometry(void) {
+bool WheelController::CalculateWheelOdometry() {
   std::call_once(first_odometry_tick_, [this]() { old_time_ = micros(); });
 
   unsigned long current_time = micros();
@@ -73,45 +79,50 @@ bool WheelController::CalculateWheelOdometry(void) {
   }
 
   int sign = is_reverse_ ? -1 : 1;
-  double circumference_meters =
-      2 * M_PI * (wheel_->Properties().Radius() / 100.0);
+  double circumference_meters = 2 * M_PI * (internal::wheel::kRadius / 100.0);
 
   wheel_feedback_status_.Position(
       (circumference_meters * 100 * signal_counter_) /
-      (100 * wheel_->Properties().PulsePerRevolution())); // Pose in Meters
+      (100 * internal::wheel::kPulsePerRevolution)); // Pose in Meters
 
   wheel_feedback_status_.Rpm(
-      1.0 / (time_taken_ * wheel_->Properties().PulsePerRevolution()) * 60.0);
+      1.0 / (time_taken_ * internal::wheel::kPulsePerRevolution) * 60.0);
 
   wheel_feedback_status_.Velocity(sign * circumference_meters *
                                   wheel_feedback_status_.Rpm() / 60.0);
 
-  // @todo(jimmyhalimi): This slows down the position calculation somehow.
+  // // @todo(jimmyhalimi): This slows down the position calculation somehow.
   // const double kVelocity = wheel_feedback_status_.Velocity();
-  // if (kVelocity >= -kMinVelocityToEffort && kVelocity <= kMinVelocityToEffort) {
+  // if (kVelocity >= -internal::kMinVelocityToEffort &&
+  //     kVelocity <= internal::kMinVelocityToEffort) {
   //   wheel_feedback_status_.Effort(sign * 63);
   // } else {
-  //   wheel_feedback_status_.Effort(sign * kWheelPowerInWatt / kVelocity);
+  //   wheel_feedback_status_.Effort(sign * internal::wheel::kPowerInWatt /
+  //                                 kVelocity);
   // }
 
   old_time_ = current_time;
   return true;
 }
 
-void WheelController::UpdateTimeout(void) { timeout_ = micros(); }
+void WheelController::UpdateTimeout() { timeout_ = micros(); }
 
-bool WheelController::TimeoutCheck(void) const {
-  return (micros() - timeout_ >= kTimeoutMicros);
+bool WheelController::TimeoutCheck() const {
+  return (micros() - timeout_ >= internal::kTimeoutMicros);
 }
 
-void WheelController::SetDirection(bool direction) {
+void WheelController::SetDirection(const bool &direction) {
   is_reverse_ = !direction;
 
   // Active Low: Direction clockwise
-  digitalWrite(wheel_->Configuration().motor_direction, direction);
+  if (direction) {
+    PORTD |= (1 << wheel_->Configuration().motor_direction);
+  } else {
+    PORTD &= ~(1 << wheel_->Configuration().motor_direction);
+  }
 }
 
-void WheelController::SetSpeed(uint8_t speed) const {
+void WheelController::SetSpeed(const uint8_t &speed) const {
   if (speed == 0) {
     Drive(false);
   } else {
@@ -121,14 +132,13 @@ void WheelController::SetSpeed(uint8_t speed) const {
   analogWrite(wheel_->Configuration().motor_speed, speed);
 }
 
-void WheelController::SetSpeedAndDirection(uint8_t speed,
-                                           bool direction) const {
+void WheelController::SetSpeedAndDirection(const uint8_t &speed,
+                                           const bool &direction) const {
   SetDirection(direction);
   SetSpeed(speed);
 }
 
-WheelController::wheel_status_t
-WheelController::WheelFeedbackStatus(void) const {
+WheelController::wheel_status_t WheelController::WheelFeedbackStatus() const {
 
   const auto wheel_feedback_status = wheel_feedback_status_;
   // Reset all the values after the feedback is requested except the position
@@ -139,14 +149,22 @@ WheelController::WheelFeedbackStatus(void) const {
   return wheel_feedback_status;
 }
 
-void WheelController::Brake(bool kBrake) const {
+void WheelController::Brake(const bool &brake) const {
   // Active High: Brake applied
-  digitalWrite(wheel_->Configuration().motor_brake, kBrake);
+  if (brake) {
+    PORTD |= (1 << wheel_->Configuration().motor_brake);
+  } else {
+    PORTD &= ~(1 << wheel_->Configuration().motor_brake);
+  }
 }
 
-void WheelController::Stop(bool kStop) const {
+void WheelController::Stop(const bool &stop) const {
   // Active Low: Drive disabled
-  digitalWrite(wheel_->Configuration().motor_stop, !kStop);
+  if (!stop) {
+    PORTD |= (1 << wheel_->Configuration().motor_stop);
+  } else {
+    PORTD &= ~(1 << wheel_->Configuration().motor_stop);
+  }
 }
 
-void WheelController::Drive(bool drive) const { Brake(!drive); }
+void WheelController::Drive(const bool &drive) const { Brake(!drive); }

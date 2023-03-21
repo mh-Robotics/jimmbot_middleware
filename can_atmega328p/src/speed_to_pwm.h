@@ -27,17 +27,20 @@
  * SOFTWARE.
  *
  */
-#include "pin_configuration.h"    // for kWheelMaxSpeed
-#include "stl_helper_functions.h" // for std::prev and std::abs
-#include <ArduinoSTL.h>           // for AurdionoSTL containers
-#include <map>                    // for std::map
+#include "constants.h"            // for k*
+#include "stl_helper_functions.h" // for std::prev
 
-#ifndef CAN_ATMEGA328P_SRC_SPEED_TO_PWM_HPP_
-#define CAN_ATMEGA328P_SRC_SPEED_TO_PWM_HPP_
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <cmath>        // for std::abs
+#include <cstdint>      // for uint8_t
+#include <map>          // for std::map
+
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_SPEED_TO_PWM_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_SPEED_TO_PWM_H_
 
 /**
  * @brief The SpeedToPWM class provides a lookup table for mapping speed values
- * to PWM values.
+ * to PWM values. @todo(jimmyhalimi): This class needs to update to PID Control.
  */
 class SpeedToPWM {
 public:
@@ -64,7 +67,7 @@ public:
     map_[1.80] = 210;
     map_[1.95] = 225;
     map_[2.10] = 240;
-    map_[kWheelMaxSpeed] = 255;
+    map_[internal::wheel::kMaxSpeed] = 255;
   }
 
   /**
@@ -76,10 +79,10 @@ public:
   uint8_t GetPWM(double speed) const {
     // Ensure that speed is within the range of the map
     if (speed < 0.0) {
-      speed = abs(speed);
+      speed = std::abs(speed);
     }
-    if (speed > kWheelMaxSpeed) {
-      speed = kWheelMaxSpeed;
+    if (speed > internal::wheel::kMaxSpeed) {
+      speed = internal::wheel::kMaxSpeed;
     }
 
     // Find the closest speed value in the map
@@ -106,4 +109,4 @@ public:
 private:
   std::map<double, int> map_;
 };
-#endif // CAN_ATMEGA328P_SRC_CAN_PACKT_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_

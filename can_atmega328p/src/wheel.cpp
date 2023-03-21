@@ -30,17 +30,21 @@
  */
 #include "wheel.h" // for Wheel
 
-bool Wheel::Init() {
-  pinMode(Configuration().motor_direction, OUTPUT);
-  pinMode(Configuration().motor_brake, OUTPUT);
-  pinMode(Configuration().motor_stop, OUTPUT);
-  pinMode(Configuration().motor_signal, INPUT_PULLUP);
-  pinMode(Configuration().motor_speed, OUTPUT);
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <avr/io.h>     // for DDR*, PORT* and PIN*
+#include <cstdint>      // for uint8_t
 
-  pinMode(Configuration().wheel_front_left, INPUT_PULLUP);
-  pinMode(Configuration().wheel_front_right, INPUT_PULLUP);
-  pinMode(Configuration().wheel_back_left, INPUT_PULLUP);
-  pinMode(Configuration().wheel_back_right, INPUT_PULLUP);
+bool Wheel::Init() {
+  const uint8_t dirBrkStopSpeedMask = (1 << Configuration().motor_direction) |
+                                      (1 << Configuration().motor_brake) |
+                                      (1 << Configuration().motor_stop) |
+                                      (1 << Configuration().motor_speed);
+  DDRD |= dirBrkStopSpeedMask; // Set direction, brake, stop, and speed pins as
+                               // outputs
+  DDRD &= ~(1 << Configuration().motor_signal); // Set signal pin as input
+  PORTD |= (1 << Configuration().motor_signal); // Enable internal Pull Up
+  DDRC &= ~0x0F;                                // Set wheel pins as inputs
+  PORTC |= 0x0F; // Enable internal Pull Ups on wheel pins
 
   return EnumToCanId(DetermineWheel());
 }
@@ -99,15 +103,24 @@ bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
 }
 
 Wheel::Wheel_Enum Wheel::DetermineWheel() {
-  if (!(digitalRead(Configuration().wheel_front_left))) {
-    return Wheel::Wheel_Enum::kFrontLeft;
-  } else if (!(digitalRead(Configuration().wheel_front_right))) {
-    return Wheel::Wheel_Enum::kFrontRight;
-  } else if (!(digitalRead(Configuration().wheel_back_left))) {
-    return Wheel::Wheel_Enum::kBackLeft;
-  } else {
-    return Wheel::Wheel_Enum::kBackRight;
-  }
+  const uint8_t pinState =
+      ((PINC & ((1 << Configuration().wheel_front_left) |
+                (1 << Configuration().wheel_front_right) |
+                (1 << Configuration().wheel_back_left) |
+                (1 << Configuration().wheel_back_right))) >>
+       2);
 
-  return Wheel::Wheel_Enum::kUnspecified;
+  // Use the bitmask to determine the selected wheel
+  switch (pinState) {
+  case 0b0001:
+    return Wheel::Wheel_Enum::kFrontLeft;
+  case 0b0010:
+    return Wheel::Wheel_Enum::kFrontRight;
+  case 0b0100:
+    return Wheel::Wheel_Enum::kBackLeft;
+  case 0b1000:
+    return Wheel::Wheel_Enum::kBackRight;
+  default:
+    return Wheel::Wheel_Enum::kUnspecified;
+  }
 }

@@ -27,10 +27,10 @@
  * SOFTWARE.
  *
  */
-#ifndef CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
-#define CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 
-#include "can_packt.h" // for PackCompressed<> and UnpackCompressed<>
+#include "can_packt.h"               // for CanPackt
 #include "drivers/include/mcp2515.h" // for MCP2515
 #include "pin_configuration.h"       // for PinConfiguration
 #include "speed_to_pwm.h"            // for SpeedToPwm
@@ -44,7 +44,7 @@ public:
   /**
    * @brief Construct a new Can Wrapper object
    */
-  CanWrapper(void) = default;
+  CanWrapper() = default;
 
   /**
    * @brief Initializes the CAN controller with the given transmit and receive
@@ -54,14 +54,14 @@ public:
    * @param receive_id The receive ID for the CAN controller
    * @return true if initialization was successful, false otherwise
    */
-  bool Init(uint8_t transmit_id, uint8_t receive_id);
+  bool Init(const uint8_t &transmit_id, const uint8_t &receive_id);
 
   /**
    * @brief Reads a message from the CAN bus
    *
    * @return true if a message was successfully read, false otherwise
    */
-  bool CommandHandler(void);
+  bool CommandHandler();
 
   /**
    * @brief Sends a message to the CAN bus
@@ -83,7 +83,7 @@ public:
    *
    * @return The latest CAN message received
    */
-  can_frame_t CanMessage(void) const;
+  can_frame_t CanMessage() const;
 
   /**
    * @brief Returns the latest WheelStatus unpacked from latest CAN message
@@ -91,28 +91,28 @@ public:
    *
    * @return The latest WheelStatus unpacked
    */
-  WheelController::wheel_status_t WheelCommandStatus(void) const;
+  WheelController::wheel_status_t WheelCommandStatus() const;
 
   /**
    * @brief Returns the speed value from the latest received CAN message
    *
    * @return The speed value from the latest received CAN message
    */
-  uint8_t SpeedPwm(void) const;
+  uint8_t SpeedPwm() const;
 
   /**
    * @brief Returns the speed value from the latest received CAN message
    *
    * @return The speed value from the latest received CAN message
    */
-  bool Direction(void) const;
+  bool Direction() const;
 
   /**
    * @brief Clears the current CAN message
    *
    * @return true if the message was cleared successfully, false otherwise
    */
-  bool cleanCanMessage(void);
+  bool cleanCanMessage();
 
   /**
    * @brief Destroy the Can Wrapper object
@@ -126,7 +126,7 @@ private:
    * @param receive_id The receive ID for the CAN controller
    * @return true if setup was successful, false otherwise
    */
-  bool Setup(int receive_id);
+  bool Setup(const int &receive_id);
 
   /**
    * @brief The MCP2515 CAN controller instance
@@ -153,4 +153,4 @@ private:
    */
   WheelController::wheel_status_t wheel_status;
 };
-#endif // CAN_WRAPPER_H_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_

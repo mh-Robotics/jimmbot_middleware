@@ -28,10 +28,10 @@
  * SOFTWARE.
  *
  */
-#ifndef CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
-#define CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_H_
 
-#include "stl_helper_functions.h" // for std::call_once
+#include "stl_helper_functions.h" // for std::call_once and std::once_flag
 #include "wheel.h"                // for Wheel
 
 /**
@@ -49,7 +49,7 @@ public:
     /**
      * @brief Gets the command ID associated with the WheelStatus.
      */
-    int CommandId(void) const { return command_id; }
+    int CommandId() const { return command_id; }
 
     /**
      * @brief Sets the command ID associated with the WheelStatus.
@@ -61,7 +61,7 @@ public:
     /**
      * @brief Gets the effort value associated with the WheelStatus.
      */
-    double Effort(void) const { return effort; }
+    double Effort() const { return effort; }
 
     /**
      * @brief Sets the effort value associated with the WheelStatus.
@@ -73,7 +73,7 @@ public:
     /**
      * @brief Gets the position value associated with the WheelStatus.
      */
-    double Position(void) const { return position; }
+    double Position() const { return position; }
 
     /**
      * @brief Sets the position value associated with the WheelStatus.
@@ -85,7 +85,7 @@ public:
     /**
      * @brief Gets the RPM value associated with the WheelStatus.
      */
-    int Rpm(void) const { return rpm; }
+    int Rpm() const { return rpm; }
 
     /**
      * @brief Sets the RPM value associated with the WheelStatus.
@@ -97,7 +97,7 @@ public:
     /**
      * @brief Gets the velocity value associated with the WheelStatus.
      */
-    double Velocity(void) const { return velocity; }
+    double Velocity() const { return velocity; }
 
     /**
      * @brief Sets the velocity value associated with the WheelStatus.
@@ -117,7 +117,7 @@ public:
   /**
    * @brief Construct a new Wheel Controller object
    */
-  WheelController(void) = default;
+  WheelController() = default;
 
   /**
    * @brief Initializes the wheel controller with the given wheel.
@@ -130,26 +130,26 @@ public:
   /**
    * @brief Handles the wheel signal IRQ.
    */
-  void WheelSignalIrqHandler(void);
+  void WheelSignalIrqHandler();
 
   /**
    * @brief Calculates the wheel odometry.
    *
    * @return true if odometry was calculated, false otherwise.
    */
-  bool CalculateWheelOdometry(void);
+  bool CalculateWheelOdometry();
 
   /**
    * @brief Updates the timeout value.
    */
-  void UpdateTimeout(void);
+  void UpdateTimeout();
 
   /**
    * @brief Checks if the timeout has occurred.
    *
    * @return true if the timeout has occurred, false otherwise.
    */
-  bool TimeoutCheck(void) const;
+  bool TimeoutCheck() const;
 
   /**
    * @brief Sets the direction of the wheel.
@@ -157,14 +157,14 @@ public:
    * @param direction The direction of the wheel (true for forward, false for
    * backward).
    */
-  void SetDirection(bool direction);
+  void SetDirection(const bool &direction);
 
   /**
    * @brief Sets the speed of the wheel.
    *
    * @param speed The speed of the wheel (in PWM 0-255).
    */
-  void SetSpeed(uint8_t speed) const;
+  void SetSpeed(const uint8_t &speed) const;
 
   /**
    * @brief Sets the speed and direction of the wheel.
@@ -173,21 +173,21 @@ public:
    * @param direction The direction of the wheel (true for forward, false for
    * backward).
    */
-  void SetSpeedAndDirection(uint8_t speed, bool direction) const;
+  void SetSpeedAndDirection(const uint8_t &speed, const bool &direction) const;
 
   /**
    * @brief Gets the current status of the wheel.
    *
    * @return The current status of the wheel.
    */
-  wheel_status_t WheelFeedbackStatus(void) const;
+  wheel_status_t WheelFeedbackStatus() const;
 
   /**
    * @brief Drives the wheel.
    *
    * @param drive true to drive the wheel, false to stop it.
    */
-  void Drive(bool drive) const;
+  void Drive(const bool &drive) const;
 
   /**
    * @brief Destroys the Wheel Controller object.
@@ -198,16 +198,16 @@ private:
   /**
    * @brief Applies the brake to the wheel.
    *
-   * @param kBrake true to apply the brake, false to release it.
+   * @param brake true to apply the brake, false to release it.
    */
-  void Brake(bool kBrake) const;
+  void Brake(const bool &brake) const;
 
   /**
    * @brief Disables the drive of the wheel.
    *
    * @param kStop true to disable the drive, false to enable it.
    */
-  void Stop(bool kStop) const;
+  void Stop(const bool &stop) const;
 
   mutable wheel_status_t wheel_feedback_status_{};
   const Wheel *wheel_{nullptr};
@@ -218,4 +218,4 @@ private:
   volatile signed long signal_counter_{0};
   std::once_flag first_odometry_tick_;
 };
-#endif // CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_H_

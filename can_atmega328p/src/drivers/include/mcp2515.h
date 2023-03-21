@@ -439,7 +439,8 @@ private:
   void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
 
 public:
-  MCP2515(const uint8_t _CS = 10, const uint32_t _SPI_CLOCK = DEFAULT_SPI_CLOCK,
+  MCP2515(const uint8_t _CS = PB2,
+          const uint32_t _SPI_CLOCK = DEFAULT_SPI_CLOCK,
           SPIClass *_SPI = nullptr);
   ERROR reset(void);
   ERROR setConfigMode();

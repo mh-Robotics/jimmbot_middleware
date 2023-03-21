@@ -38,31 +38,33 @@ bool IWheelController::Init(WheelController &wheel_controller,
 
 bool IWheelController::CommandReady() const { return update_flag_; }
 
-void IWheelController::CommandReady(bool flag) { update_flag_ = flag; }
+void IWheelController::CommandReady(const bool &flag) { update_flag_ = flag; }
 
-bool IWheelController::FeedbackReady(void) const { return feedback_flag_; }
+bool IWheelController::FeedbackReady() const { return feedback_flag_; }
 
-void IWheelController::FeedbackReady(bool flag) { feedback_flag_ = flag; }
+void IWheelController::FeedbackReady(const bool &flag) {
+  feedback_flag_ = flag;
+}
 
-bool IWheelController::UpdateCanMessage(void) {
+bool IWheelController::UpdateCanMessage() {
   UpdateTimeout();
   CommandReady(true);
   return can_wrapper_->CommandHandler();
 }
 
-bool IWheelController::UpdateEmptyCanMessage(void) const {
+bool IWheelController::UpdateEmptyCanMessage() const {
   return can_wrapper_->cleanCanMessage();
 }
 
-void IWheelController::UpdateTimeout(void) const {
+void IWheelController::UpdateTimeout() const {
   wheel_controller_->UpdateTimeout();
 }
 
-void IWheelController::UpdateWheelSignal(void) const {
+void IWheelController::UpdateWheelSignal() const {
   wheel_controller_->WheelSignalIrqHandler();
 }
 
-bool IWheelController::CommandCallback(void) {
+bool IWheelController::CommandCallback() {
   wheel_controller_->SetSpeedAndDirection(can_wrapper_->SpeedPwm(),
                                           can_wrapper_->Direction());
   CommandReady(false);
@@ -71,13 +73,13 @@ bool IWheelController::CommandCallback(void) {
   return true;
 }
 
-bool IWheelController::FeedbackCallback(void) {
+bool IWheelController::FeedbackCallback() {
   can_wrapper_->FeedbackHandler(wheel_controller_->WheelFeedbackStatus());
   FeedbackReady(false);
 
   return true;
 }
 
-bool IWheelController::TimeoutCheckCallback(void) const {
+bool IWheelController::TimeoutCheckCallback() const {
   return wheel_controller_->TimeoutCheck();
 }

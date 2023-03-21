@@ -1,5 +1,5 @@
-#ifndef STL_HELPER_FUNCTIONS_H_
-#define STL_HELPER_FUNCTIONS_H_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_STL_HELPER_FUNCTIONS_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_STL_HELPER_FUNCTIONS_H_
 
 namespace std {
 /**
@@ -55,4 +55,4 @@ ForwardIterator prev(ForwardIterator it, int n = 1) {
   return it;
 }
 } // namespace std
-#endif // STL_HELPER_FUNCTIONS_H_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_STL_HELPER_FUNCTIONS_H_

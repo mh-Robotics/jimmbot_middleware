@@ -27,12 +27,14 @@
  * SOFTWARE.
  *
  */
-#ifndef CAN_ATMEGA328P_SRC_WHEEL_HPP_
-#define CAN_ATMEGA328P_SRC_WHEEL_HPP_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
 
+#include "constants.h"         // for k*
 #include "pin_configuration.h" // for PinConfiguration
-#include "stdint.h"
 
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <cstdint>      // for uint8_t
 /**
  * @brief A class representing a wheel
  */
@@ -92,7 +94,7 @@ public:
      *
      * @return The receive ID of the wheel
      */
-    uint8_t ReceiveId(void) const { return command_id; }
+    uint8_t ReceiveId() const { return command_id; }
 
     /**
      * @brief Set the receive ID of the wheel
@@ -106,7 +108,7 @@ public:
      *
      * @return The transmit ID of the wheel
      */
-    uint8_t TransmitId(void) const { return feedback_id; }
+    uint8_t TransmitId() const { return feedback_id; }
 
     /**
      * @brief Set the transmit ID of the wheel
@@ -116,20 +118,6 @@ public:
     void TransmitId(const uint8_t &feedback_id) {
       this->feedback_id = feedback_id;
     }
-
-    /**
-     * @brief Get the radius of the wheel
-     *
-     * @return double The radius in centimeters
-     */
-    double Radius(void) const { return kRadius; }
-
-    /**
-     * @brief Get the number of encoder pulses per revolution of the wheel
-     *
-     * @return int The number of pulses
-     */
-    int PulsePerRevolution(void) const { return kPulsePerRevolution; }
 
   private:
     /**
@@ -146,22 +134,12 @@ public:
      * @brief Whether the wheel is reversed
      */
     bool reverse{false};
-
-    /**
-     * @brief The radius of the wheel in centimeters
-     */
-    const double kRadius{8.25};
-
-    /**
-     * @brief The number of encoder pulses per revolution of the wheel
-     */
-    const int kPulsePerRevolution{90};
   } properties_t;
 
   /**
    * @brief Construct a new Wheel object
    */
-  Wheel(void) = default;
+  Wheel() = default;
 
   /**
    * @brief Initialize the Wheel object with given pin configuration
@@ -170,21 +148,21 @@ public:
    * @return true Initialization successful
    * @return false Initialization failed
    */
-  bool Init(void);
+  bool Init();
 
   /**
    * @brief Returns the properties object for this wheel
    *
    * @return properties_t The properties object for this wheel
    */
-  properties_t Properties(void) const;
+  properties_t Properties() const;
 
   /**
    * @brief Returns the pin configuration object for this wheel
    *
    * @return pin_configuration_t The pin configuration object for this wheel
    */
-  pin_configuration_t Configuration(void) const;
+  pin_configuration_t Configuration() const;
 
   /**
    * @brief Destroy the Wheel object
@@ -206,7 +184,7 @@ private:
    *
    * @return Wheel_Enum The enum value of the wheel this object belongs to
    */
-  Wheel_Enum DetermineWheel(void);
+  Wheel_Enum DetermineWheel();
 
   /**
    * @brief The properties object for this wheel
@@ -218,4 +196,4 @@ private:
    */
   pin_configuration_t pin_configuration_;
 };
-#endif // CAN_ATMEGA328P_SRC_WHEEL_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
