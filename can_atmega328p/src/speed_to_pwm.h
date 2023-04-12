@@ -25,8 +25,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_SPEED_TO_PWM_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_SPEED_TO_PWM_H_
 #include "constants.h"            // for k*
 #include "stl_helper_functions.h" // for std::prev
 
@@ -34,9 +35,6 @@
 #include <cmath>        // for std::abs
 #include <cstdint>      // for uint8_t
 #include <map>          // for std::map
-
-#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_SPEED_TO_PWM_H_
-#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_SPEED_TO_PWM_H_
 
 /**
  * @brief The SpeedToPWM class provides a lookup table for mapping speed values

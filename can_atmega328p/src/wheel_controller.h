@@ -26,11 +26,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 #ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_H_
 #define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_CONTROLLER_H_
-
 #include "stl_helper_functions.h" // for std::call_once and std::once_flag
 #include "wheel.h"                // for Wheel
 
@@ -44,7 +42,7 @@ public:
    * @brief Struct that contains the status of the Wheel.
    *
    */
-  typedef struct WheelStatus {
+  using WheelStatus = struct WheelStatus {
   public:
     /**
      * @brief Gets the command ID associated with the WheelStatus.
@@ -112,7 +110,7 @@ public:
     double position{0.0};
     int rpm{0};
     double velocity{0.0};
-  } wheel_status_t;
+  };
 
   /**
    * @brief Construct a new Wheel Controller object
@@ -180,7 +178,7 @@ public:
    *
    * @return The current status of the wheel.
    */
-  wheel_status_t WheelFeedbackStatus() const;
+  WheelStatus WheelFeedbackStatus() const;
 
   /**
    * @brief Drives the wheel.
@@ -209,7 +207,7 @@ private:
    */
   void Stop(const bool &stop) const;
 
-  mutable wheel_status_t wheel_feedback_status_{};
+  mutable WheelStatus wheel_feedback_status_{};
   const Wheel *wheel_{nullptr};
   volatile bool is_reverse_{false};
   volatile unsigned long timeout_{0};

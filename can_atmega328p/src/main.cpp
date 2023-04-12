@@ -28,14 +28,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
+#include "Arduino.h" // for attachInterrupt, digitalPinToInterrupt and RISING
 #include "can_wrapper.h"       // for CanWrapper
 #include "iwheel_controller.h" // for IWheelController
 #include "wheel.h"             // for Wheel
 #include "wheel_controller.h"  // for WheelController
 
-#include "Arduino.h"
+#include <util/delay.h> // for _delay_ms
 
 Wheel wheel;
 WheelController wheel_controller;
@@ -80,5 +80,5 @@ void loop() {
   TimeoutCheckLoop();
   // Loop needs to be updated at a rate of 20 Hz.
   // @todo(jimmyhalimi): Update to timer interrupt.
-  delay(50);
+  _delay_ms(50);
 }

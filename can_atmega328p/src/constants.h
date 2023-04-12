@@ -25,11 +25,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 #ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CONSTANTS_H_
 #define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CONSTANTS_H_
-
 namespace internal {
 /**
  * @brief Timeout constant [ms] if no CanBus message is received
@@ -70,5 +68,4 @@ const auto kRadius{8.25};
 const auto kPulsePerRevolution{90};
 } // namespace wheel
 } // namespace internal
-
 #endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CONSTANTS_H_

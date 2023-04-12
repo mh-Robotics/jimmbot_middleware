@@ -25,17 +25,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
-#include "drivers/include/can.h" // for can_frame_t
-#include "wheel_controller.h"    // for WheelController::wheel_status_t
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_
+#include "drivers/can.h"      // for can_frame_t
+#include "wheel_controller.h" // for WheelController::WheelStatus
 
 #include <ArduinoSTL.h> // for ArduinoSTL containers
 #include <cstdint>      // for int Data Types
 #include <cstring>      // for std::memcpy
-
-#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_
-#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_PACKT_H_
 
 /**
  * @brief Defines a bit-field struct to represent the compressed motor status
@@ -51,6 +49,7 @@ using CompressedWheelStatus =
   int8_t velocity : 8;    /**< Velocity (signed 8-bit magnitude), Range -5.95
                              to 5.95 */
 };
+
 /**
  * @brief A class for packing and unpacking compressed CAN messages
  */
@@ -68,7 +67,7 @@ public:
   /**
    * @brief Packs a compressed wheel status data structure into a CAN frame
    *
-   * @tparam inType the input data type (must be a wheel_status_t)
+   * @tparam inType the input data type (must be a WheelStatus)
    * @tparam outType the output data type (must be a can_frame_t)
    * @param data the input data to pack
    * @return the packed CAN frame
@@ -92,7 +91,7 @@ public:
    * structure
    *
    * @tparam inType the input data type (must be a can_frame_t)
-   * @tparam outType the output data type (must be a wheel_status_t)
+   * @tparam outType the output data type (must be a WheelStatus)
    * @param msg the CAN frame to unpack
    * @return the unpacked wheel status data structure
    */
@@ -114,7 +113,7 @@ private:
 
 /**
  * @brief Specialization of the PackCompressed template function for packing a
- * wheel_status_t into a can_frame_t
+ * WheelStatus into a can_frame_t
  *
  * @tparam inType The type of the input data.
  * @tparam outType The type of the output data.
@@ -123,8 +122,8 @@ private:
  */
 template <>
 inline can_frame_t
-CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
-    const WheelController::wheel_status_t &wheel_status) {
+CanPackt::PackCompressed<WheelController::WheelStatus, can_frame_t>(
+    const WheelController::WheelStatus &wheel_status) {
   static_assert(sizeof(CompressedWheelStatus) <= CAN_MAX_DLEN,
                 "Struct is larger than CAN message data field size");
 
@@ -150,7 +149,7 @@ CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
 
 /**
  * @brief Specialization of the PackCompressed template function for unpacking a
- * can_frame_t into a wheel_status_t
+ * can_frame_t into a WheelStatus
  *
  * @tparam inType The type of the input data.
  * @tparam outType The type of the output data.
@@ -158,13 +157,13 @@ CanPackt::PackCompressed<WheelController::wheel_status_t, can_frame_t>(
  * @return The packed data as a wheel status data structure.
  */
 template <>
-inline WheelController::wheel_status_t
-CanPackt::UnpackCompressed<can_frame_t, WheelController::wheel_status_t>(
+inline WheelController::WheelStatus
+CanPackt::UnpackCompressed<can_frame_t, WheelController::WheelStatus>(
     const can_frame_t &can_frame) {
   static_assert(sizeof(can_frame_t::data) <= CAN_MAX_DLEN,
                 "Struct is larger than CAN message data field size");
 
-  WheelController::wheel_status_t wheel_status;
+  WheelController::WheelStatus wheel_status;
 
   // Extract the compressed data from the CAN frame
   CompressedWheelStatus compressed_status;

@@ -25,16 +25,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 #ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
 #define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_
-
-#include "can_packt.h"               // for CanPackt
-#include "drivers/include/mcp2515.h" // for MCP2515
-#include "pin_configuration.h"       // for PinConfiguration
-#include "speed_to_pwm.h"            // for SpeedToPwm
-#include "wheel_controller.h"        // for WheelController::wheel_status_t
+#include "can_packt.h"        // for CanPackt
+#include "drivers/mcp2515.h"  // for MCP2515
+#include "speed_to_pwm.h"     // for SpeedToPwm
+#include "wheel_controller.h" // for WheelController::WheelStatus
 
 /**
  * @brief A wrapper class for the MCP2515 CAN controller
@@ -68,7 +65,7 @@ public:
    *
    * @param wheel_status The wheel status data to be sent
    */
-  void FeedbackHandler(const WheelController::wheel_status_t &wheel_status);
+  void FeedbackHandler(const WheelController::WheelStatus &wheel_status);
 
   /**
    * @brief Configures the CAN ID filter mask for the given CAN ID
@@ -91,7 +88,7 @@ public:
    *
    * @return The latest WheelStatus unpacked
    */
-  WheelController::wheel_status_t WheelCommandStatus() const;
+  WheelController::WheelStatus WheelCommandStatus() const;
 
   /**
    * @brief Returns the speed value from the latest received CAN message
@@ -151,6 +148,6 @@ private:
   /**
    * @brief The latest WheelStatus received, unpacked from CAN message
    */
-  WheelController::wheel_status_t wheel_status;
+  WheelController::WheelStatus wheel_status;
 };
 #endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_CAN_WRAPPER_H_

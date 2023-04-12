@@ -25,16 +25,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 #ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
 #define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
-
 #include "constants.h"         // for k*
 #include "pin_configuration.h" // for PinConfiguration
 
 #include <ArduinoSTL.h> // for ArduinoSTL containers
 #include <cstdint>      // for uint8_t
+
 /**
  * @brief A class representing a wheel
  */
@@ -87,7 +86,7 @@ public:
   /**
    * @brief A structure representing the properties of a wheel
    */
-  typedef struct Properties {
+  using properties = struct Properties {
   public:
     /**
      * @brief Get the receive ID of the wheel
@@ -134,7 +133,7 @@ public:
      * @brief Whether the wheel is reversed
      */
     bool reverse{false};
-  } properties_t;
+  };
 
   /**
    * @brief Construct a new Wheel object
@@ -153,16 +152,16 @@ public:
   /**
    * @brief Returns the properties object for this wheel
    *
-   * @return properties_t The properties object for this wheel
+   * @return properties The properties object for this wheel
    */
-  properties_t Properties() const;
+  properties Properties() const;
 
   /**
    * @brief Returns the pin configuration object for this wheel
    *
-   * @return pin_configuration_t The pin configuration object for this wheel
+   * @return PinConfiguration The pin configuration object for this wheel
    */
-  pin_configuration_t Configuration() const;
+  PinConfiguration Configuration() const;
 
   /**
    * @brief Destroy the Wheel object
@@ -189,11 +188,11 @@ private:
   /**
    * @brief The properties object for this wheel
    */
-  properties_t properties_;
+  properties properties_;
 
   /**
    * @brief The pin configuration object for this wheel
    */
-  pin_configuration_t pin_configuration_;
+  PinConfiguration pin_configuration_;
 };
 #endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_

@@ -26,11 +26,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 #ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_
 #define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_
-
 #include <ArduinoSTL.h> // for ArduinoSTL containers
 #include <avr/io.h>     // for avr pins P*
 #include <cstdint>      // for uint8_t
@@ -40,88 +38,74 @@
  * connections for this firmware to work.
  *
  */
-typedef struct PinConfiguration {
+using PinConfiguration = struct PinConfiguration {
   /**
    * @brief Holds the motor brake pin number
-   *
    */
   uint8_t motor_brake;
 
   /**
    * @brief Holds the motor stop pin number
-   *
    */
   uint8_t motor_stop;
 
   /**
    * @brief Holds the motor encoder pin number
-   *
    */
   uint8_t motor_signal;
 
   /**
    * @brief Holds the motor direction pin number
-   *
    */
   uint8_t motor_direction;
 
   /**
    * @brief Holds the motor speed pin number
-   *
    */
   uint8_t motor_speed;
 
   /**
    * @brief Holds the CanBus board interrupt pin number
-   *
    */
   uint8_t can_mcp_irq;
 
   /**
    * @brief Holds the CanBus board receive pin number
-   *
    */
   uint8_t can_mcp_rcv;
 
   /**
    * @brief Holds the CanBus board mosi pin number
-   *
    */
   uint8_t can_mcp_mosi;
 
   /**
    * @brief Holds the CanBus board miso pin number
-   *
    */
   uint8_t can_mcp_miso;
 
   /**
    * @brief Holds the CanBus board serial clock pin number
-   *
    */
   uint8_t can_mcp_sck;
 
   /**
    * @brief Holds the FrontLeft wheel active pin number
-   *
    */
   uint8_t wheel_front_left;
 
   /**
    * @brief Holds the FrontRight wheel active pin number
-   *
    */
   uint8_t wheel_front_right;
 
   /**
    * @brief Holds the BackLeft wheel active pin number
-   *
    */
   uint8_t wheel_back_left;
 
   /**
    * @brief Holds the BackRight wheel active pin number
-   *
    */
   uint8_t wheel_back_right;
 
@@ -189,5 +173,5 @@ typedef struct PinConfiguration {
         can_mcp_sck{canMcpSck}, wheel_front_left{wheelFrontLeft},
         wheel_front_right{wheelFrontRight}, wheel_back_left{wheelBackLeft},
         wheel_back_right{wheelBackRight} {}
-} pin_configuration_t;
+};
 #endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_

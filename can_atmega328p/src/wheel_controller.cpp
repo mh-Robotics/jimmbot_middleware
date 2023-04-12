@@ -27,16 +27,15 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 #include "wheel_controller.h"  // for WheelController
 #include "constants.h"         // for k*
-#include "pin_configuration.h" // for PinConfiguration and k*
+#include "pin_configuration.h" // for internal::*
 
 #include <ArduinoSTL.h> // for ArduinoSTL containers
 #include <cmath>        // for M_PI
 
-#include "Arduino.h"
+#include "Arduino.h" // analogWrite() and micros()
 
 bool WheelController::Init(const Wheel &wheel) {
   wheel_ = &wheel;
@@ -138,7 +137,7 @@ void WheelController::SetSpeedAndDirection(const uint8_t &speed,
   SetSpeed(speed);
 }
 
-WheelController::wheel_status_t WheelController::WheelFeedbackStatus() const {
+WheelController::WheelStatus WheelController::WheelFeedbackStatus() const {
 
   const auto wheel_feedback_status = wheel_feedback_status_;
   // Reset all the values after the feedback is requested except the position

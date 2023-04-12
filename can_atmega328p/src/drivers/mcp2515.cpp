@@ -1,4 +1,5 @@
-#include "../include/mcp2515.h"
+#include "mcp2515.h" // for MCP2515
+
 #include <avr/io.h>     // for DDR* and PORT*
 #include <util/delay.h> // for _delay_ms
 

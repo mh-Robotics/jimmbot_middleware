@@ -26,9 +26,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
-#include "wheel.h" // for Wheel
+#include "wheel.h"             // for Wheel
+#include "pin_configuration.h" // for PinConfiguration
 
 #include <ArduinoSTL.h> // for ArduinoSTL containers
 #include <avr/io.h>     // for DDR*, PORT* and PIN*
@@ -49,9 +49,9 @@ bool Wheel::Init() {
   return EnumToCanId(DetermineWheel());
 }
 
-Wheel::properties_t Wheel::Properties() const { return properties_; }
+Wheel::properties Wheel::Properties() const { return properties_; }
 
-pin_configuration_t Wheel::Configuration() const { return pin_configuration_; }
+PinConfiguration Wheel::Configuration() const { return pin_configuration_; }
 
 bool Wheel::EnumToCanId(const Wheel::Wheel_Enum &wheelEnum) {
   switch (wheelEnum) {
