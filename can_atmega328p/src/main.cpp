@@ -28,12 +28,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
-#include "can_wrapper.h"        // for CanWrapper
-#include "iwheel_controller.h"  // for IWheelController
-#include "wheel.h"              // for Wheel
-#include "wheel_controller.h"   // for WheelController
+#include "Arduino.h" // for attachInterrupt, digitalPinToInterrupt and RISING
+#include "can_wrapper.h"       // for CanWrapper
+#include "iwheel_controller.h" // for IWheelController
+#include "wheel.h"             // for Wheel
+#include "wheel_controller.h"  // for WheelController
+
+#include <util/delay.h> // for _delay_ms
 
 Wheel wheel;
 WheelController wheel_controller;
@@ -65,8 +67,8 @@ void IsrEncoderPulse() { i_wheel_controller.UpdateWheelSignal(); }
 void setup() {
   wheel.Init();
   wheel_controller.Init(wheel);
-  can_wrapper.Init(wheel.Properties().ReceiveId(),
-                   wheel.Properties().TransmitId());
+  can_wrapper.Init(wheel.Properties().TransmitId(),
+                   wheel.Properties().ReceiveId());
   i_wheel_controller.Init(wheel_controller, can_wrapper);
 
   attachInterrupt(digitalPinToInterrupt(wheel.Configuration().motor_signal),
@@ -76,5 +78,7 @@ void setup() {
 void loop() {
   CanReceiveHandler();
   TimeoutCheckLoop();
-  delay(10);
+  // Loop needs to be updated at a rate of 20 Hz.
+  // @todo(jimmyhalimi): Update to timer interrupt.
+  _delay_ms(50);
 }

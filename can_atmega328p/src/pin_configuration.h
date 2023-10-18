@@ -26,128 +26,125 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
-#ifndef CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
-#define CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
-
-#include "Arduino.h"  // for digital*, analogWrite()
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <avr/io.h>     // for avr pins P*
+#include <cstdint>      // for uint8_t
 
 /**
  * @brief Pin Configuration structure that holds all the pin numbers and
  * connections for this firmware to work.
  *
  */
-typedef struct PinConfiguration {
+using PinConfiguration = struct PinConfiguration {
   /**
    * @brief Holds the motor brake pin number
-   *
    */
   uint8_t motor_brake;
 
   /**
    * @brief Holds the motor stop pin number
-   *
    */
   uint8_t motor_stop;
 
   /**
    * @brief Holds the motor encoder pin number
-   *
    */
   uint8_t motor_signal;
 
   /**
    * @brief Holds the motor direction pin number
-   *
    */
   uint8_t motor_direction;
 
   /**
    * @brief Holds the motor speed pin number
-   *
    */
   uint8_t motor_speed;
 
   /**
    * @brief Holds the CanBus board interrupt pin number
-   *
    */
   uint8_t can_mcp_irq;
 
   /**
    * @brief Holds the CanBus board receive pin number
-   *
    */
   uint8_t can_mcp_rcv;
 
   /**
    * @brief Holds the CanBus board mosi pin number
-   *
    */
   uint8_t can_mcp_mosi;
 
   /**
    * @brief Holds the CanBus board miso pin number
-   *
    */
   uint8_t can_mcp_miso;
 
   /**
    * @brief Holds the CanBus board serial clock pin number
-   *
    */
   uint8_t can_mcp_sck;
 
   /**
    * @brief Holds the FrontLeft wheel active pin number
-   *
    */
   uint8_t wheel_front_left;
 
   /**
    * @brief Holds the FrontRight wheel active pin number
-   *
    */
   uint8_t wheel_front_right;
 
   /**
    * @brief Holds the BackLeft wheel active pin number
-   *
    */
   uint8_t wheel_back_left;
 
   /**
    * @brief Holds the BackRight wheel active pin number
-   *
    */
   uint8_t wheel_back_right;
 
   /**
    * @brief Construct a new Pin Configuration object with default pin numbers
    *
+   *     ATMEL ATMEGA328P / ARDUINO
+   *
+   *                   +-\/-+
+   *             PC6  1|    |28  PC5 (AI 5)
+   *       (D 0) PD0  2|    |27  PC4 (AI 4)
+   *       (D 1) PD1  3|    |26  PC3 (AI 3)
+   *       (D 2) PD2  4|    |25  PC2 (AI 2)
+   *  PWM+ (D 3) PD3  5|    |24  PC1 (AI 1)
+   *       (D 4) PD4  6|    |23  PC0 (AI 0)
+   *             VCC  7|    |22  GND
+   *             GND  8|    |21  AREF
+   *             PB6  9|    |20  AVCC
+   *             PB7 10|    |19  PB5 (D 13)
+   *  PWM+ (D 5) PD5 11|    |18  PB4 (D 12)
+   *  PWM+ (D 6) PD6 12|    |17  PB3 (D 11) PWM
+   *       (D 7) PD7 13|    |16  PB2 (D 10) PWM
+   *       (D 8) PB0 14|    |15  PB1 (D 9) PWM
+   *                   +----+
+   *
+   *  (PWM+ indicates the additional PWM pins on the ATmega168.)
    */
   PinConfiguration()
-      : motor_brake{7},
-        motor_stop{4},
-        motor_signal{3},
-        motor_direction{5},
-        motor_speed{6},
-        can_mcp_irq{2},
-        can_mcp_rcv{10},
-        can_mcp_mosi{11},
-        can_mcp_miso{12},
-        can_mcp_sck{13},
-        wheel_front_left{A0},
-        wheel_front_right{A1},
-        wheel_back_left{A2},
-        wheel_back_right{A3} {}
+      : motor_brake{PD7}, motor_stop{PD4}, motor_signal{PD3},
+        motor_direction{PD5}, motor_speed{PD6}, can_mcp_irq{PD2},
+        can_mcp_rcv{PB2}, can_mcp_mosi{PB3}, can_mcp_miso{PB4},
+        can_mcp_sck{PB5}, wheel_front_left{PC0}, wheel_front_right{PC1},
+        wheel_back_left{PC2}, wheel_back_right{PC3} {}
 
   /**
    * @brief Construct a new Pin Configuration object with specified pin numbers
    *
    * @param motorBrake uint8_t PinNumber passed when called
-   * @param motorEnable uint8_t PinNumber passed when called
+   * @param motorStop uint8_t PinNumber passed when called
    * @param motorSignal uint8_t PinNumber passed when called
    * @param motorDirection uint8_t PinNumber passed when called
    * @param motorSpeed uint8_t PinNumber passed when called
@@ -161,33 +158,20 @@ typedef struct PinConfiguration {
    * @param wheelBackLeft uint8_t PinNumber passed when called
    * @param wheelBackRight uint8_t PinNumber passed when called
    */
-  PinConfiguration(const uint8_t& motorBrake, const uint8_t& motorEnable,
-                   const uint8_t& motorSignal, const uint8_t& motorDirection,
-                   const uint8_t& motorSpeed, const uint8_t& canMcpIrq,
-                   const uint8_t& canMcpRcv, const uint8_t& canMcpMosi,
-                   const uint8_t& canMcpMiso, const uint8_t& canMcpSck,
-                   const uint8_t& wheelFrontLeft,
-                   const uint8_t& wheelFrontRight, const uint8_t& wheelBackLeft,
-                   const uint8_t& wheelBackRight)
-      : motor_brake{motorBrake},
-        motor_stop{motorEnable},
-        motor_signal{motorSignal},
-        motor_direction{motorDirection},
-        motor_speed{motorSpeed},
-        can_mcp_irq{canMcpIrq},
-        can_mcp_rcv{canMcpRcv},
-        can_mcp_mosi{canMcpMosi},
-        can_mcp_miso{canMcpMiso},
-        can_mcp_sck{canMcpSck},
-        wheel_front_left{wheelFrontLeft},
-        wheel_front_right{wheelFrontRight},
-        wheel_back_left{wheelBackLeft},
+  PinConfiguration(const uint8_t &motorBrake, const uint8_t &motorStop,
+                   const uint8_t &motorSignal, const uint8_t &motorDirection,
+                   const uint8_t &motorSpeed, const uint8_t &canMcpIrq,
+                   const uint8_t &canMcpRcv, const uint8_t &canMcpMosi,
+                   const uint8_t &canMcpMiso, const uint8_t &canMcpSck,
+                   const uint8_t &wheelFrontLeft,
+                   const uint8_t &wheelFrontRight, const uint8_t &wheelBackLeft,
+                   const uint8_t &wheelBackRight)
+      : motor_brake{motorBrake}, motor_stop{motorStop},
+        motor_signal{motorSignal}, motor_direction{motorDirection},
+        motor_speed{motorSpeed}, can_mcp_irq{canMcpIrq}, can_mcp_rcv{canMcpRcv},
+        can_mcp_mosi{canMcpMosi}, can_mcp_miso{canMcpMiso},
+        can_mcp_sck{canMcpSck}, wheel_front_left{wheelFrontLeft},
+        wheel_front_right{wheelFrontRight}, wheel_back_left{wheelBackLeft},
         wheel_back_right{wheelBackRight} {}
-} pin_configuration_t;
-
-/**
- * @brief Timeout constant [ms] if no CanBus message is received
- *
- */
-constexpr uint8_t kTimeoutMs = 250;
-#endif  // CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_HPP_
+};
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_PIN_CONFIGURATION_H_

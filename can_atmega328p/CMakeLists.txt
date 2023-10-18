@@ -26,11 +26,11 @@ set(CMAKE_C_FLAGS "-Wall -Wextra -Wno-error=narrowing -Os -mmcu=${CPU} -DF_CPU=$
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-error=narrowing -Os -mmcu=${CPU} -DF_CPU=${CPU_FREQ}")
 
 include_directories(
-  src/drivers/include
+  src/drivers
 )
 
 set(${PROJECT_NAME}_drivers_src
-  src/drivers/src/mcp2515.cpp
+  src/drivers/mcp2515.cpp
 )
 
 set(${PROJECT_NAME}_src

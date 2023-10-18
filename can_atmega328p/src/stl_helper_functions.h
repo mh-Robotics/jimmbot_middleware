@@ -1,5 +1,5 @@
-#ifndef STL_HELPER_FUNCTIONS_H_
-#define STL_HELPER_FUNCTIONS_H_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_STL_HELPER_FUNCTIONS_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_STL_HELPER_FUNCTIONS_H_
 
 namespace std {
 /**
@@ -31,11 +31,28 @@ struct once_flag {
  * @param args Additional arguments to be passed to the function.
  */
 template <class Callable, class... Args>
-void inline call_once(once_flag& flag, Callable&& f, Args&&... args) {
+void inline call_once(once_flag &flag, Callable &&f, Args &&...args) {
   if (!flag.is_called) {
     f();
     flag.is_called = true;
   }
 }
-}  // namespace std
-#endif  // STL_HELPER_FUNCTIONS_H_
+
+/**
+ * Returns an iterator that points to the element n positions before it.
+ *
+ * @tparam ForwardIterator the type of the iterator
+ * @param it the iterator to start from
+ * @param n the number of positions to move backward (default 1)
+ * @return the iterator pointing to the element n positions before it
+ */
+template <typename ForwardIterator>
+ForwardIterator prev(ForwardIterator it, int n = 1) {
+  while (n > 0) {
+    --it;
+    --n;
+  }
+  return it;
+}
+} // namespace std
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_STL_HELPER_FUNCTIONS_H_

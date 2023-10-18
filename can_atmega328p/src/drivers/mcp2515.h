@@ -200,7 +200,7 @@ enum CAN_CLKOUT {
 };
 
 class MCP2515 {
- public:
+public:
   enum ERROR {
     ERROR_OK = 0,
     ERROR_FAIL = 1,
@@ -240,7 +240,7 @@ class MCP2515 {
     EFLG_EWARN = (1 << 0)
   };
 
- private:
+private:
   static const uint8_t CANCTRL_REQOP = 0xE0;
   static const uint8_t CANCTRL_ABAT = 0x10;
   static const uint8_t CANCTRL_OSM = 0x08;
@@ -400,7 +400,7 @@ class MCP2515 {
     MCP_RXB1DATA = 0x76
   };
 
-  static const uint32_t DEFAULT_SPI_CLOCK = 10000000;  // 10MHz
+  static const uint32_t DEFAULT_SPI_CLOCK = 10000000; // 10MHz
 
   static const int N_TXBUFFERS = 3;
   static const int N_RXBUFFERS = 2;
@@ -420,9 +420,9 @@ class MCP2515 {
 
   uint8_t SPICS;
   uint32_t SPI_CLOCK;
-  SPIClass* SPIn;
+  SPIClass *SPIn;
 
- private:
+private:
   void startSPI();
   void endSPI();
 
@@ -436,11 +436,12 @@ class MCP2515 {
   void modifyRegister(const REGISTER reg, const uint8_t mask,
                       const uint8_t data);
 
-  void prepareId(uint8_t* buffer, const bool ext, const uint32_t id);
+  void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
 
- public:
-  MCP2515(const uint8_t _CS = 10, const uint32_t _SPI_CLOCK = DEFAULT_SPI_CLOCK,
-          SPIClass* _SPI = nullptr);
+public:
+  MCP2515(const uint8_t _CS = PB2,
+          const uint32_t _SPI_CLOCK = DEFAULT_SPI_CLOCK,
+          SPIClass *_SPI = nullptr);
   ERROR reset(void);
   ERROR setConfigMode();
   ERROR setListenOnlyMode();
@@ -452,10 +453,10 @@ class MCP2515 {
   ERROR setBitrate(const CAN_SPEED canSpeed, const CAN_CLOCK canClock);
   ERROR setFilterMask(const MASK num, const bool ext, const uint32_t ulData);
   ERROR setFilter(const RXF num, const bool ext, const uint32_t ulData);
-  ERROR sendMessage(const TXBn txbn, const can_frame_t* frame);
-  ERROR sendMessage(const can_frame_t* frame);
-  ERROR readMessage(const RXBn rxbn, can_frame_t* frame);
-  ERROR readMessage(can_frame_t* frame);
+  ERROR sendMessage(const TXBn txbn, const can_frame_t *frame);
+  ERROR sendMessage(const can_frame_t *frame);
+  ERROR readMessage(const RXBn rxbn, can_frame_t *frame);
+  ERROR readMessage(can_frame_t *frame);
   bool checkReceive(void);
   bool checkError(void);
   uint8_t getErrorFlags(void);

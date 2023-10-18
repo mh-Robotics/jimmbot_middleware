@@ -25,12 +25,14 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
-#ifndef CAN_ATMEGA328P_SRC_WHEEL_HPP_
-#define CAN_ATMEGA328P_SRC_WHEEL_HPP_
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_
+#include "constants.h"         // for k*
+#include "pin_configuration.h" // for PinConfiguration
 
-#include "pin_configuration.h"  // for PinConfiguration
+#include <ArduinoSTL.h> // for ArduinoSTL containers
+#include <cstdint>      // for uint8_t
 
 /**
  * @brief A class representing a wheel
@@ -66,7 +68,7 @@ class Wheel {
     kEnd
   };
 
- public:
+public:
   /**
    * @brief An enum representing the different commands
    */
@@ -84,67 +86,39 @@ class Wheel {
   /**
    * @brief A structure representing the properties of a wheel
    */
-  typedef struct Properties {
-   public:
+  using properties = struct Properties {
+  public:
     /**
      * @brief Get the receive ID of the wheel
      *
      * @return The receive ID of the wheel
      */
-    uint8_t ReceiveId(void) const { return command_id; }
+    uint8_t ReceiveId() const { return command_id; }
 
     /**
      * @brief Set the receive ID of the wheel
      *
      * @param command_id The receive ID of the wheel
      */
-    void ReceiveId(const uint8_t& command_id) { this->command_id = command_id; }
+    void ReceiveId(const uint8_t &command_id) { this->command_id = command_id; }
 
     /**
      * @brief Get the transmit ID of the wheel
      *
      * @return The transmit ID of the wheel
      */
-    uint8_t TransmitId(void) const { return feedback_id; }
+    uint8_t TransmitId() const { return feedback_id; }
 
     /**
      * @brief Set the transmit ID of the wheel
      *
      * @param feedback_id The transmit ID of the wheel
      */
-    void TransmitId(const uint8_t& feedback_id) {
+    void TransmitId(const uint8_t &feedback_id) {
       this->feedback_id = feedback_id;
     }
 
-    /**
-     * @brief Get whether the wheel is reversed
-     *
-     * @return True if the wheel is reversed, false otherwise
-     */
-    bool Reverse(void) const { return reverse; }
-
-    /**
-     * @brief Set whether the wheel is reversed
-     *
-     * @param reverse True if the wheel is reversed, false otherwise
-     */
-    void Reverse(const bool& reverse) { this->reverse = reverse; }
-
-    /**
-     * @brief Get the radius of the wheel
-     *
-     * @return double The radius in centimeters
-     */
-    double Radius(void) const { return kRadius; }
-
-    /**
-     * @brief Get the number of encoder pulses per revolution of the wheel
-     *
-     * @return int The number of pulses
-     */
-    int PulsePerRevolution(void) const { return kPulsePerRevolution; }
-
-   private:
+  private:
     /**
      * @brief The CAN ID for sending commands to the wheel
      */
@@ -159,22 +133,12 @@ class Wheel {
      * @brief Whether the wheel is reversed
      */
     bool reverse{false};
-
-    /**
-     * @brief The radius of the wheel in centimeters
-     */
-    const double kRadius{8.25};
-
-    /**
-     * @brief The number of encoder pulses per revolution of the wheel
-     */
-    const int kPulsePerRevolution{90};
-  } properties_t;
+  };
 
   /**
    * @brief Construct a new Wheel object
    */
-  Wheel(void) = default;
+  Wheel() = default;
 
   /**
    * @brief Initialize the Wheel object with given pin configuration
@@ -183,28 +147,28 @@ class Wheel {
    * @return true Initialization successful
    * @return false Initialization failed
    */
-  bool Init(void);
+  bool Init();
 
   /**
    * @brief Returns the properties object for this wheel
    *
-   * @return properties_t The properties object for this wheel
+   * @return properties The properties object for this wheel
    */
-  properties_t Properties(void) const;
+  properties Properties() const;
 
   /**
    * @brief Returns the pin configuration object for this wheel
    *
-   * @return pin_configuration_t The pin configuration object for this wheel
+   * @return PinConfiguration The pin configuration object for this wheel
    */
-  pin_configuration_t Configuration(void) const;
+  PinConfiguration Configuration() const;
 
   /**
    * @brief Destroy the Wheel object
    */
   ~Wheel() = default;
 
- private:
+private:
   /**
    * @brief Sets the specific properties for the wheel
    *
@@ -212,23 +176,23 @@ class Wheel {
    * @return true Setting properties successful
    * @return false Setting properties failed
    */
-  bool EnumToCanId(const Wheel::Wheel_Enum& wheelEnum);
+  bool EnumToCanId(const Wheel::Wheel_Enum &wheelEnum);
 
   /**
    * @brief Determines which wheel this object belongs to
    *
    * @return Wheel_Enum The enum value of the wheel this object belongs to
    */
-  Wheel_Enum DetermineWheel(void);
+  Wheel_Enum DetermineWheel();
 
   /**
    * @brief The properties object for this wheel
    */
-  properties_t properties_;
+  properties properties_;
 
   /**
    * @brief The pin configuration object for this wheel
    */
-  pin_configuration_t pin_configuration_;
+  PinConfiguration pin_configuration_;
 };
-#endif  // CAN_ATMEGA328P_SRC_WHEEL_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_WHEEL_H_

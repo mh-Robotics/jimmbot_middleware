@@ -25,20 +25,18 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
-#ifndef CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
-#define CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
-
-#include "can_wrapper.h"       // for CanWrapper
-#include "wheel_controller.h"  // for WheelController
+#ifndef JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_H_
+#define JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_H_
+#include "can_wrapper.h"      // for CanWrapper
+#include "wheel_controller.h" // for WheelController
 
 /**
  * @brief Interface for a wheel controller.
  *
  */
 class IWheelController {
- public:
+public:
   /**
    * @brief Construct a new IWheelController object.
    *
@@ -53,96 +51,96 @@ class IWheelController {
    * @param can_wrapper The CanWrapper object.
    * @return true if initialization is successful, false otherwise.
    */
-  bool Init(WheelController& wheel_controller, CanWrapper& can_wrapper);
+  bool Init(WheelController &wheel_controller, CanWrapper &can_wrapper);
 
   /**
    * @brief Returns the status of the CommandReady flag.
    *
    * @return true if the CommandReady flag is set, false otherwise.
    */
-  bool CommandReady(void) const;
+  bool CommandReady() const;
 
   /**
    * @brief Sets the CommandReady flag to the specified value.
    *
    * @param flag The value to set the CommandReady flag to.
    */
-  void CommandReady(bool flag);
+  void CommandReady(const bool &flag);
 
   /**
    * @brief Returns the status of the FeedbackReady flag.
    *
    * @return true if the FeedbackReady flag is set, false otherwise.
    */
-  bool FeedbackReady(void) const;
+  bool FeedbackReady() const;
 
   /**
    * @brief Sets the FeedbackReady flag to the specified value.
    *
    * @param flag The value to set the FeedbackReady flag to.
    */
-  void FeedbackReady(bool flag);
+  void FeedbackReady(const bool &flag);
 
   /**
    * @brief Updates the CAN message for the wheel controller.
    *
    * @return true if the update is successful, false otherwise.
    */
-  bool UpdateCanMessage(void);
+  bool UpdateCanMessage();
 
   /**
    * @brief Updates the empty CAN message for the wheel controller.
    *
    * @return true if the update is successful, false otherwise.
    */
-  bool UpdateEmptyCanMessage(void) const;
+  bool UpdateEmptyCanMessage() const;
 
   /**
    * @brief Updates the wheel signal for the wheel controller.
    */
-  void UpdateWheelSignal(void) const;
+  void UpdateWheelSignal() const;
 
   /**
    * @brief Callback function for the command.
    *
    * @return true if the callback is successful, false otherwise.
    */
-  bool CommandCallback(void);
+  bool CommandCallback();
 
   /**
    * @brief Callback function for the feedback.
    *
    * @return true if the callback is successful, false otherwise.
    */
-  bool FeedbackCallback(void);
+  bool FeedbackCallback();
 
   /**
    * @brief Callback function for the timeout check.
    *
    * @return true if the callback is successful, false otherwise.
    */
-  bool TimeoutCheckCallback(void) const;
+  bool TimeoutCheckCallback() const;
 
   /**
    * @brief Destroy the IWheelController object.
    */
-  ~IWheelController(void) = default;
+  ~IWheelController() = default;
 
- private:
+private:
   /**
    * @brief Updates the timeout for the wheel controller.
    */
-  void UpdateTimeout(void) const;
+  void UpdateTimeout() const;
 
   /**
    * @brief The WheelController object for the wheel controller.
    */
-  WheelController* wheel_controller_{nullptr};
+  WheelController *wheel_controller_{nullptr};
 
   /**
    * @brief The CanWrapper object for the wheel controller.
    */
-  CanWrapper* can_wrapper_{nullptr};
+  CanWrapper *can_wrapper_{nullptr};
 
   /**
    * @brief Flag for updating the wheel controller.
@@ -154,4 +152,4 @@ class IWheelController {
    */
   volatile bool feedback_flag_;
 };
-#endif  // CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_HPP_
+#endif // JIMMBOT_BOARDS_FIRMWARE_CAN_ATMEGA328P_SRC_IWHEEL_CONTROLLER_H_
