@@ -33,13 +33,13 @@ import rospkg
 import rosserial_client
 from rosserial_client.make_library import *
 
-THIS_PACKAGE = "jimmbot_boards_firmware"
+THIS_PACKAGE = "jimmbot_middleware"
 
 __usage__ = """
 make_libraries.py generates the ESP32 rosserial library files for ESP32 (ESP-IDF).
 It requires the location of your esp-idf/components folder.
 
-rosrun jimmbot_boards_firmware make_libraries.py $IDF_PATH/components
+rosrun jimmbot_middleware make_libraries.py $IDF_PATH/components
 """
 
 # for copying files
@@ -79,29 +79,29 @@ print("\nExporting to %s" % path)
 
 rospack = rospkg.RosPack()
 
-# Create jimmbot_boards_firmware component folder if it doesn't exists
-if not os.path.exists(path+"/jimmbot_boards_firmware/"):
-    os.makedirs(path+"/jimmbot_boards_firmware/include/")
-    with open(path+"/jimmbot_boards_firmware/component.mk", "w") as file:
+# Create jimmbot_middleware component folder if it doesn't exists
+if not os.path.exists(path+"/jimmbot_middleware/"):
+    os.makedirs(path+"/jimmbot_middleware/include/")
+    with open(path+"/jimmbot_middleware/component.mk", "w") as file:
         pass
 
 # copy ros_lib stuff in
-jimmbot_boards_firmware_dir = rospack.get_path(THIS_PACKAGE)
-files = os.listdir(jimmbot_boards_firmware_dir+"/ros_lib")
+jimmbot_middleware_dir = rospack.get_path(THIS_PACKAGE)
+files = os.listdir(jimmbot_middleware_dir+"/ros_lib")
 for f in files:
-    if os.path.isfile(jimmbot_boards_firmware_dir+"/ros_lib/"+f):
+    if os.path.isfile(jimmbot_middleware_dir+"/ros_lib/"+f):
         if f.endswith(".h"):
-            shutil.copy(jimmbot_boards_firmware_dir+"/ros_lib/"+f, path+"/jimmbot_boards_firmware/include/")
+            shutil.copy(jimmbot_middleware_dir+"/ros_lib/"+f, path+"/jimmbot_middleware/include/")
         else:
-            shutil.copy(jimmbot_boards_firmware_dir+"/ros_lib/"+f, path+"/jimmbot_boards_firmware/")
+            shutil.copy(jimmbot_middleware_dir+"/ros_lib/"+f, path+"/jimmbot_middleware/")
 
-rosserial_client_copy_files(rospack, path+"/jimmbot_boards_firmware/include/")
+rosserial_client_copy_files(rospack, path+"/jimmbot_middleware/include/")
 
 # generate messages
-rosserial_generate(rospack, path+"/jimmbot_boards_firmware/include/", ROS_TO_EMBEDDED_TYPES)
+rosserial_generate(rospack, path+"/jimmbot_middleware/include/", ROS_TO_EMBEDDED_TYPES)
 
 # Move source files to parent directory
-src_files = os.listdir(path+"/jimmbot_boards_firmware/include/")
+src_files = os.listdir(path+"/jimmbot_middleware/include/")
 for f in src_files:
     if f.endswith(".cpp"):
-        shutil.move(path+"/jimmbot_boards_firmware/include/"+f, path+"/jimmbot_boards_firmware/")
+        shutil.move(path+"/jimmbot_middleware/include/"+f, path+"/jimmbot_middleware/")
