@@ -77,7 +77,6 @@ constexpr int kEnableLightRightMsgIndex = 7;
 bool rightLightOn{false};
 
 ros::NodeHandle nh;
-void canFrameFeedbackCallback(void);
 ros::Publisher canFramePublisher(kFeedbackTopicCanMsg, &feedback_msg);
 void canFrameCallback(const jimmbot_msgs::CanFrameStamped &data_msg);
 ros::Subscriber<jimmbot_msgs::CanFrameStamped>

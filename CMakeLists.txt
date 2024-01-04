@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(jimmbot_boards_firmware)
+project(jimmbot_middleware)
 
 add_compile_options(-std=c++17)
 
@@ -10,8 +10,6 @@ catkin_package()
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
-
-# add_subdirectory(can_atmega328p)
 
 install(DIRECTORY
   ros_lib

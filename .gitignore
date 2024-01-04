@@ -3,13 +3,8 @@
 
 build/
 
-can_atmega328p/.vscode/
-can_atmega328p/build/
-can_atmega328p/docs/
-can_atmega328p/doxygen_warnings.log
-
-can_esp32/.vscode/
-can_esp32/build/
-can_esp32/docs/
-can_esp32/doxygen_warnings.log
-can_esp32/sdkconfig
+firmware/.vscode/
+firmware/build/
+firmware/docs/
+firmware/doxygen_warnings.log
+firmware/sdkconfig

@@ -1,4 +1,4 @@
-# jimmbot_boards_firmware
+# jimmbot_middleware
 
 Jimmbot Boards Firmware is a package designed to control wheel controllers and ESP32 modules that connect the ROS master
 with the CAN network to control the wheels. The firmware can be used to command the bldc wheel drive ZS-X11H V2, which
@@ -18,16 +18,15 @@ generated only once.
 ```bash
 cd path/to/catkin_ws/src/
 git clone 
-rosrun jimmbot_boards_firmware make_libraries.py $IDF_PATH/components/ jimmbot_msgs
+rosrun jimmbot_middleware make_libraries.py $IDF_PATH/components/ jimmbot_msgs
 ```
 
 Once the above commands have been executed, all the necessary ROS files and custom messages will have been generated in
-`$IDF_PATH/components/jimmbot_boards_firmware/`.
+`$IDF_PATH/components/jimmbot_middleware/`.
 
 ## Firmware
 
-* [can_atmega328p_firmware](can_atmega328p/README.md)
-* [can_esp32_firmware](can_esp32/README.md)
+* [middleware_firmware](firmware/README.md)
 
 These firmware types enable communication between the ESP32 module and the CAN network. The CAN ATmega328P firmware
 is designed for controlling the ATmega328P microcontroller-based boards, while the CAN ESP32 firmware is designed for
