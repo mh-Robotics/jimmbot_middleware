@@ -49,8 +49,16 @@ To use WiFi instead of the default UART communication mode, follow these steps:
 
 1. Enable rosserial over WiFi
 
-```bash
-`idf.py menuconfig` -> `Component config` -> `rosserial` ->`rosserial over WiFi using TCP`
-```
+    ```bash
+    `idf.py menuconfig` -> `Component config` -> `rosserial` ->`rosserial over WiFi using TCP`
+    ```
 
-2. Enter WiFi and server details
+2. Enter WiFi and server details in Kconfig
+
+    ```bash
+    config ROSSERVER_AP
+        string "WiFi SSID"
+
+    config ROSSERVER_PASS
+        string "WiFi Password"
+    ```
