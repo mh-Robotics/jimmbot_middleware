@@ -85,9 +85,21 @@ esp_err_t rosserial_spinonce(void);
 /**
  * @brief Spin the ROS Node callback, and publish feedback
  *
- * @return esp_err_t Return error code with success or fail
+ * Continuously processes ROS callbacks and CAN messages. Will exit gracefully if:
+ * - ROS connection is lost (after 10 consecutive spinOnce failures)
+ * - Global should_exit flag is set
+ *
+ * @return esp_err_t Return error code with success (ESP_OK) or fail
  */
 esp_err_t rosserial_spin(void);
+
+/**
+ * @brief Request graceful shutdown of ROS and CAN systems
+ *
+ * Sets the should_exit flag which will cause rosserial_spin() to exit,
+ * allowing cleanup code in main() to execute properly.
+ */
+extern volatile bool should_exit;
 
 #ifdef __cplusplus
 }

@@ -33,6 +33,7 @@
 
 #include "driver/gpio.h"                  // for gpio_*
 #include "driver/twai.h"                  // for twai_*
+#include "esp_log.h"                      // for ESP_LOG*
 #include "jimmbot_msgs/CanFrame.h"        // for jimmbot_msgs::CanFrame
 #include "jimmbot_msgs/CanFrameStamped.h" // for jimmbot_msgs::CanFrameStamped
 
@@ -43,6 +44,8 @@ constexpr auto kCanRxTxDelayMs = 100;
 constexpr auto kCanRxTxQueueLen = 10;
 
 constexpr auto kLightCanMsgId{0x31};
+
+static const char *TAG = "CAN_ESP32";
 
 constexpr auto kGpioCanTransmit{GPIO_NUM_21};
 constexpr auto kGpioCanReceive{GPIO_NUM_22};
@@ -75,6 +78,8 @@ constexpr int kEnableLightLeftMsgIndex = 3;
 bool leftLightOn{false};
 constexpr int kEnableLightRightMsgIndex = 7;
 bool rightLightOn{false};
+
+static volatile bool should_exit = false;
 
 ros::NodeHandle nh;
 ros::Publisher canFramePublisher(kFeedbackTopicCanMsg, &feedback_msg);
@@ -115,18 +120,21 @@ toJimmBotCanMessage(const twai_message_t &twai_msg) {
 }
 
 static void can_transmit_task(void *arg) {
-  while (true) {
+  while (!should_exit) {
     jimmbot_msgs::CanFrameStamped data_msg;
     if (xQueueReceive(tx_task_queue, &data_msg,
                       pdMS_TO_TICKS(kCanRxTxDelayMs)) == pdPASS) {
       twai_message_t twai_msg = toTwaiMessage(data_msg);
-      twai_transmit(&twai_msg, pdMS_TO_TICKS(kCanRxTxDelayMs));
+      esp_err_t tx_err = twai_transmit(&twai_msg, pdMS_TO_TICKS(kCanRxTxDelayMs));
+      if (tx_err != ESP_OK) {
+        ESP_LOGE("CAN_TX", "Failed to transmit CAN message: 0x%x", tx_err);
+      }
     }
   }
 }
 
 static void can_receive_task(void *arg) {
-  while (true) {
+  while (!should_exit) {
     twai_message_t rx_msg;
     if (twai_receive(&rx_msg, pdMS_TO_TICKS(kCanRxTxDelayMs)) == ESP_OK) {
       feedback_msg.header.frame_id = kFeedbackFrameId;
@@ -140,25 +148,45 @@ static void can_receive_task(void *arg) {
 
 void canFrameCallback(const jimmbot_msgs::CanFrameStamped &data_msg) {
   if (data_msg.can_frame.id == kLightCanMsgId) {
-    if (leftLightOn != data_msg.can_frame.data[kEnableLightLeftMsgIndex]) {
-      leftLightOn = data_msg.can_frame.data[kEnableLightLeftMsgIndex];
-      gpio_set_level(kGpioOutputLightLeft, leftLightOn);
+    // Validate DLC is sufficient for light control indices
+    if (data_msg.can_frame.dlc < 8) {
+      ESP_LOGW("CAN_CB", "Light control message DLC too small: %u", data_msg.can_frame.dlc);
+      return;
     }
-    if (rightLightOn != data_msg.can_frame.data[kEnableLightRightMsgIndex]) {
-      rightLightOn = data_msg.can_frame.data[kEnableLightRightMsgIndex];
+
+    // Validate left light value (must be 0x00 or 0x01)
+    uint8_t left_val = data_msg.can_frame.data[kEnableLightLeftMsgIndex];
+    if (left_val != 0x00 && left_val != 0x01) {
+      ESP_LOGW("CAN_CB", "Invalid left light value: 0x%02x (must be 0x00 or 0x01)", left_val);
+    } else if (leftLightOn != (bool)left_val) {
+      leftLightOn = (bool)left_val;
+      gpio_set_level(kGpioOutputLightLeft, leftLightOn);
+      ESP_LOGI("CAN_CB", "Left light set to %u", leftLightOn);
+    }
+
+    // Validate right light value (must be 0x00 or 0x01)
+    uint8_t right_val = data_msg.can_frame.data[kEnableLightRightMsgIndex];
+    if (right_val != 0x00 && right_val != 0x01) {
+      ESP_LOGW("CAN_CB", "Invalid right light value: 0x%02x (must be 0x00 or 0x01)", right_val);
+    } else if (rightLightOn != (bool)right_val) {
+      rightLightOn = (bool)right_val;
       gpio_set_level(kGpioOutputLightRight, rightLightOn);
+      ESP_LOGI("CAN_CB", "Right light set to %u", rightLightOn);
     }
 
     return;
   }
 
-  xQueueSend(tx_task_queue, &data_msg, pdMS_TO_TICKS(kCanRxTxDelayMs));
+  BaseType_t queue_result = xQueueSend(tx_task_queue, &data_msg, pdMS_TO_TICKS(kCanRxTxDelayMs));
+  if (queue_result != pdPASS) {
+    ESP_LOGE("CAN_CB", "Failed to queue CAN message for transmission (queue full)");
+  }
 }
 
 esp_err_t can_init(void) {
   esp_err_t err;
 
-  tx_task_queue = xQueueCreate(1, sizeof(jimmbot_msgs::CanFrameStamped));
+  tx_task_queue = xQueueCreate(kCanRxTxQueueLen, sizeof(jimmbot_msgs::CanFrameStamped));
 
   err = twai_driver_install(&g_config, &t_config, &f_config);
   err = twai_start();
@@ -168,6 +196,10 @@ esp_err_t can_init(void) {
 
 esp_err_t can_destroy(void) {
   esp_err_t err;
+
+  // Signal tasks to exit
+  should_exit = true;
+  vTaskDelay(pdMS_TO_TICKS(200)); // Give tasks time to exit gracefully
 
   if (txHandle != NULL) {
     vTaskDelete(txHandle);
@@ -230,12 +262,28 @@ esp_err_t rosserial_spinonce(void) {
 }
 
 esp_err_t rosserial_spin(void) {
-  while (true) {
-    rosserial_spinonce();
+  const int kMaxConsecutiveFailures = 10;
+  int consecutive_failures = 0;
 
-    // @todo Find a way to break this when not connected with ROS PC
-    // if (!nh.connected()) { break; }
+  while (!should_exit) {
+    esp_err_t spin_result = rosserial_spinonce();
+
+    // Track connection failures
+    if (spin_result != ESP_OK) {
+      consecutive_failures++;
+      if (consecutive_failures >= kMaxConsecutiveFailures) {
+        ESP_LOGW("ROS_SPIN", "ROS connection lost (failures: %d), initiating shutdown",
+                 consecutive_failures);
+        should_exit = true;
+        break;
+      }
+    } else {
+      consecutive_failures = 0; // Reset on successful spin
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(1)); // Prevent watchdog starvation
   }
 
-  return ESP_FAIL;
+  ESP_LOGI("ROS_SPIN", "ROS spin loop exiting gracefully");
+  return ESP_OK;
 }
