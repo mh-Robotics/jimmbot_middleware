@@ -24,7 +24,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  -->
-<package format="2">
+<package format="3">
   <name>jimmbot_middleware</name>
   <version>0.1.0</version>
   <description>mhRobotics jimmBOT esp32 firmware</description>
@@ -38,13 +38,12 @@ SOFTWARE.
 
   <license>MIT</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>jimmbot_msgs</build_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>jimmbot_msgs</depend>
 
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>rosserial_client</exec_depend>
-  <exec_depend>rosserial_msgs</exec_depend>
+  <exec_depend>python3</exec_depend>
 
   <export>
+    <build_type>ament_cmake</build_type>
   </export>
 </package>
